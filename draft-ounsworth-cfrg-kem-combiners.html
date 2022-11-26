@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta content="Common,Latin" name="scripts">
 <meta content="initial-scale=1.0" name="viewport">
-<title>Combiner function for hybrid key encapsulation mechanisms (KEMs)</title>
+<title>Combiner function for hybrid key encapsulation mechanisms (Hybrid KEMs)</title>
 <meta content="Mike Ounsworth" name="author">
 <meta content="
        The migration to post-quantum cryptography often calls for performing multiple key encapsulations in parallel and then combining their outputs to derive a single shared secret. 
@@ -1209,7 +1209,7 @@ li > p:last-of-type {
 </dd>
 </dl>
 </div>
-<h1 id="title">Combiner function for hybrid key encapsulation mechanisms (KEMs)</h1>
+<h1 id="title">Combiner function for hybrid key encapsulation mechanisms (Hybrid KEMs)</h1>
 <section id="section-abstract">
       <h2 id="abstract"><a href="#abstract" class="selfRef">Abstract</a></h2>
 <p id="section-abstract-1">The migration to post-quantum cryptography often calls for performing multiple key encapsulations in parallel and then combining their outputs to derive a single shared secret.<a href="#section-abstract-1" class="pilcrow">¶</a></p>
@@ -1277,6 +1277,11 @@ li > p:last-of-type {
 <nav class="toc"><ul class="compact toc ulBare ulEmpty">
 <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.1">
             <p id="section-toc.1-1.1.1" class="keepWithNext"><a href="#section-1" class="xref">1</a>.  <a href="#name-terminology-2" class="xref">Terminology</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.1.2.1">
+                <p id="section-toc.1-1.1.2.1.1" class="keepWithNext"><a href="#section-1.1" class="xref">1.1</a>.  <a href="#name-key-encapsulation-mechanisms" class="xref">Key Encapsulation Mechanisms</a></p>
+</li>
+            </ul>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.2">
             <p id="section-toc.1-1.2.1"><a href="#section-2" class="xref">2</a>.  <a href="#name-introduction-2" class="xref">Introduction</a></p>
@@ -1285,13 +1290,10 @@ li > p:last-of-type {
                 <p id="section-toc.1-1.2.2.1.1" class="keepWithNext"><a href="#section-2.1" class="xref">2.1</a>.  <a href="#name-kem-psk-hybrids-2" class="xref">KEM/PSK hybrids</a></p>
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.2.2.2">
-                <p id="section-toc.1-1.2.2.2.1" class="keepWithNext"><a href="#section-2.2" class="xref">2.2</a>.  <a href="#name-pq-traditional-hybrid-kems-2" class="xref">PQ/Traditional hybrid KEMs</a></p>
+                <p id="section-toc.1-1.2.2.2.1"><a href="#section-2.2" class="xref">2.2</a>.  <a href="#name-pq-traditional-hybrid-kems-2" class="xref">PQ/Traditional hybrid KEMs</a></p>
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.2.2.3">
                 <p id="section-toc.1-1.2.2.3.1"><a href="#section-2.3" class="xref">2.3</a>.  <a href="#name-kem-based-ake-2" class="xref">KEM-based AKE</a></p>
-</li>
-              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.2.2.4">
-                <p id="section-toc.1-1.2.2.4.1"><a href="#section-2.4" class="xref">2.4</a>.  <a href="#name-key-encapsulation-mechanisms" class="xref">Key Encapsulation Mechanisms</a></p>
 </li>
             </ul>
 </li>
@@ -1363,6 +1365,23 @@ li > p:last-of-type {
       </h2>
 <p id="section-1-1">The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in BCP 14 <span>[<a href="#RFC2119" class="xref">RFC2119</a>]</span>  <span>[<a href="#RFC8174" class="xref">RFC8174</a>]</span> when, and only when, they appear in all capitals, as shown here.<a href="#section-1-1" class="pilcrow">¶</a></p>
 <p id="section-1-2">This document is consistent with all terminology defined in <span>[<a href="#I-D.driscoll-pqt-hybrid-terminology" class="xref">I-D.driscoll-pqt-hybrid-terminology</a>]</span>.<a href="#section-1-2" class="pilcrow">¶</a></p>
+<div id="sec-kem-defn">
+<section id="section-1.1">
+        <h3 id="name-key-encapsulation-mechanisms">
+<a href="#section-1.1" class="section-number selfRef">1.1. </a><a href="#name-key-encapsulation-mechanisms" class="section-name selfRef">Key Encapsulation Mechanisms</a>
+        </h3>
+<p id="section-1.1-1">For the purposes of this document, we consider a Key Encapsulation Mechanism (KEM) to be any asymmetric cryptographic scheme comprised of algorithms satisfying the following interfaces <span>[<a href="#PQCAPI" class="xref">PQCAPI</a>]</span>.<a href="#section-1.1-1" class="pilcrow">¶</a></p>
+<div class="alignLeft art-text artwork" id="section-1.1-2">
+<pre>
+def kemKeyGen() -&gt; (pk, sk)
+def kemEncaps(pk) -&gt; (ct, ss)
+def kemDecaps(ct, sk) -&gt; ss
+</pre><a href="#section-1.1-2" class="pilcrow">¶</a>
+</div>
+<p id="section-1.1-3">where <code>pk</code> is public key, <code>sk</code> is secret key, <code>ct</code> is ciphertext, and <code>ss</code> is shared secret.<a href="#section-1.1-3" class="pilcrow">¶</a></p>
+<p id="section-1.1-4">KEMs are typically used in cases where two parties, hereby refereed to as the "encapsulater" and the "decapsulater", wish to establish a shared secret via public key cryptography, where the decapsulater has an asymmetric key pair and has previously shared the public key with the encapsulater.<a href="#section-1.1-4" class="pilcrow">¶</a></p>
+</section>
+</div>
 </section>
 </div>
 <div id="sec-intro">
@@ -1409,24 +1428,7 @@ li > p:last-of-type {
         <h3 id="name-kem-based-ake-2">
 <a href="#section-2.3" class="section-number selfRef">2.3. </a><a href="#name-kem-based-ake-2" class="section-name selfRef">KEM-based AKE</a>
         </h3>
-<p id="section-2.3-1">The need for a KEM-based authenticated key establishment arises, for example, when two communicating parties each have long-term KEM keys (for example in X.509 certificates), and wish to involve both KEM keys in deriving a mutually-authenticated shared secret. In particular this will arise for any protocol that needs to provide post-quantum replacements for static-static (elliptic curve) Diffie-Hellman mechanisms. Examples include <span>[<a href="#I-D.ietf-lamps-cmp-updates" class="xref">I-D.ietf-lamps-cmp-updates</a>]</span> .. TODO: cite others.<a href="#section-2.3-1" class="pilcrow">¶</a></p>
-</section>
-</div>
-<div id="sec-kem-defn">
-<section id="section-2.4">
-        <h3 id="name-key-encapsulation-mechanisms">
-<a href="#section-2.4" class="section-number selfRef">2.4. </a><a href="#name-key-encapsulation-mechanisms" class="section-name selfRef">Key Encapsulation Mechanisms</a>
-        </h3>
-<p id="section-2.4-1">For the purposes of this document, we consider a Key Encapsulation Mechanism (KEM) to be any asymmetric cryptographic scheme comprised of algorithms satisfying the following interfaces <span>[<a href="#PQCAPI" class="xref">PQCAPI</a>]</span>.<a href="#section-2.4-1" class="pilcrow">¶</a></p>
-<div class="alignLeft art-text artwork" id="section-2.4-2">
-<pre>
-def kemKeyGen() -&gt; (pk, sk)
-def kemEncaps(pk) -&gt; (ct, ss)
-def kemDecaps(ct, sk) -&gt; ss
-</pre><a href="#section-2.4-2" class="pilcrow">¶</a>
-</div>
-<p id="section-2.4-3">where <code>pk</code> is public key, <code>sk</code> is secret key, <code>ct</code> is ciphertext, and <code>ss</code> is shared secret.<a href="#section-2.4-3" class="pilcrow">¶</a></p>
-<p id="section-2.4-4">KEMs are typically used in cases where two parties, hereby refereed to as the "encapsulater" and the "decapsulater", wish to establish a shared secret via public key cryptography, where the decapsulater has an asymmetric key pair and has previously shared the public key with the encapsulater.<a href="#section-2.4-4" class="pilcrow">¶</a></p>
+<p id="section-2.3-1">The need for a KEM-based authenticated key establishment arises, for example, when two communicating parties each have long-term KEM keys (for example in X.509 certificates), and wish to involve both KEM keys in deriving a mutually-authenticated shared secret. In particular this will arise for any protocol that needs to provide post-quantum replacements for static-static (elliptic curve) Diffie-Hellman mechanisms. Examples include a KEM replacement for CMP's DHBasedMac <span>[<a href="#I-D.ietf-lamps-cmp-updates" class="xref">I-D.ietf-lamps-cmp-updates</a>]</span>, .. TODO: cite others.<a href="#section-2.3-1" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
@@ -1661,7 +1663,7 @@ ss = kemCombiner(ss1, ss2, ss3, ... )
 </pre><a href="#appendix-A.3-2" class="pilcrow">¶</a>
 </div>
 <p id="appendix-A.3-3">where Steps 1 - 3 define "RSA-KEM", which is considered here. Steps 4 - 6 define "Key Transport based on RSA-KEM" and is out of scope for this analysis as we assume that any RSA-KEM construction intended for use in a hybrid KEM would use the <code>KEK</code> output from Step 3 as the final shared secret.<a href="#appendix-A.3-3" class="pilcrow">¶</a></p>
-<p id="appendix-A.3-4">Here the transported symmetric key, <code>KEK</code>, is the KEM output (shared secret) <code>ss</code> as defined in <a href="#sec-kem-defn" class="xref">Section 2.4</a>. The encapsulater must choose a key derivation function <code>KDF</code> and declare it in the RSA-KEM parameters. The decapsulater may refuse to perform the the decapsulation if it does not like the encapsulater's choice of <code>KDF</code>, therefore it can be modeled as a random oracle producing an output of fixed length. The attacker is free to choose <code>z</code>, but assuming a strong choice of <code>KDF</code>, they cannot control either the length or the value <code>KEK</code> beyond what can be obtained by rejection sampling, thus satisfying properties 1 and 2 and defined in {.sec-kemprimitives}}.<a href="#appendix-A.3-4" class="pilcrow">¶</a></p>
+<p id="appendix-A.3-4">Here the transported symmetric key, <code>KEK</code>, is the KEM output (shared secret) <code>ss</code> as defined in <a href="#sec-kem-defn" class="xref">Section 1.1</a>. The encapsulater must choose a key derivation function <code>KDF</code> and declare it in the RSA-KEM parameters. The decapsulater may refuse to perform the the decapsulation if it does not like the encapsulater's choice of <code>KDF</code>, therefore it can be modeled as a random oracle producing an output of fixed length. The attacker is free to choose <code>z</code>, but assuming a strong choice of <code>KDF</code>, they cannot control either the length or the value <code>KEK</code> beyond what can be obtained by rejection sampling, thus satisfying properties 1 and 2 and defined in {.sec-kemprimitives}}.<a href="#appendix-A.3-4" class="pilcrow">¶</a></p>
 <p id="appendix-A.3-5">Therefore RSA-KEM is considered to be suitable for use with the simplified KEM combiner defined in <a href="#sec-kemcombiner" class="xref">Section 3</a>, <a href="#tab-simplifiedCombiner" class="xref">Figure 2</a>.<a href="#appendix-A.3-5" class="pilcrow">¶</a></p>
 <p id="appendix-A.3-6">Security note: This analysis applies to the specific RSA-KEM construction defined above. This result is not intended to generalize to all RSA-based key transport mechanisms, as they may not have the same cryptographic properties.<a href="#appendix-A.3-6" class="pilcrow">¶</a></p>
 </section>
