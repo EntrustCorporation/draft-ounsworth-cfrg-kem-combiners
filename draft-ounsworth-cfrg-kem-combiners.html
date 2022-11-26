@@ -1181,7 +1181,7 @@ li > p:last-of-type {
 </tr></thead>
 <tfoot><tr>
 <td class="left">Ounsworth</td>
-<td class="center">Expires 22 May 2023</td>
+<td class="center">Expires 29 May 2023</td>
 <td class="right">[Page]</td>
 </tr></tfoot>
 </table>
@@ -1194,12 +1194,12 @@ li > p:last-of-type {
 <dd class="internet-draft">draft-ounsworth-cfrg-kem-combiners-00</dd>
 <dt class="label-published">Published:</dt>
 <dd class="published">
-<time datetime="2022-11-18" class="published">18 November 2022</time>
+<time datetime="2022-11-25" class="published">25 November 2022</time>
     </dd>
 <dt class="label-intended-status">Intended Status:</dt>
 <dd class="intended-status">Informational</dd>
 <dt class="label-expires">Expires:</dt>
-<dd class="expires"><time datetime="2023-05-22">22 May 2023</time></dd>
+<dd class="expires"><time datetime="2023-05-29">29 May 2023</time></dd>
 <dt class="label-authors">Author:</dt>
 <dd class="authors">
 <div class="author">
@@ -1214,6 +1214,21 @@ li > p:last-of-type {
       <h2 id="abstract"><a href="#abstract" class="selfRef">Abstract</a></h2>
 <p id="section-abstract-1">The migration to post-quantum cryptography often calls for performing multiple key encapsulations in parallel and then combining their outputs to derive a single shared secret.<a href="#section-abstract-1" class="pilcrow">¶</a></p>
 <p id="section-abstract-2">This document defines the KEM combiner <code>KDF( H(ss1) || H(ss2) )</code> which is considered to be a dual PRF in practice, even though not provably secure. This mechanism simplifies to <code>KDF( ss1 || ss2 )</code> when used with a KEM which internally uses a KDF to produce its shared secret. RSA-KEM, ECDH, Edwards curve DH, and CRYSTALS-Kyber are shown to meet this criteria and therefore be safe to use with the simplified KEM combiner.<a href="#section-abstract-2" class="pilcrow">¶</a></p>
+</section>
+<section class="note rfcEditorRemove" id="section-note.1">
+      <h2 id="name-about-this-document-2">
+<a href="#name-about-this-document-2" class="section-name selfRef">About This Document</a>
+      </h2>
+<p id="section-note.1-1">This note is to be removed before publishing as an RFC.<a href="#section-note.1-1" class="pilcrow">¶</a></p>
+<p id="section-note.1-2">
+        Status information for this document may be found at <span><a href="https://datatracker.ietf.org/doc/draft-ounsworth-cfrg-kem-combiners/">https://datatracker.ietf.org/doc/draft-ounsworth-cfrg-kem-combiners/</a></span>.<a href="#section-note.1-2" class="pilcrow">¶</a></p>
+<p id="section-note.1-3">
+        Discussion of this document takes place on the
+        Limited Additional Mechanisms for PKIX and SMIME (lamps) Working Group mailing list (<span><a href="mailto:spasm@ietf.org">mailto:spasm@ietf.org</a></span>),
+        which is archived at <span><a href="https://mailarchive.ietf.org/arch/browse/spasm/">https://mailarchive.ietf.org/arch/browse/spasm/</a></span>.
+        Subscribe at <span><a href="https://www.ietf.org/mailman/listinfo/spasm/">https://www.ietf.org/mailman/listinfo/spasm/</a></span>.<a href="#section-note.1-3" class="pilcrow">¶</a></p>
+<p id="section-note.1-4">Source for this draft and an issue tracker can be found at
+        <span><a href="https://github.com/EntrustCorporation/draft-ounsworth-cfrg-kem-combiners">https://github.com/EntrustCorporation/draft-ounsworth-cfrg-kem-combiners</a></span>.<a href="#section-note.1-4" class="pilcrow">¶</a></p>
 </section>
 <div id="status-of-memo">
 <section id="section-boilerplate.1">
@@ -1234,7 +1249,7 @@ li > p:last-of-type {
         time. It is inappropriate to use Internet-Drafts as reference
         material or to cite them other than as "work in progress."<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
 <p id="section-boilerplate.1-4">
-        This Internet-Draft will expire on 22 May 2023.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
+        This Internet-Draft will expire on 29 May 2023.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="copyright">
@@ -1264,10 +1279,19 @@ li > p:last-of-type {
             <p id="section-toc.1-1.1.1" class="keepWithNext"><a href="#section-1" class="xref">1</a>.  <a href="#name-terminology-2" class="xref">Terminology</a></p>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.2">
-            <p id="section-toc.1-1.2.1" class="keepWithNext"><a href="#section-2" class="xref">2</a>.  <a href="#name-introduction-2" class="xref">Introduction</a></p>
+            <p id="section-toc.1-1.2.1"><a href="#section-2" class="xref">2</a>.  <a href="#name-introduction-2" class="xref">Introduction</a></p>
 <ul class="compact toc ulBare ulEmpty">
 <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.2.2.1">
-                <p id="section-toc.1-1.2.2.1.1" class="keepWithNext"><a href="#section-2.1" class="xref">2.1</a>.  <a href="#name-key-encapsulation-mechanisms" class="xref">Key Encapsulation Mechanisms</a></p>
+                <p id="section-toc.1-1.2.2.1.1" class="keepWithNext"><a href="#section-2.1" class="xref">2.1</a>.  <a href="#name-kem-psk-hybrids-2" class="xref">KEM/PSK hybrids</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.2.2.2">
+                <p id="section-toc.1-1.2.2.2.1" class="keepWithNext"><a href="#section-2.2" class="xref">2.2</a>.  <a href="#name-pq-traditional-hybrid-kems-2" class="xref">PQ/Traditional hybrid KEMs</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.2.2.3">
+                <p id="section-toc.1-1.2.2.3.1"><a href="#section-2.3" class="xref">2.3</a>.  <a href="#name-kem-based-ake-2" class="xref">KEM-based AKE</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.2.2.4">
+                <p id="section-toc.1-1.2.2.4.1"><a href="#section-2.4" class="xref">2.4</a>.  <a href="#name-key-encapsulation-mechanisms" class="xref">Key Encapsulation Mechanisms</a></p>
 </li>
             </ul>
 </li>
@@ -1346,31 +1370,63 @@ li > p:last-of-type {
       <h2 id="name-introduction-2">
 <a href="#section-2" class="section-number selfRef">2. </a><a href="#name-introduction-2" class="section-name selfRef">Introduction</a>
       </h2>
-<p id="section-2-1">A post-quantum / traditional hybrid key encapsulation mechanism (hybrid KEM) as defined in <span>[<a href="#I-D.driscoll-pqt-hybrid-terminology" class="xref">I-D.driscoll-pqt-hybrid-terminology</a>]</span> as<a href="#section-2-1" class="pilcrow">¶</a></p>
-<span class="break"></span><dl class="dlParallel" id="section-2-2">
-        <dt id="section-2-2.1">PQ/T Hybrid Key Encapsulation Mechanism:</dt>
-        <dd style="margin-left: 1.5em" id="section-2-2.2">
-          <p id="section-2-2.2.1">A Key Encapsulation Mechanism (KEM) made up of two or more component KEM algorithms where at least one is a post-quantum algorithm and at least one is a traditional algorithm.<a href="#section-2-2.2.1" class="pilcrow">¶</a></p>
-</dd>
-      <dd class="break"></dd>
-</dl>
-<p id="section-2-3">Building a PQ/T hybrid KEM requires a secure function which combines the output of both component KEMs to form a single output. Several IETF protocols are adding PQ/T hybrid KEM mechanisms as part of their overall post-quantum migration strategies, examples include TLS 1.3 <span>[<a href="#I-D.ietf-tls-hybrid-design" class="xref">I-D.ietf-tls-hybrid-design</a>]</span>, IKEv2 <span>[<a href="#I-D.ietf-ipsecme-ikev2-multiple-ke" class="xref">I-D.ietf-ipsecme-ikev2-multiple-ke</a>]</span>, X.509; PKIX; CMS <span>[<a href="#I-D.ounsworth-pq-composite-kem" class="xref">I-D.ounsworth-pq-composite-kem</a>]</span>, OpenPGP (CITE once Aron's draft is up), JOSE / COSE (CITE once Orie's drafts are up).<a href="#section-2-3" class="pilcrow">¶</a></p>
-<p id="section-2-4">This document normalizes a mechanisms for combining the output of two KEMs<a href="#section-2-4" class="pilcrow">¶</a></p>
-<div id="sec-kem-defn">
+<p id="section-2-1">The need for a KEM combiner function arises in three different contexts within IETF security protocols:<a href="#section-2-1" class="pilcrow">¶</a></p>
+<ol start="1" type="1" class="normal type-1" id="section-2-2">
+<li id="section-2-2.1">KEM / PSK hybrids where the output of a KEM is combined with a static pre-shared key.<a href="#section-2-2.1" class="pilcrow">¶</a>
+</li>
+        <li id="section-2-2.2">Post-quantum / tradtional hybrid KEMs.<a href="#section-2-2.2" class="pilcrow">¶</a>
+</li>
+        <li id="section-2-2.3">KEM-based authenticated key exchanges (AKEs).<a href="#section-2-2.3" class="pilcrow">¶</a>
+</li>
+      </ol>
+<p id="section-2-3">This document normalizes a mechanisms for combining the output of two KEMs.<a href="#section-2-3" class="pilcrow">¶</a></p>
+<div id="kempsk-hybrids">
 <section id="section-2.1">
-        <h3 id="name-key-encapsulation-mechanisms">
-<a href="#section-2.1" class="section-number selfRef">2.1. </a><a href="#name-key-encapsulation-mechanisms" class="section-name selfRef">Key Encapsulation Mechanisms</a>
+        <h3 id="name-kem-psk-hybrids-2">
+<a href="#section-2.1" class="section-number selfRef">2.1. </a><a href="#name-kem-psk-hybrids-2" class="section-name selfRef">KEM/PSK hybrids</a>
         </h3>
-<p id="section-2.1-1">For the purposes of this document, we consider a Key Encapsulation Mechanism (KEM) to be any asymmetric cryptographic scheme comprised of algorithms satisfying the following interfaces <span>[<a href="#PQCAPI" class="xref">PQCAPI</a>]</span>.<a href="#section-2.1-1" class="pilcrow">¶</a></p>
-<div class="alignLeft art-text artwork" id="section-2.1-2">
+<p id="section-2.1-1">As a post-quantum stop-gap, several IETF protocols have added extensions to allow for mixing a pre-shared key (PSK) into an (EC)DH based key exchange. Examples include CMS <span>[<a href="#RFC8696" class="xref">RFC8696</a>]</span> and IKEv2 <span>[<a href="#RFC8784" class="xref">RFC8784</a>]</span>.<a href="#section-2.1-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="pqtraditional-hybrid-kems">
+<section id="section-2.2">
+        <h3 id="name-pq-traditional-hybrid-kems-2">
+<a href="#section-2.2" class="section-number selfRef">2.2. </a><a href="#name-pq-traditional-hybrid-kems-2" class="section-name selfRef">PQ/Traditional hybrid KEMs</a>
+        </h3>
+<p id="section-2.2-1">A post-quantum / traditional hybrid key encapsulation mechanism (hybrid KEM) as defined in <span>[<a href="#I-D.driscoll-pqt-hybrid-terminology" class="xref">I-D.driscoll-pqt-hybrid-terminology</a>]</span> as<a href="#section-2.2-1" class="pilcrow">¶</a></p>
+<span class="break"></span><dl class="dlParallel" id="section-2.2-2">
+          <dt id="section-2.2-2.1">PQ/T Hybrid Key Encapsulation Mechanism:</dt>
+          <dd style="margin-left: 1.5em" id="section-2.2-2.2">
+            <p id="section-2.2-2.2.1">A Key Encapsulation Mechanism (KEM) made up of two or more component KEM algorithms where at least one is a post-quantum algorithm and at least one is a traditional algorithm.<a href="#section-2.2-2.2.1" class="pilcrow">¶</a></p>
+</dd>
+        <dd class="break"></dd>
+</dl>
+<p id="section-2.2-3">Building a PQ/T hybrid KEM requires a secure function which combines the output of both component KEMs to form a single output. Several IETF protocols are adding PQ/T hybrid KEM mechanisms as part of their overall post-quantum migration strategies, examples include TLS 1.3 <span>[<a href="#I-D.ietf-tls-hybrid-design" class="xref">I-D.ietf-tls-hybrid-design</a>]</span>, IKEv2 <span>[<a href="#I-D.ietf-ipsecme-ikev2-multiple-ke" class="xref">I-D.ietf-ipsecme-ikev2-multiple-ke</a>]</span>, X.509; PKIX; CMS <span>[<a href="#I-D.ounsworth-pq-composite-kem" class="xref">I-D.ounsworth-pq-composite-kem</a>]</span>, OpenPGP (CITE once Aron's draft is up), JOSE / COSE (CITE once Orie's drafts are up).<a href="#section-2.2-3" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="kem-based-ake">
+<section id="section-2.3">
+        <h3 id="name-kem-based-ake-2">
+<a href="#section-2.3" class="section-number selfRef">2.3. </a><a href="#name-kem-based-ake-2" class="section-name selfRef">KEM-based AKE</a>
+        </h3>
+<p id="section-2.3-1">The need for a KEM-based authenticated key establishment arises, for example, when two communicating parties each have long-term KEM keys (for example in X.509 certificates), and wish to involve both KEM keys in deriving a mutually-authenticated shared secret. In particular this will arise for any protocol that needs to provide post-quantum replacements for static-static (elliptic curve) Diffie-Hellman mechanisms. Examples include <span>[<a href="#I-D.ietf-lamps-cmp-updates" class="xref">I-D.ietf-lamps-cmp-updates</a>]</span> .. TODO: cite others.<a href="#section-2.3-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="sec-kem-defn">
+<section id="section-2.4">
+        <h3 id="name-key-encapsulation-mechanisms">
+<a href="#section-2.4" class="section-number selfRef">2.4. </a><a href="#name-key-encapsulation-mechanisms" class="section-name selfRef">Key Encapsulation Mechanisms</a>
+        </h3>
+<p id="section-2.4-1">For the purposes of this document, we consider a Key Encapsulation Mechanism (KEM) to be any asymmetric cryptographic scheme comprised of algorithms satisfying the following interfaces <span>[<a href="#PQCAPI" class="xref">PQCAPI</a>]</span>.<a href="#section-2.4-1" class="pilcrow">¶</a></p>
+<div class="alignLeft art-text artwork" id="section-2.4-2">
 <pre>
 def kemKeyGen() -&gt; (pk, sk)
 def kemEncaps(pk) -&gt; (ct, ss)
 def kemDecaps(ct, sk) -&gt; ss
-</pre><a href="#section-2.1-2" class="pilcrow">¶</a>
+</pre><a href="#section-2.4-2" class="pilcrow">¶</a>
 </div>
-<p id="section-2.1-3">where <code>pk</code> is public key, <code>sk</code> is secret key, <code>ct</code> is ciphertext, and <code>ss</code> is shared secret.<a href="#section-2.1-3" class="pilcrow">¶</a></p>
-<p id="section-2.1-4">KEMs are typically used in cases where two parties, hereby refereed to as the "encapsulater" and the "decapsulater", wish to establish a shared secret via public key cryptography, where the decapsulater has an asymmetric key pair and has previously shared the public key with the encapsulater.<a href="#section-2.1-4" class="pilcrow">¶</a></p>
+<p id="section-2.4-3">where <code>pk</code> is public key, <code>sk</code> is secret key, <code>ct</code> is ciphertext, and <code>ss</code> is shared secret.<a href="#section-2.4-3" class="pilcrow">¶</a></p>
+<p id="section-2.4-4">KEMs are typically used in cases where two parties, hereby refereed to as the "encapsulater" and the "decapsulater", wish to establish a shared secret via public key cryptography, where the decapsulater has an asymmetric key pair and has previously shared the public key with the encapsulater.<a href="#section-2.4-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
@@ -1386,7 +1442,7 @@ def kemDecaps(ct, sk) -&gt; ss
 ss = kemCombiner(ss1, ss2)
 </pre><a href="#section-3-2" class="pilcrow">¶</a>
 </div>
-<p id="section-3-3">This document assumes that shared secrets are the output of a KEM, but without loss of generality they may also be a pre-shared key (PSK) or any other source of cryptographic key material that implementers wish to combine with the output of a KEM, which is a post-safe migration strategy being adopted by some protocols, see for example IKEv2 in <span>[<a href="#RFC8784" class="xref">RFC8784</a>]</span>.<a href="#section-3-3" class="pilcrow">¶</a></p>
+<p id="section-3-3">This document assumes that shared secrets are the output of a KEM, but without loss of generality they may also be any other source of cryptographic key material, such as pre-shared keys (PSKs), with PQ/PSK being a quantum-safe migration strategy being made available by some protocols, see for example IKEv2 in <span>[<a href="#RFC8784" class="xref">RFC8784</a>]</span>.<a href="#section-3-3" class="pilcrow">¶</a></p>
 <p id="section-3-4">In general it is desirable to use a dual PRF, a dual-input PRF which is keyed off either input, as a KEM combiner (see <a href="#sec-dualprf" class="xref">Appendix A.1</a> for a discussion of dual PRFs). We take the following construction as a dual PRF in practice, and therefore suitable for use in all IETF protocols that need to combine the output of two KEMs:<a href="#section-3-4" class="pilcrow">¶</a></p>
 <span id="name-general-kem-combiner-constru"></span><figure id="figure-1">
         <div class="alignLeft art-text artwork" id="section-3-5.1">
@@ -1493,6 +1549,10 @@ ss = kemCombiner(ss1, ss2, ss3, ... )
         <dd>
 <span class="refAuthor">Tjhai, C.</span>, <span class="refAuthor">Tomlinson, M.</span>, <span class="refAuthor">Bartlett, G.</span>, <span class="refAuthor">Fluhrer, S.</span>, <span class="refAuthor">Van Geest, D.</span>, <span class="refAuthor">Garcia-Morchon, O.</span>, and <span class="refAuthor">V. Smyslov</span>, <span class="refTitle">"Multiple Key Exchanges in IKEv2"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-ietf-ipsecme-ikev2-multiple-ke-10</span>, <time datetime="2022-11-09" class="refDate">9 November 2022</time>, <span>&lt;<a href="https://www.ietf.org/archive/id/draft-ietf-ipsecme-ikev2-multiple-ke-10.txt">https://www.ietf.org/archive/id/draft-ietf-ipsecme-ikev2-multiple-ke-10.txt</a>&gt;</span>. </dd>
 <dd class="break"></dd>
+<dt id="I-D.ietf-lamps-cmp-updates">[I-D.ietf-lamps-cmp-updates]</dt>
+        <dd>
+<span class="refAuthor">Brockhaus, H.</span>, <span class="refAuthor">von Oheimb, D.</span>, and <span class="refAuthor">J. Gray</span>, <span class="refTitle">"Certificate Management Protocol (CMP) Updates"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-ietf-lamps-cmp-updates-23</span>, <time datetime="2022-06-29" class="refDate">29 June 2022</time>, <span>&lt;<a href="https://www.ietf.org/archive/id/draft-ietf-lamps-cmp-updates-23.txt">https://www.ietf.org/archive/id/draft-ietf-lamps-cmp-updates-23.txt</a>&gt;</span>. </dd>
+<dd class="break"></dd>
 <dt id="I-D.ietf-tls-hybrid-design">[I-D.ietf-tls-hybrid-design]</dt>
         <dd>
 <span class="refAuthor">Stebila, D.</span>, <span class="refAuthor">Fluhrer, S.</span>, and <span class="refAuthor">S. Gueron</span>, <span class="refTitle">"Hybrid key exchange in TLS 1.3"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-ietf-tls-hybrid-design-05</span>, <time datetime="2022-08-28" class="refDate">28 August 2022</time>, <span>&lt;<a href="https://www.ietf.org/archive/id/draft-ietf-tls-hybrid-design-05.txt">https://www.ietf.org/archive/id/draft-ietf-tls-hybrid-design-05.txt</a>&gt;</span>. </dd>
@@ -1516,6 +1576,10 @@ ss = kemCombiner(ss1, ss2, ss3, ... )
 <dt id="RFC8411">[RFC8411]</dt>
         <dd>
 <span class="refAuthor">Schaad, J.</span> and <span class="refAuthor">R. Andrews</span>, <span class="refTitle">"IANA Registration for the Cryptographic Algorithm Object Identifier Range"</span>, <span class="seriesInfo">RFC 8411</span>, <span class="seriesInfo">DOI 10.17487/RFC8411</span>, <time datetime="2018-08" class="refDate">August 2018</time>, <span>&lt;<a href="https://www.rfc-editor.org/info/rfc8411">https://www.rfc-editor.org/info/rfc8411</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC8696">[RFC8696]</dt>
+        <dd>
+<span class="refAuthor">Housley, R.</span>, <span class="refTitle">"Using Pre-Shared Key (PSK) in the Cryptographic Message Syntax (CMS)"</span>, <span class="seriesInfo">RFC 8696</span>, <span class="seriesInfo">DOI 10.17487/RFC8696</span>, <time datetime="2019-12" class="refDate">December 2019</time>, <span>&lt;<a href="https://www.rfc-editor.org/info/rfc8696">https://www.rfc-editor.org/info/rfc8696</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="RFC8784">[RFC8784]</dt>
       <dd>
@@ -1543,7 +1607,7 @@ ss = kemCombiner(ss1, ss2, ss3, ... )
         <h3 id="name-kem-primitives-2">
 <a href="#appendix-A.2" class="section-number selfRef">A.2. </a><a href="#name-kem-primitives-2" class="section-name selfRef">KEM primitives</a>
         </h3>
-<p id="appendix-A.2-1">In modern cryptographic design, KEM algorithms seek to have indistinguishability under adaptive chosen ciphertext attack (IND-CCA2). For hybrid KEMs we desire the additional property that the combiner, without loss of generality, leaks no information about ss2 even if ss1 is controlled by an attacker.<a href="#appendix-A.2-1" class="pilcrow">¶</a></p>
+<p id="appendix-A.2-1">In modern cryptographic design, KEM algorithms seek to have indistinguishability under adaptive chosen ciphertext attack (IND-CCA2). FFor hybrid KEMs we desire the additional property that even if one input is controlled by an attacker, then combiner leaks no information about the other input.<a href="#appendix-A.2-1" class="pilcrow">¶</a></p>
 <p id="appendix-A.2-2">There are two ways to achieve such a hybrid KEM combiner; either by designing a combiner that is robust to one of the inputs being maliciously-chosen, called a dual PRF. See <a href="#sec-dualprf" class="xref">Appendix A.1</a> for a discussion about the current state of dual PRF research. Or alternatively by only allowing the hybridization of KEMs where a malicious kemEncaps() algorithm cannot control the shared secret derived by the victim's kemDecaps() algorithm and then combining the shared secrets in a trivial way.<a href="#appendix-A.2-2" class="pilcrow">¶</a></p>
 <p id="appendix-A.2-3">The following sections analyze commonly-used KEM algorithms to show that they have the following two properties, and are therefore suitable for use with the simplified KEM combiner presented in <a href="#sec-kemcombiner" class="xref">Section 3</a>, <a href="#tab-simplifiedCombiner" class="xref">Figure 2</a>.<a href="#appendix-A.2-3" class="pilcrow">¶</a></p>
 <ol start="1" type="1" class="normal type-1" id="appendix-A.2-4">
@@ -1597,7 +1661,7 @@ ss = kemCombiner(ss1, ss2, ss3, ... )
 </pre><a href="#appendix-A.3-2" class="pilcrow">¶</a>
 </div>
 <p id="appendix-A.3-3">where Steps 1 - 3 define "RSA-KEM", which is considered here. Steps 4 - 6 define "Key Transport based on RSA-KEM" and is out of scope for this analysis as we assume that any RSA-KEM construction intended for use in a hybrid KEM would use the <code>KEK</code> output from Step 3 as the final shared secret.<a href="#appendix-A.3-3" class="pilcrow">¶</a></p>
-<p id="appendix-A.3-4">Here the transported symmetric key, <code>KEK</code>, is the KEM output (shared secret) <code>ss</code> as defined in <a href="#sec-kem-defn" class="xref">Section 2.1</a>. The encapsulater must choose a key derivation function <code>KDF</code> and declare it in the RSA-KEM parameters. The decapsulater may refuse to perform the the decapsulation if it does not like the encapsulater's choice of <code>KDF</code>, therefore it can be modeled as a random oracle producing an output of fixed length. The attacker is free to choose <code>z</code>, but assuming a strong choice of <code>KDF</code>, they cannot control either the length or the value <code>KEK</code> beyond what can be obtained by rejection sampling, thus satisfying properties 1 and 2 and defined in {.sec-kemprimitives}}.<a href="#appendix-A.3-4" class="pilcrow">¶</a></p>
+<p id="appendix-A.3-4">Here the transported symmetric key, <code>KEK</code>, is the KEM output (shared secret) <code>ss</code> as defined in <a href="#sec-kem-defn" class="xref">Section 2.4</a>. The encapsulater must choose a key derivation function <code>KDF</code> and declare it in the RSA-KEM parameters. The decapsulater may refuse to perform the the decapsulation if it does not like the encapsulater's choice of <code>KDF</code>, therefore it can be modeled as a random oracle producing an output of fixed length. The attacker is free to choose <code>z</code>, but assuming a strong choice of <code>KDF</code>, they cannot control either the length or the value <code>KEK</code> beyond what can be obtained by rejection sampling, thus satisfying properties 1 and 2 and defined in {.sec-kemprimitives}}.<a href="#appendix-A.3-4" class="pilcrow">¶</a></p>
 <p id="appendix-A.3-5">Therefore RSA-KEM is considered to be suitable for use with the simplified KEM combiner defined in <a href="#sec-kemcombiner" class="xref">Section 3</a>, <a href="#tab-simplifiedCombiner" class="xref">Figure 2</a>.<a href="#appendix-A.3-5" class="pilcrow">¶</a></p>
 <p id="appendix-A.3-6">Security note: This analysis applies to the specific RSA-KEM construction defined above. This result is not intended to generalize to all RSA-based key transport mechanisms, as they may not have the same cryptographic properties.<a href="#appendix-A.3-6" class="pilcrow">¶</a></p>
 </section>
@@ -1685,7 +1749,7 @@ function that includes K, K_A, and K_B to derive a symmetric key.
 </pre><a href="#appendix-A.6-2" class="pilcrow">¶</a>
 </div>
 <p id="appendix-A.6-3">with definitions as per <span>[<a href="#I-D.cfrg-schwabe-kyber" class="xref">I-D.cfrg-schwabe-kyber</a>]</span>.<a href="#appendix-A.6-3" class="pilcrow">¶</a></p>
-<p id="appendix-A.6-4">Here the hash functions <code>G</code>, <code>H</code> and the key derivation function <code>KDF</code> are in theory chosen by the encapsulater, but in practice are fixed by the Kyber specification to be <code>H: SHA3-256</code>, <code>G: SHA3-512</code>, and <code>KDF: SHAKE-256</code>, which can be modeled as random oracles. The attacker is free to choose <code>m</code>, but but not the decapsulater's public key <code>pk</code>, nor do they have control of <code>cpaCipherText</code> so long as <code>InnerEnc</code> remains IND-CPA secure. Therefore the attacker cannot control the value or length of <code>K</code> beyond what can be obtained by rejection sampling.<a href="#appendix-A.6-4" class="pilcrow">¶</a></p>
+<p id="appendix-A.6-4">Here the hash functions <code>G</code>, <code>H</code> and the key derivation function <code>KDF</code> are in theory chosen by the encapsulater, but in practice are fixed by the Kyber specification to be <code>H: SHA3-256</code>, <code>G: SHA3-512</code>, and <code>KDF: SHAKE-256</code>, which can be modeled as random oracles. The attacker is free to choose <code>m</code>, but not the decapsulater's public key <code>pk</code>, nor do they have control of <code>cpaCipherText</code> so long as <code>InnerEnc</code> remains IND-CPA secure. Therefore the attacker cannot control the value or length of <code>K</code> beyond what can be obtained by rejection sampling.<a href="#appendix-A.6-4" class="pilcrow">¶</a></p>
 <p id="appendix-A.6-5">Therefore CRYSTALS-Kyber is considered to be suitable for use with the simplified KEM combiner defined in <a href="#sec-kemcombiner" class="xref">Section 3</a>, <a href="#tab-simplifiedCombiner" class="xref">Figure 2</a>.<a href="#appendix-A.6-5" class="pilcrow">¶</a></p>
 </section>
 </div>
