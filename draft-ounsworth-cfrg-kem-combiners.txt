@@ -4,8 +4,8 @@
 
 CFRG                                                        M. Ounsworth
 Internet-Draft                                                   Entrust
-Intended status: Informational                          25 November 2022
-Expires: 29 May 2023
+Intended status: Informational                          26 November 2022
+Expires: 30 May 2023
 
 
 Combiner function for hybrid key encapsulation mechanisms (Hybrid KEMs)
@@ -21,9 +21,12 @@ Abstract
    is considered to be a dual PRF in practice, even though not provably
    secure.  This mechanism simplifies to KDF( ss1 || ss2 ) when used
    with a KEM which internally uses a KDF to produce its shared secret.
-   RSA-KEM, ECDH, Edwards curve DH, and CRYSTALS-Kyber are shown to meet
-   this criteria and therefore be safe to use with the simplified KEM
-   combiner.
+   RSA-KEM [RFC5990], ECDH [SEC1], Edwards curve DH [RFC7748], and
+   CRYSTALS-Kyber [I-D.cfrg-schwabe-kyber] are shown to meet this
+   criteria, when implemented as per the listed specification, and
+   therefore are safe to use with the simplified KEM combiner.  Care
+   should be taken with implementations that are similar but not
+   identical to those analyzed in this document.
 
 About This Document
 
@@ -50,10 +53,7 @@ Status of This Memo
 
 
 
-
-
-
-Ounsworth                  Expires 29 May 2023                  [Page 1]
+Ounsworth                  Expires 30 May 2023                  [Page 1]
 
 Internet-Draft                KEM Combiner                 November 2022
 
@@ -68,7 +68,7 @@ Internet-Draft                KEM Combiner                 November 2022
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 29 May 2023.
+   This Internet-Draft will expire on 30 May 2023.
 
 Copyright Notice
 
@@ -109,7 +109,7 @@ Table of Contents
 
 
 
-Ounsworth                  Expires 29 May 2023                  [Page 2]
+Ounsworth                  Expires 30 May 2023                  [Page 2]
 
 Internet-Draft                KEM Combiner                 November 2022
 
@@ -165,7 +165,7 @@ Internet-Draft                KEM Combiner                 November 2022
 
 
 
-Ounsworth                  Expires 29 May 2023                  [Page 3]
+Ounsworth                  Expires 30 May 2023                  [Page 3]
 
 Internet-Draft                KEM Combiner                 November 2022
 
@@ -221,7 +221,7 @@ Internet-Draft                KEM Combiner                 November 2022
 
 
 
-Ounsworth                  Expires 29 May 2023                  [Page 4]
+Ounsworth                  Expires 30 May 2023                  [Page 4]
 
 Internet-Draft                KEM Combiner                 November 2022
 
@@ -277,7 +277,7 @@ Internet-Draft                KEM Combiner                 November 2022
 
 
 
-Ounsworth                  Expires 29 May 2023                  [Page 5]
+Ounsworth                  Expires 30 May 2023                  [Page 5]
 
 Internet-Draft                KEM Combiner                 November 2022
 
@@ -333,7 +333,7 @@ Internet-Draft                KEM Combiner                 November 2022
 
 
 
-Ounsworth                  Expires 29 May 2023                  [Page 6]
+Ounsworth                  Expires 30 May 2023                  [Page 6]
 
 Internet-Draft                KEM Combiner                 November 2022
 
@@ -389,7 +389,7 @@ Internet-Draft                KEM Combiner                 November 2022
 
 
 
-Ounsworth                  Expires 29 May 2023                  [Page 7]
+Ounsworth                  Expires 30 May 2023                  [Page 7]
 
 Internet-Draft                KEM Combiner                 November 2022
 
@@ -445,7 +445,7 @@ A.1.  Dual PRF
 
 
 
-Ounsworth                  Expires 29 May 2023                  [Page 8]
+Ounsworth                  Expires 30 May 2023                  [Page 8]
 
 Internet-Draft                KEM Combiner                 November 2022
 
@@ -501,7 +501,7 @@ A.3.  RSA-KEM
 
 
 
-Ounsworth                  Expires 29 May 2023                  [Page 9]
+Ounsworth                  Expires 30 May 2023                  [Page 9]
 
 Internet-Draft                KEM Combiner                 November 2022
 
@@ -557,7 +557,7 @@ Internet-Draft                KEM Combiner                 November 2022
 
 
 
-Ounsworth                  Expires 29 May 2023                 [Page 10]
+Ounsworth                  Expires 30 May 2023                 [Page 10]
 
 Internet-Draft                KEM Combiner                 November 2022
 
@@ -613,7 +613,7 @@ A.4.  Elliptic Curve Diffie-Hellman (ECDH)
 
 
 
-Ounsworth                  Expires 29 May 2023                 [Page 11]
+Ounsworth                  Expires 30 May 2023                 [Page 11]
 
 Internet-Draft                KEM Combiner                 November 2022
 
@@ -669,7 +669,7 @@ A.5.  Edwards Curve Diffie-Hellman (X25519 / X448)
 
 
 
-Ounsworth                  Expires 29 May 2023                 [Page 12]
+Ounsworth                  Expires 30 May 2023                 [Page 12]
 
 Internet-Draft                KEM Combiner                 November 2022
 
@@ -725,7 +725,7 @@ Appendix C.  Contributors and Acknowledgements
 
 
 
-Ounsworth                  Expires 29 May 2023                 [Page 13]
+Ounsworth                  Expires 30 May 2023                 [Page 13]
 
 Internet-Draft                KEM Combiner                 November 2022
 
@@ -781,4 +781,4 @@ Author's Address
 
 
 
-Ounsworth                  Expires 29 May 2023                 [Page 14]
+Ounsworth                  Expires 30 May 2023                 [Page 14]

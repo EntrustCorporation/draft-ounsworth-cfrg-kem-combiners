@@ -8,7 +8,7 @@
 <meta content="Mike Ounsworth" name="author">
 <meta content="
        The migration to post-quantum cryptography often calls for performing multiple key encapsulations in parallel and then combining their outputs to derive a single shared secret. 
-       This document defines the KEM combiner  KDF( H(ss1) || H(ss2) )  which is considered to be a dual PRF in practice, even though not provably secure. This mechanism simplifies to  KDF( ss1 || ss2 )  when used with a KEM which internally uses a KDF to produce its shared secret. RSA-KEM, ECDH, Edwards curve DH, and CRYSTALS-Kyber are shown to meet this criteria and therefore be safe to use with the simplified KEM combiner. 
+       This document defines the KEM combiner  KDF( H(ss1) || H(ss2) )  which is considered to be a dual PRF in practice, even though not provably secure. This mechanism simplifies to  KDF( ss1 || ss2 )  when used with a KEM which internally uses a KDF to produce its shared secret. RSA-KEM  , ECDH  , Edwards curve DH  , and CRYSTALS-Kyber   are shown to meet this criteria, when implemented as per the listed specification, and therefore are safe to use with the simplified KEM combiner. Care should be taken with implementations that are similar but not identical to those analyzed in this document. 
        
 
 
@@ -1181,7 +1181,7 @@ li > p:last-of-type {
 </tr></thead>
 <tfoot><tr>
 <td class="left">Ounsworth</td>
-<td class="center">Expires 29 May 2023</td>
+<td class="center">Expires 30 May 2023</td>
 <td class="right">[Page]</td>
 </tr></tfoot>
 </table>
@@ -1194,12 +1194,12 @@ li > p:last-of-type {
 <dd class="internet-draft">draft-ounsworth-cfrg-kem-combiners-00</dd>
 <dt class="label-published">Published:</dt>
 <dd class="published">
-<time datetime="2022-11-25" class="published">25 November 2022</time>
+<time datetime="2022-11-26" class="published">26 November 2022</time>
     </dd>
 <dt class="label-intended-status">Intended Status:</dt>
 <dd class="intended-status">Informational</dd>
 <dt class="label-expires">Expires:</dt>
-<dd class="expires"><time datetime="2023-05-29">29 May 2023</time></dd>
+<dd class="expires"><time datetime="2023-05-30">30 May 2023</time></dd>
 <dt class="label-authors">Author:</dt>
 <dd class="authors">
 <div class="author">
@@ -1213,7 +1213,7 @@ li > p:last-of-type {
 <section id="section-abstract">
       <h2 id="abstract"><a href="#abstract" class="selfRef">Abstract</a></h2>
 <p id="section-abstract-1">The migration to post-quantum cryptography often calls for performing multiple key encapsulations in parallel and then combining their outputs to derive a single shared secret.<a href="#section-abstract-1" class="pilcrow">¶</a></p>
-<p id="section-abstract-2">This document defines the KEM combiner <code>KDF( H(ss1) || H(ss2) )</code> which is considered to be a dual PRF in practice, even though not provably secure. This mechanism simplifies to <code>KDF( ss1 || ss2 )</code> when used with a KEM which internally uses a KDF to produce its shared secret. RSA-KEM, ECDH, Edwards curve DH, and CRYSTALS-Kyber are shown to meet this criteria and therefore be safe to use with the simplified KEM combiner.<a href="#section-abstract-2" class="pilcrow">¶</a></p>
+<p id="section-abstract-2">This document defines the KEM combiner <code>KDF( H(ss1) || H(ss2) )</code> which is considered to be a dual PRF in practice, even though not provably secure. This mechanism simplifies to <code>KDF( ss1 || ss2 )</code> when used with a KEM which internally uses a KDF to produce its shared secret. RSA-KEM <span>[<a href="#RFC5990" class="xref">RFC5990</a>]</span>, ECDH <span>[<a href="#SEC1" class="xref">SEC1</a>]</span>, Edwards curve DH <span>[<a href="#RFC7748" class="xref">RFC7748</a>]</span>, and CRYSTALS-Kyber <span>[<a href="#I-D.cfrg-schwabe-kyber" class="xref">I-D.cfrg-schwabe-kyber</a>]</span> are shown to meet this criteria, when implemented as per the listed specification, and therefore are safe to use with the simplified KEM combiner. Care should be taken with implementations that are similar but not identical to those analyzed in this document.<a href="#section-abstract-2" class="pilcrow">¶</a></p>
 </section>
 <section class="note rfcEditorRemove" id="section-note.1">
       <h2 id="name-about-this-document-2">
@@ -1249,7 +1249,7 @@ li > p:last-of-type {
         time. It is inappropriate to use Internet-Drafts as reference
         material or to cite them other than as "work in progress."<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
 <p id="section-boilerplate.1-4">
-        This Internet-Draft will expire on 29 May 2023.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
+        This Internet-Draft will expire on 30 May 2023.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="copyright">
