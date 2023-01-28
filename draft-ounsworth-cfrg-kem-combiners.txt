@@ -4,8 +4,8 @@
 
 CFRG                                                        M. Ounsworth
 Internet-Draft                                                   Entrust
-Intended status: Informational                          26 November 2022
-Expires: 30 May 2023
+Intended status: Informational                           28 January 2023
+Expires: 1 August 2023
 
 
 Combiner function for hybrid key encapsulation mechanisms (Hybrid KEMs)
@@ -53,9 +53,9 @@ Status of This Memo
 
 
 
-Ounsworth                  Expires 30 May 2023                  [Page 1]
+Ounsworth                 Expires 1 August 2023                 [Page 1]
 
-Internet-Draft                KEM Combiner                 November 2022
+Internet-Draft                KEM Combiner                  January 2023
 
 
    Internet-Drafts are working documents of the Internet Engineering
@@ -68,11 +68,11 @@ Internet-Draft                KEM Combiner                 November 2022
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 30 May 2023.
+   This Internet-Draft will expire on 1 August 2023.
 
 Copyright Notice
 
-   Copyright (c) 2022 IETF Trust and the persons identified as the
+   Copyright (c) 2023 IETF Trust and the persons identified as the
    document authors.  All rights reserved.
 
    This document is subject to BCP 78 and the IETF Trust's Legal
@@ -94,24 +94,24 @@ Table of Contents
    5.  Security Considerations . . . . . . . . . . . . . . . . . . .   6
    6.  References  . . . . . . . . . . . . . . . . . . . . . . . . .   6
      6.1.  Normative References  . . . . . . . . . . . . . . . . . .   6
-     6.2.  Informative References  . . . . . . . . . . . . . . . . .   6
-   Appendix A.  Security Analysis  . . . . . . . . . . . . . . . . .   8
-     A.1.  Dual PRF  . . . . . . . . . . . . . . . . . . . . . . . .   8
+     6.2.  Informative References  . . . . . . . . . . . . . . . . .   7
+   Appendix A.  Security Analysis  . . . . . . . . . . . . . . . . .   9
+     A.1.  Dual PRF  . . . . . . . . . . . . . . . . . . . . . . . .   9
      A.2.  KEM primitives  . . . . . . . . . . . . . . . . . . . . .   9
-     A.3.  RSA-KEM . . . . . . . . . . . . . . . . . . . . . . . . .   9
-     A.4.  Elliptic Curve Diffie-Hellman (ECDH)  . . . . . . . . . .  11
-     A.5.  Edwards Curve Diffie-Hellman (X25519 / X448)  . . . . . .  12
-     A.6.  CRYSTALS-Kyber  . . . . . . . . . . . . . . . . . . . . .  13
-   Appendix B.  Intellectual Property Considerations . . . . . . . .  13
-   Appendix C.  Contributors and Acknowledgements  . . . . . . . . .  13
-     C.1.  Making contributions  . . . . . . . . . . . . . . . . . .  14
-   Author's Address  . . . . . . . . . . . . . . . . . . . . . . . .  14
+     A.3.  RSA-KEM . . . . . . . . . . . . . . . . . . . . . . . . .  10
+     A.4.  Elliptic Curve Diffie-Hellman (ECDH)  . . . . . . . . . .  12
+     A.5.  Edwards Curve Diffie-Hellman (X25519 / X448)  . . . . . .  13
+     A.6.  CRYSTALS-Kyber  . . . . . . . . . . . . . . . . . . . . .  14
+   Appendix B.  Intellectual Property Considerations . . . . . . . .  14
+   Appendix C.  Contributors and Acknowledgements  . . . . . . . . .  14
+     C.1.  Making contributions  . . . . . . . . . . . . . . . . . .  15
+   Author's Address  . . . . . . . . . . . . . . . . . . . . . . . .  15
 
 
 
-Ounsworth                  Expires 30 May 2023                  [Page 2]
+Ounsworth                 Expires 1 August 2023                 [Page 2]
 
-Internet-Draft                KEM Combiner                 November 2022
+Internet-Draft                KEM Combiner                  January 2023
 
 
 1.  Terminology
@@ -165,9 +165,9 @@ Internet-Draft                KEM Combiner                 November 2022
 
 
 
-Ounsworth                  Expires 30 May 2023                  [Page 3]
+Ounsworth                 Expires 1 August 2023                 [Page 3]
 
-Internet-Draft                KEM Combiner                 November 2022
+Internet-Draft                KEM Combiner                  January 2023
 
 
 2.1.  KEM/PSK hybrids
@@ -209,22 +209,34 @@ Internet-Draft                KEM Combiner                 November 2022
 
 3.  KEM Combiner
 
+   TODO: read and cite the ETSI doc "Quantum-safe Hybrid Key Exchanges"
+   https://www.etsi.org/deliver/
+   etsi_ts/103700_103799/103744/01.01.01_60/ts_103744v010101p.pdf
+
+   TODO: as per https://www.enisa.europa.eu/publications/post-quantum-
+   cryptography-integration-study section 4.2, might need to specify
+   behaviour in light of KEMs with a non-zero failure probility.
+
+
+
+
+
+Ounsworth                 Expires 1 August 2023                 [Page 4]
+
+Internet-Draft                KEM Combiner                  January 2023
+
+
+   TODO: read and cite Federico Giacon, Felix Heuer, and Bertram
+   Poettering.  KEM combiners.  In Michel Abdalla and Ricardo Dahab,
+   editors, PKC 2018: 21st International Conference on Theory and
+   Practice of Public Key Cryptography, Part I, volume 10769 of Lecture
+   Notes in Com- puter Science, pages 190-218.  Springer, Heidelberg,
+   March 2018.
+
    A KEM combiner is a function that takes in two shared secrets and
    returns a combined shared secret, where all values are byte arrays.
 
    ss = kemCombiner(ss1, ss2)
-
-
-
-
-
-
-
-
-Ounsworth                  Expires 30 May 2023                  [Page 4]
-
-Internet-Draft                KEM Combiner                 November 2022
-
 
    This document assumes that shared secrets are the output of a KEM,
    but without loss of generality they may also be any other source of
@@ -262,6 +274,14 @@ Internet-Draft                KEM Combiner                 November 2022
      Figure 2: simplified KEM combiner construction when both KEMs are
                        known to provide strong output
 
+
+
+
+Ounsworth                 Expires 1 August 2023                 [Page 5]
+
+Internet-Draft                KEM Combiner                  January 2023
+
+
    This simplified combiner proposed as a KEM combiner, for example in
    [I-D.ietf-tls-hybrid-design].
 
@@ -273,14 +293,6 @@ Internet-Draft                KEM Combiner                 November 2022
 
       Figure 3: KEM combiner construction for combining more than two
                                shared secrets
-
-
-
-
-Ounsworth                  Expires 30 May 2023                  [Page 5]
-
-Internet-Draft                KEM Combiner                 November 2022
-
 
 4.  IANA Considerations
 
@@ -311,32 +323,30 @@ Internet-Draft                KEM Combiner                 November 2022
               DOI 10.17487/RFC2119, March 1997,
               <https://www.rfc-editor.org/info/rfc2119>.
 
-   [RFC5990]  Randall, J., Kaliski, B., Brainard, J., Turner, S., and
-              RFC Publisher, "Use of the RSA-KEM Key Transport Algorithm
-              in the Cryptographic Message Syntax (CMS)", RFC 5990,
+   [RFC5990]  Randall, J., Kaliski, B., Brainard, J., and S. Turner,
+              "Use of the RSA-KEM Key Transport Algorithm in the
+              Cryptographic Message Syntax (CMS)", RFC 5990,
               DOI 10.17487/RFC5990, September 2010,
               <https://www.rfc-editor.org/info/rfc5990>.
 
-   [RFC7748]  Langley, A., Hamburg, M., Turner, S., and RFC Publisher,
-              "Elliptic Curves for Security", RFC 7748,
-              DOI 10.17487/RFC7748, January 2016,
-              <https://www.rfc-editor.org/info/rfc7748>.
+
+
+
+
+Ounsworth                 Expires 1 August 2023                 [Page 6]
+
+Internet-Draft                KEM Combiner                  January 2023
+
+
+   [RFC7748]  Langley, A., Hamburg, M., and S. Turner, "Elliptic Curves
+              for Security", RFC 7748, DOI 10.17487/RFC7748, January
+              2016, <https://www.rfc-editor.org/info/rfc7748>.
 
    [SEC1]     "Standards for Efficient Cryptography Group, SEC1:
               Elliptic Curve Cryptography", May 2009,
               <<https://www.secg.org/sec1-v2.pdf>>.
 
 6.2.  Informative References
-
-
-
-
-
-
-Ounsworth                  Expires 30 May 2023                  [Page 6]
-
-Internet-Draft                KEM Combiner                 November 2022
-
 
    [Aviram2022]
               Aviram, N., Dowling, B., Komargodski, I., Paterson, K. G.,
@@ -367,9 +377,22 @@ Internet-Draft                KEM Combiner                 November 2022
               Tjhai, C., Tomlinson, M., Bartlett, G., Fluhrer, S., Van
               Geest, D., Garcia-Morchon, O., and V. Smyslov, "Multiple
               Key Exchanges in IKEv2", Work in Progress, Internet-Draft,
-              draft-ietf-ipsecme-ikev2-multiple-ke-10, 9 November 2022,
+              draft-ietf-ipsecme-ikev2-multiple-ke-12, 1 December 2022,
               <https://www.ietf.org/archive/id/draft-ietf-ipsecme-ikev2-
-              multiple-ke-10.txt>.
+              multiple-ke-12.txt>.
+
+
+
+
+
+
+
+
+
+Ounsworth                 Expires 1 August 2023                 [Page 7]
+
+Internet-Draft                KEM Combiner                  January 2023
+
 
    [I-D.ietf-lamps-cmp-updates]
               Brockhaus, H., von Oheimb, D., and J. Gray, "Certificate
@@ -385,15 +408,6 @@ Internet-Draft                KEM Combiner                 November 2022
               <https://www.ietf.org/archive/id/draft-ietf-tls-hybrid-
               design-05.txt>.
 
-
-
-
-
-Ounsworth                  Expires 30 May 2023                  [Page 7]
-
-Internet-Draft                KEM Combiner                 November 2022
-
-
    [I-D.ounsworth-pq-composite-kem]
               Ounsworth, M. and J. Gray, "Composite KEM For Use In
               Internet PKI", Work in Progress, Internet-Draft, draft-
@@ -405,11 +419,10 @@ Internet-Draft                KEM Combiner                 November 2022
               <https://csrc.nist.gov/CSRC/media/Projects/Post-Quantum-
               Cryptography/documents/example-files/api-notes.pdf>.
 
-   [RFC3447]  Jonsson, J., Kaliski, B., and RFC Publisher, "Public-Key
-              Cryptography Standards (PKCS) #1: RSA Cryptography
-              Specifications Version 2.1", RFC 3447,
-              DOI 10.17487/RFC3447, February 2003,
-              <https://www.rfc-editor.org/info/rfc3447>.
+   [RFC3447]  Jonsson, J. and B. Kaliski, "Public-Key Cryptography
+              Standards (PKCS) #1: RSA Cryptography Specifications
+              Version 2.1", RFC 3447, DOI 10.17487/RFC3447, February
+              2003, <https://www.rfc-editor.org/info/rfc3447>.
 
    [RFC8174]  Leiba, B., "Ambiguity of Uppercase vs Lowercase in RFC
               2119 Key Words", BCP 14, RFC 8174, DOI 10.17487/RFC8174,
@@ -425,10 +438,22 @@ Internet-Draft                KEM Combiner                 November 2022
               DOI 10.17487/RFC8696, December 2019,
               <https://www.rfc-editor.org/info/rfc8696>.
 
-   [RFC8784]  Fluhrer, S., Kampanakis, P., McGrew, D., Smyslov, V., and
-              RFC Publisher, "Mixing Preshared Keys in the Internet Key
-              Exchange Protocol Version 2 (IKEv2) for Post-quantum
-              Security", RFC 8784, DOI 10.17487/RFC8784, June 2020,
+
+
+
+
+
+
+
+Ounsworth                 Expires 1 August 2023                 [Page 8]
+
+Internet-Draft                KEM Combiner                  January 2023
+
+
+   [RFC8784]  Fluhrer, S., Kampanakis, P., McGrew, D., and V. Smyslov,
+              "Mixing Preshared Keys in the Internet Key Exchange
+              Protocol Version 2 (IKEv2) for Post-quantum Security",
+              RFC 8784, DOI 10.17487/RFC8784, June 2020,
               <https://www.rfc-editor.org/info/rfc8784>.
 
 Appendix A.  Security Analysis
@@ -442,14 +467,6 @@ A.1.  Dual PRF
    of this document, no dual PRFs have been standardized for use.  In
    practice we often use HMACs or HKDFs to serve the role of a dual PRF
    even though they have never been proved to be dual PRFs
-
-
-
-Ounsworth                  Expires 30 May 2023                  [Page 8]
-
-Internet-Draft                KEM Combiner                 November 2022
-
-
    [Bellare2015], [Aviram2022].
 
    In essence, this document assumes that KDF( H(input1) || H(input2))
@@ -482,6 +499,13 @@ A.2.  KEM primitives
    suitable for use with the simplified KEM combiner presented in
    Section 3, Figure 2.
 
+
+
+Ounsworth                 Expires 1 August 2023                 [Page 9]
+
+Internet-Draft                KEM Combiner                  January 2023
+
+
    1.  A malicious encapsulater cannot control the length of the KEM
        output (shared secret) that will be derived by the decapsulater.
 
@@ -501,9 +525,41 @@ A.3.  RSA-KEM
 
 
 
-Ounsworth                  Expires 30 May 2023                  [Page 9]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Ounsworth                 Expires 1 August 2023                [Page 10]
 
-Internet-Draft                KEM Combiner                 November 2022
+Internet-Draft                KEM Combiner                  January 2023
 
 
    1. Generate a random integer z between 0 and n-1 (see note), and
@@ -557,9 +613,9 @@ Internet-Draft                KEM Combiner                 November 2022
 
 
 
-Ounsworth                  Expires 30 May 2023                 [Page 10]
+Ounsworth                 Expires 1 August 2023                [Page 11]
 
-Internet-Draft                KEM Combiner                 November 2022
+Internet-Draft                KEM Combiner                  January 2023
 
 
    Here the transported symmetric key, KEK, is the KEM output (shared
@@ -613,9 +669,9 @@ A.4.  Elliptic Curve Diffie-Hellman (ECDH)
 
 
 
-Ounsworth                  Expires 30 May 2023                 [Page 11]
+Ounsworth                 Expires 1 August 2023                [Page 12]
 
-Internet-Draft                KEM Combiner                 November 2022
+Internet-Draft                KEM Combiner                  January 2023
 
 
    Other key exchange methods defined in [SEC1] follow a similar
@@ -669,9 +725,9 @@ A.5.  Edwards Curve Diffie-Hellman (X25519 / X448)
 
 
 
-Ounsworth                  Expires 30 May 2023                 [Page 12]
+Ounsworth                 Expires 1 August 2023                [Page 13]
 
-Internet-Draft                KEM Combiner                 November 2022
+Internet-Draft                KEM Combiner                  January 2023
 
 
    rejection sampling.  Assuming a strong choice of KDF, the attacker
@@ -725,9 +781,9 @@ Appendix C.  Contributors and Acknowledgements
 
 
 
-Ounsworth                  Expires 30 May 2023                 [Page 13]
+Ounsworth                 Expires 1 August 2023                [Page 14]
 
-Internet-Draft                KEM Combiner                 November 2022
+Internet-Draft                KEM Combiner                  January 2023
 
 
    Douglas Stebila, Nimrod Aviram.
@@ -781,4 +837,4 @@ Author's Address
 
 
 
-Ounsworth                  Expires 30 May 2023                 [Page 14]
+Ounsworth                 Expires 1 August 2023                [Page 15]

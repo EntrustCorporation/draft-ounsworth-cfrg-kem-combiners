@@ -163,6 +163,18 @@ The need for a KEM-based authenticated key establishment arises, for example, wh
 
 # KEM Combiner {#sec-kemcombiner}
 
+TODO: read and cite the ETSI doc "Quantum-safe Hybrid Key Exchanges"
+https://www.etsi.org/deliver/etsi_ts/103700_103799/103744/01.01.01_60/ts_103744v010101p.pdf
+
+TODO: as per https://www.enisa.europa.eu/publications/post-quantum-cryptography-integration-study section 4.2, might need to specify behaviour in light of KEMs with a non-zero failure probility.
+
+TODO: read and cite 
+Federico Giacon, Felix Heuer, and Bertram Poettering. KEM combiners. In Michel
+Abdalla and Ricardo Dahab, editors, PKC 2018: 21st International Conference on Theory
+and Practice of Public Key Cryptography, Part I, volume 10769 of Lecture Notes in Com-
+puter Science, pages 190–218. Springer, Heidelberg, March 2018.
+
+
 A KEM combiner is a function that takes in two shared secrets and returns a combined shared secret, where all values are byte arrays.
 
 ~~~
