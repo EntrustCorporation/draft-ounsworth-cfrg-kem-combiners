@@ -6,9 +6,10 @@
 <meta content="initial-scale=1.0" name="viewport">
 <title>Combiner function for hybrid key encapsulation mechanisms (Hybrid KEMs)</title>
 <meta content="Mike Ounsworth" name="author">
+<meta content="Aron Wussler" name="author">
 <meta content="
        The migration to post-quantum cryptography often calls for performing multiple key encapsulations in parallel and then combining their outputs to derive a single shared secret. 
-       This document defines the KEM combiner  KDF( H(ss1) || H(ss2) )  which is considered to be a dual PRF in practice, even though not provably secure. This mechanism simplifies to  KDF( ss1 || ss2 )  when used with a KEM which internally uses a KDF to produce its shared secret. RSA-KEM  , ECDH  , Edwards curve DH  , and CRYSTALS-Kyber   are shown to meet this criteria, when implemented as per the listed specification, and therefore are safe to use with the simplified KEM combiner. Care should be taken with implementations that are similar but not identical to those analyzed in this document. 
+       This document defines a flexible multi-share KEM combiner, that fulfils the security criteria to join an arbitrary number of key shares. 
        
 
 
@@ -20,7 +21,6 @@
 <!-- Generator version information:
   xml2rfc 3.12.2
     Python 3.10.6
-    weasyprint 54.1
 -->
 <link href="draft-ounsworth-cfrg-kem-combiners.xml" rel="alternate" type="application/rfc+xml">
 <link href="#copyright" rel="license">
@@ -1177,11 +1177,11 @@ li > p:last-of-type {
 <thead><tr>
 <td class="left">Internet-Draft</td>
 <td class="center">KEM Combiner</td>
-<td class="right">January 2023</td>
+<td class="right">March 2023</td>
 </tr></thead>
 <tfoot><tr>
-<td class="left">Ounsworth</td>
-<td class="center">Expires 1 August 2023</td>
+<td class="left">Ounsworth &amp; Wussler</td>
+<td class="center">Expires 2 September 2023</td>
 <td class="right">[Page]</td>
 </tr></tfoot>
 </table>
@@ -1194,17 +1194,21 @@ li > p:last-of-type {
 <dd class="internet-draft">draft-ounsworth-cfrg-kem-combiners-00</dd>
 <dt class="label-published">Published:</dt>
 <dd class="published">
-<time datetime="2023-01-28" class="published">28 January 2023</time>
+<time datetime="2023-03-01" class="published">1 March 2023</time>
     </dd>
 <dt class="label-intended-status">Intended Status:</dt>
 <dd class="intended-status">Informational</dd>
 <dt class="label-expires">Expires:</dt>
-<dd class="expires"><time datetime="2023-08-01">1 August 2023</time></dd>
-<dt class="label-authors">Author:</dt>
+<dd class="expires"><time datetime="2023-09-02">2 September 2023</time></dd>
+<dt class="label-authors">Authors:</dt>
 <dd class="authors">
 <div class="author">
       <div class="author-name">M. Ounsworth</div>
 <div class="org">Entrust</div>
+</div>
+<div class="author">
+      <div class="author-name">A. Wussler</div>
+<div class="org">Proton</div>
 </div>
 </dd>
 </dl>
@@ -1213,7 +1217,7 @@ li > p:last-of-type {
 <section id="section-abstract">
       <h2 id="abstract"><a href="#abstract" class="selfRef">Abstract</a></h2>
 <p id="section-abstract-1">The migration to post-quantum cryptography often calls for performing multiple key encapsulations in parallel and then combining their outputs to derive a single shared secret.<a href="#section-abstract-1" class="pilcrow">¶</a></p>
-<p id="section-abstract-2">This document defines the KEM combiner <code>KDF( H(ss1) || H(ss2) )</code> which is considered to be a dual PRF in practice, even though not provably secure. This mechanism simplifies to <code>KDF( ss1 || ss2 )</code> when used with a KEM which internally uses a KDF to produce its shared secret. RSA-KEM <span>[<a href="#RFC5990" class="xref">RFC5990</a>]</span>, ECDH <span>[<a href="#SEC1" class="xref">SEC1</a>]</span>, Edwards curve DH <span>[<a href="#RFC7748" class="xref">RFC7748</a>]</span>, and CRYSTALS-Kyber <span>[<a href="#I-D.cfrg-schwabe-kyber" class="xref">I-D.cfrg-schwabe-kyber</a>]</span> are shown to meet this criteria, when implemented as per the listed specification, and therefore are safe to use with the simplified KEM combiner. Care should be taken with implementations that are similar but not identical to those analyzed in this document.<a href="#section-abstract-2" class="pilcrow">¶</a></p>
+<p id="section-abstract-2">This document defines a flexible multi-share KEM combiner, that fulfils the security criteria to join an arbitrary number of key shares.<a href="#section-abstract-2" class="pilcrow">¶</a></p>
 </section>
 <section class="note rfcEditorRemove" id="section-note.1">
       <h2 id="name-about-this-document-2">
@@ -1249,7 +1253,7 @@ li > p:last-of-type {
         time. It is inappropriate to use Internet-Drafts as reference
         material or to cite them other than as "work in progress."<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
 <p id="section-boilerplate.1-4">
-        This Internet-Draft will expire on 1 August 2023.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
+        This Internet-Draft will expire on 2 September 2023.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="copyright">
@@ -1298,7 +1302,15 @@ li > p:last-of-type {
             </ul>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3">
-            <p id="section-toc.1-1.3.1"><a href="#section-3" class="xref">3</a>.  <a href="#name-kem-combiner-2" class="xref">KEM Combiner</a></p>
+            <p id="section-toc.1-1.3.1"><a href="#section-3" class="xref">3</a>.  <a href="#name-kem-combiner-construction-2" class="xref">KEM Combiner construction</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.1">
+                <p id="section-toc.1-1.3.2.1.1"><a href="#section-3.1" class="xref">3.1</a>.  <a href="#name-protocol-binding-2" class="xref">Protocol binding</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.2">
+                <p id="section-toc.1-1.3.2.2.1"><a href="#section-3.2" class="xref">3.2</a>.  <a href="#name-practical-instantiations-2" class="xref">Practical instantiations</a></p>
+</li>
+            </ul>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4">
             <p id="section-toc.1-1.4.1"><a href="#section-4" class="xref">4</a>.  <a href="#name-iana-considerations-2" class="xref">IANA Considerations</a></p>
@@ -1318,41 +1330,10 @@ li > p:last-of-type {
             </ul>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7">
-            <p id="section-toc.1-1.7.1"><a href="#appendix-A" class="xref">Appendix A</a>.  <a href="#name-security-analysis-2" class="xref">Security Analysis</a></p>
-<ul class="compact toc ulBare ulEmpty">
-<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7.2.1">
-                <p id="section-toc.1-1.7.2.1.1"><a href="#appendix-A.1" class="xref">A.1</a>.  <a href="#name-dual-prf-2" class="xref">Dual PRF</a></p>
-</li>
-              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7.2.2">
-                <p id="section-toc.1-1.7.2.2.1"><a href="#appendix-A.2" class="xref">A.2</a>.  <a href="#name-kem-primitives-2" class="xref">KEM primitives</a></p>
-</li>
-              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7.2.3">
-                <p id="section-toc.1-1.7.2.3.1"><a href="#appendix-A.3" class="xref">A.3</a>.  <a href="#name-rsa-kem-2" class="xref">RSA-KEM</a></p>
-</li>
-              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7.2.4">
-                <p id="section-toc.1-1.7.2.4.1"><a href="#appendix-A.4" class="xref">A.4</a>.  <a href="#name-elliptic-curve-diffie-hellma" class="xref">Elliptic Curve Diffie-Hellman (ECDH)</a></p>
-</li>
-              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7.2.5">
-                <p id="section-toc.1-1.7.2.5.1"><a href="#appendix-A.5" class="xref">A.5</a>.  <a href="#name-edwards-curve-diffie-hellman" class="xref">Edwards Curve Diffie-Hellman (X25519 / X448)</a></p>
-</li>
-              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7.2.6">
-                <p id="section-toc.1-1.7.2.6.1"><a href="#appendix-A.6" class="xref">A.6</a>.  <a href="#name-crystals-kyber-2" class="xref">CRYSTALS-Kyber</a></p>
-</li>
-            </ul>
+            <p id="section-toc.1-1.7.1"><a href="#appendix-A" class="xref"></a><a href="#name-acknowledgements-2" class="xref">Acknowledgements</a></p>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.8">
-            <p id="section-toc.1-1.8.1"><a href="#appendix-B" class="xref">Appendix B</a>.  <a href="#name-intellectual-property-consid" class="xref">Intellectual Property Considerations</a></p>
-</li>
-          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.9">
-            <p id="section-toc.1-1.9.1"><a href="#appendix-C" class="xref">Appendix C</a>.  <a href="#name-contributors-and-acknowledge" class="xref">Contributors and Acknowledgements</a></p>
-<ul class="compact toc ulBare ulEmpty">
-<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.9.2.1">
-                <p id="section-toc.1-1.9.2.1.1"><a href="#appendix-C.1" class="xref">C.1</a>.  <a href="#name-making-contributions-2" class="xref">Making contributions</a></p>
-</li>
-            </ul>
-</li>
-          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.10">
-            <p id="section-toc.1-1.10.1"><a href="#appendix-D" class="xref"></a><a href="#name-authors-address-2" class="xref">Author's Address</a></p>
+            <p id="section-toc.1-1.8.1"><a href="#appendix-B" class="xref"></a><a href="#name-authors-addresses-2" class="xref">Authors' Addresses</a></p>
 </li>
         </ul>
 </nav>
@@ -1393,7 +1374,7 @@ def kemDecaps(ct, sk) -&gt; ss
 <ol start="1" type="1" class="normal type-1" id="section-2-2">
 <li id="section-2-2.1">KEM / PSK hybrids where the output of a KEM is combined with a static pre-shared key.<a href="#section-2-2.1" class="pilcrow">¶</a>
 </li>
-        <li id="section-2-2.2">Post-quantum / tradtional hybrid KEMs.<a href="#section-2-2.2" class="pilcrow">¶</a>
+        <li id="section-2-2.2">Post-quantum / traditional hybrid KEMs.<a href="#section-2-2.2" class="pilcrow">¶</a>
 </li>
         <li id="section-2-2.3">KEM-based authenticated key exchanges (AKEs).<a href="#section-2-2.3" class="pilcrow">¶</a>
 </li>
@@ -1420,7 +1401,7 @@ def kemDecaps(ct, sk) -&gt; ss
 </dd>
         <dd class="break"></dd>
 </dl>
-<p id="section-2.2-3">Building a PQ/T hybrid KEM requires a secure function which combines the output of both component KEMs to form a single output. Several IETF protocols are adding PQ/T hybrid KEM mechanisms as part of their overall post-quantum migration strategies, examples include TLS 1.3 <span>[<a href="#I-D.ietf-tls-hybrid-design" class="xref">I-D.ietf-tls-hybrid-design</a>]</span>, IKEv2 <span>[<a href="#I-D.ietf-ipsecme-ikev2-multiple-ke" class="xref">I-D.ietf-ipsecme-ikev2-multiple-ke</a>]</span>, X.509; PKIX; CMS <span>[<a href="#I-D.ounsworth-pq-composite-kem" class="xref">I-D.ounsworth-pq-composite-kem</a>]</span>, OpenPGP (CITE once Aron's draft is up), JOSE / COSE (CITE once Orie's drafts are up).<a href="#section-2.2-3" class="pilcrow">¶</a></p>
+<p id="section-2.2-3">Building a PQ/T hybrid KEM requires a secure function which combines the output of both component KEMs to form a single output. Several IETF protocols are adding PQ/T hybrid KEM mechanisms as part of their overall post-quantum migration strategies, examples include TLS 1.3 <span>[<a href="#I-D.ietf-tls-hybrid-design" class="xref">I-D.ietf-tls-hybrid-design</a>]</span>, IKEv2 <span>[<a href="#I-D.ietf-ipsecme-ikev2-multiple-ke" class="xref">I-D.ietf-ipsecme-ikev2-multiple-ke</a>]</span>, X.509; PKIX; CMS <span>[<a href="#I-D.ounsworth-pq-composite-kem" class="xref">I-D.ounsworth-pq-composite-kem</a>]</span>, OpenPGP <span>[<a href="#I-D.wussler-openpgp-pqc" class="xref">I-D.wussler-openpgp-pqc</a>]</span>, JOSE / COSE (CITE once Orie's drafts are up).<a href="#section-2.2-3" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="kem-based-ake">
@@ -1435,59 +1416,72 @@ def kemDecaps(ct, sk) -&gt; ss
 </div>
 <div id="sec-kemcombiner">
 <section id="section-3">
-      <h2 id="name-kem-combiner-2">
-<a href="#section-3" class="section-number selfRef">3. </a><a href="#name-kem-combiner-2" class="section-name selfRef">KEM Combiner</a>
+      <h2 id="name-kem-combiner-construction-2">
+<a href="#section-3" class="section-number selfRef">3. </a><a href="#name-kem-combiner-construction-2" class="section-name selfRef">KEM Combiner construction</a>
       </h2>
-<p id="section-3-1">TODO: read and cite the ETSI doc "Quantum-safe Hybrid Key Exchanges"
-https://www.etsi.org/deliver/etsi_ts/103700_103799/103744/01.01.01_60/ts_103744v010101p.pdf<a href="#section-3-1" class="pilcrow">¶</a></p>
-<p id="section-3-2">TODO: as per https://www.enisa.europa.eu/publications/post-quantum-cryptography-integration-study section 4.2, might need to specify behaviour in light of KEMs with a non-zero failure probility.<a href="#section-3-2" class="pilcrow">¶</a></p>
-<p id="section-3-3">TODO: read and cite 
-Federico Giacon, Felix Heuer, and Bertram Poettering. KEM combiners. In Michel
-Abdalla and Ricardo Dahab, editors, PKC 2018: 21st International Conference on Theory
-and Practice of Public Key Cryptography, Part I, volume 10769 of Lecture Notes in Com-
-puter Science, pages 190-218. Springer, Heidelberg, March 2018.<a href="#section-3-3" class="pilcrow">¶</a></p>
-<p id="section-3-4">A KEM combiner is a function that takes in two shared secrets and returns a combined shared secret, where all values are byte arrays.<a href="#section-3-4" class="pilcrow">¶</a></p>
-<div class="alignLeft art-text artwork" id="section-3-5">
+<p id="section-3-1">A KEM combiner is a function that takes in two or more shared secrets and returns a combined shared secret, where all values are byte arrays.<a href="#section-3-1" class="pilcrow">¶</a></p>
+<div class="alignLeft art-text artwork" id="section-3-2">
 <pre>
-ss = kemCombiner(ss1, ss2)
-</pre><a href="#section-3-5" class="pilcrow">¶</a>
+SS = kemCombiner(SS_1, SS_2, ..., SS_n)
+</pre><a href="#section-3-2" class="pilcrow">¶</a>
 </div>
-<p id="section-3-6">This document assumes that shared secrets are the output of a KEM, but without loss of generality they may also be any other source of cryptographic key material, such as pre-shared keys (PSKs), with PQ/PSK being a quantum-safe migration strategy being made available by some protocols, see for example IKEv2 in <span>[<a href="#RFC8784" class="xref">RFC8784</a>]</span>.<a href="#section-3-6" class="pilcrow">¶</a></p>
-<p id="section-3-7">In general it is desirable to use a dual PRF, a dual-input PRF which is keyed off either input, as a KEM combiner (see <a href="#sec-dualprf" class="xref">Appendix A.1</a> for a discussion of dual PRFs). We take the following construction as a dual PRF in practice, and therefore suitable for use in all IETF protocols that need to combine the output of two KEMs:<a href="#section-3-7" class="pilcrow">¶</a></p>
+<p id="section-3-3">This document assumes that shared secrets are the output of a KEM, but without loss of generality they may also be any other source of cryptographic key material, such as pre-shared keys (PSKs), with PQ/PSK being a quantum-safe migration strategy being made available by some protocols, see for example IKEv2 in <span>[<a href="#RFC8784" class="xref">RFC8784</a>]</span>.<a href="#section-3-3" class="pilcrow">¶</a></p>
+<p id="section-3-4">In general it is desirable to use a multi-PRF as a KEM combiner, a function that can be keyed by any input.
+The following simple yet generic construction can be used in all IETF protocols that need to combine the output of two or more KEMs:<a href="#section-3-4" class="pilcrow">¶</a></p>
 <span id="name-general-kem-combiner-constru"></span><figure id="figure-1">
-        <div class="alignLeft art-text artwork" id="section-3-8.1">
+        <div class="alignLeft art-text artwork" id="section-3-5.1">
 <pre>
-ss = kemCombiner(ss1, ss2) = KDF( H(ss1) || H(ss2) )
+KDF(counter || K_1 || ... || K_n || fixedInfo)
 </pre>
 </div>
 <figcaption><a href="#figure-1" class="selfRef">Figure 1</a>:
 <a href="#name-general-kem-combiner-constru" class="selfRef">general KEM combiner construction</a>
         </figcaption></figure>
-<p id="section-3-9">where <code>KDF</code> represents a suitable choice of cryptographic key derivation function, <code>H</code> represents a cryptographic hash function, <code>ss1</code> and <code>ss2</code> represent the outputs of the first and second KEMs, and <code>||</code> represents concatenation. <code>KDF</code> and <code>H</code> are assumed to behave as random oracles.<a href="#section-3-9" class="pilcrow">¶</a></p>
-<p id="section-3-10">See <a href="#sec-kemprimitives" class="xref">Appendix A.2</a> for security analysis on the safety of using this combiner with RSA-KEM <span>[<a href="#RFC5990" class="xref">RFC5990</a>]</span>, elliptic curve Diffie-Hellman <span>[<a href="#SEC1" class="xref">SEC1</a>]</span>, Edwards curve Diffie-Hellman <span>[<a href="#RFC7748" class="xref">RFC7748</a>]</span>, and CRYSTALS-Kyber <span>[<a href="#I-D.cfrg-schwabe-kyber" class="xref">I-D.cfrg-schwabe-kyber</a>]</span>. All of these cryptographic algorithms are found to have a KDF or cryptographic hash as the last step before output of the shared secret, and therefore the KEM combiner construction may be simplified to the following when used with combinations of the analyzed cryptographic algorithms.<a href="#section-3-10" class="pilcrow">¶</a></p>
-<span id="name-simplified-kem-combiner-cons"></span><div id="tab-simplifiedCombiner">
-<figure id="figure-2">
-        <div class="alignLeft art-text artwork" id="section-3-11.1">
+<p id="section-3-6">where <code>KDF</code> represents a suitable choice of cryptographic key derivation function, <code>K_i</code> represent the constant-length input keys, <code>fixedInfo</code> is some protocol-specific KDF binding, and <code>||</code> represents concatenation.
+The counter parameter is instantiation specific.<a href="#section-3-6" class="pilcrow">¶</a></p>
+<p id="section-3-7">This construction is in line with NIST SP-800 56Cr2 <span>[<a href="#SP800-56C" class="xref">SP800-56C</a>]</span>.
+In section <a href="#sec-instantiation" class="xref">Section 3.2</a> several possible practical instantiations will be proposed.<a href="#section-3-7" class="pilcrow">¶</a></p>
+<p id="section-3-8">Each <code>K_i</code> MUST be constant in length, therefore the secret shares <code>SS_i</code> can be used directly only if they are guaranteed to be constant length. For all other cases, it is REQUIRED to hash them first:<a href="#section-3-8" class="pilcrow">¶</a></p>
+<div class="alignLeft art-text artwork" id="section-3-9">
 <pre>
-ss = kemCombiner(ss1, ss2) = KDF( ss1 || ss2 )
-</pre>
+K_i = H(SS_i)
+</pre><a href="#section-3-9" class="pilcrow">¶</a>
 </div>
-<figcaption><a href="#figure-2" class="selfRef">Figure 2</a>:
-<a href="#name-simplified-kem-combiner-cons" class="selfRef">simplified KEM combiner construction when both KEMs are known to provide strong output</a>
-        </figcaption></figure>
+<div id="protocol-binding">
+<section id="section-3.1">
+        <h3 id="name-protocol-binding-2">
+<a href="#section-3.1" class="section-number selfRef">3.1. </a><a href="#name-protocol-binding-2" class="section-name selfRef">Protocol binding</a>
+        </h3>
+<p id="section-3.1-1">The <code>fixedInfo</code> string is a fixed-length string containing some context-specific information.
+It MUST NOT depend on the secret shares.<a href="#section-3.1-1" class="pilcrow">¶</a></p>
+<p id="section-3.1-2">A non-comprehensive list of information that can be included in the fixedInfo can be found in paragraph 5.8.2 of NIST SP800-56Ar3 <span>[<a href="#SP800-56A" class="xref">SP800-56A</a>]</span>.<a href="#section-3.1-2" class="pilcrow">¶</a></p>
+<p id="section-3.1-3">The <code>fixedInfo</code> string MUST have a definite structure depending on the protocol where all parts are fixed length. This prevents possible cases where a variable length structure could be used to create collisions between two different instances.
+In cases some variable length input is necessary, such as the representation of a public key or an OID, then hashing or padding can be used.<a href="#section-3.1-3" class="pilcrow">¶</a></p>
+</section>
 </div>
-<p id="section-3-12">This simplified combiner proposed as a KEM combiner, for example in <span>[<a href="#I-D.ietf-tls-hybrid-design" class="xref">I-D.ietf-tls-hybrid-design</a>]</span>.<a href="#section-3-12" class="pilcrow">¶</a></p>
-<p id="section-3-13">In the case that more than two shared secrets need to be combined, the above construction can be extended in the obvious way:<a href="#section-3-13" class="pilcrow">¶</a></p>
-<span id="name-kem-combiner-construction-fo"></span><figure id="figure-3">
-        <div class="alignLeft art-text artwork" id="section-3-14.1">
-<pre>
-ss = kemCombiner(ss1, ss2, ss3, ... )
-      = KDF( H(ss1) || H(ss2) || H(ss3) ... )
-</pre>
+<div id="sec-instantiation">
+<section id="section-3.2">
+        <h3 id="name-practical-instantiations-2">
+<a href="#section-3.2" class="section-number selfRef">3.2. </a><a href="#name-practical-instantiations-2" class="section-name selfRef">Practical instantiations</a>
+        </h3>
+<p id="section-3.2-1">The KDF MUST be instantiated with one of the following Keccak-based option.
+Each instance defines a function to be used as KDF, a hash function to optionally derive the <code>K_i</code>, and a counter.<a href="#section-3.2-1" class="pilcrow">¶</a></p>
+<ol start="1" type="1" class="normal type-1" id="section-3.2-2">
+<li id="section-3.2-2.1">
+            <code>KDF = SHA3-256</code> and <code>H = SHA3-256</code>. The counter MUST be initialized with the string <code>0x00000001</code> and MUST be increased by 0x01 if more key material is needed.<a href="#section-3.2-2.1" class="pilcrow">¶</a>
+</li>
+          <li id="section-3.2-2.2">
+            <code>KDF = SHA3-512</code> and <code>H = SHA3-512</code>. The counter MUST be initialized with the string <code>0x00000001</code> and MUST be increased by 0x01 if more key material is needed.<a href="#section-3.2-2.2" class="pilcrow">¶</a>
+</li>
+          <li id="section-3.2-2.3">
+            <code>KDF = KMAC128</code> and <code>H = SHA3-256</code>. The counter MUST be the fixed string <code>0x00000001</code>.<a href="#section-3.2-2.3" class="pilcrow">¶</a>
+</li>
+          <li id="section-3.2-2.4">
+            <code>KDF = KMAC256</code> and <code>H = SHA3-512</code>. The counter MUST be the fixed string <code>0x00000001</code>.<a href="#section-3.2-2.4" class="pilcrow">¶</a>
+</li>
+        </ol>
+</section>
 </div>
-<figcaption><a href="#figure-3" class="selfRef">Figure 3</a>:
-<a href="#name-kem-combiner-construction-fo" class="selfRef">KEM combiner construction for combining more than two shared secrets</a>
-        </figcaption></figure>
 </section>
 </div>
 <div id="sec-iana">
@@ -1503,8 +1497,10 @@ ss = kemCombiner(ss1, ss2, ss3, ... )
       <h2 id="name-security-considerations-2">
 <a href="#section-5" class="section-number selfRef">5. </a><a href="#name-security-considerations-2" class="section-name selfRef">Security Considerations</a>
       </h2>
-<p id="section-5-1">This work assumes that the KEM combiner defined in <a href="#sec-kemcombiner" class="xref">Section 3</a> is a dual PRF in practice, despite the lack of security proof. As the academic literature progresses towards provably secure dual PRFs, this document may need to be obsoleted in favour of a more robust primitive.<a href="#section-5-1" class="pilcrow">¶</a></p>
-<p id="section-5-2">It is important to note that the analysis herein pertains to the specific cryptographic algorithms analyzed and do not necessarily generalize to other constructions, even if they are based on the same underlying primitive. Specifically it depends on whether the shared secret produced by the KEM is the output of a fixed and secure key derivation function which makes the length and value of the shared secret beyond the direct control of the initiator of the KEM.<a href="#section-5-2" class="pilcrow">¶</a></p>
+<p id="section-5-1">The proposed instantiations in <a href="#sec-instantiation" class="xref">Section 3.2</a> are practical multi-PRFs and this specification limits to the use of Keccak-based constructions. The sponge construction was proven to be indifferentiable from a random oracle <span>[<a href="#SPONGE" class="xref">SPONGE</a>]</span>.
+More precisely, for a given capacity <code>c</code> the indifferentiability proof shows that assuming there are no weaknesses found in the Keccak permutation, an attacker has to make an expected number of <code>2^(c/2)</code> calls to the permutation to tell Keccak from a random oracle.
+For a random oracle, a difference in only a single bit gives an unrelated, uniformly random output.
+Hence, to be able to distinguish a key <code>K</code>, derived from shared keys <code>K_i</code> from a random bit string, an adversary has to correctly guess all key shares <code>K_i</code> entirely.<a href="#section-5-1" class="pilcrow">¶</a></p>
 </section>
 </div>
 <section id="section-6">
@@ -1517,20 +1513,8 @@ ss = kemCombiner(ss1, ss2, ss3, ... )
         </h3>
 <dl class="references">
 <dt id="RFC2119">[RFC2119]</dt>
-        <dd>
-<span class="refAuthor">Bradner, S.</span>, <span class="refTitle">"Key words for use in RFCs to Indicate Requirement Levels"</span>, <span class="seriesInfo">BCP 14</span>, <span class="seriesInfo">RFC 2119</span>, <span class="seriesInfo">DOI 10.17487/RFC2119</span>, <time datetime="1997-03" class="refDate">March 1997</time>, <span>&lt;<a href="https://www.rfc-editor.org/info/rfc2119">https://www.rfc-editor.org/info/rfc2119</a>&gt;</span>. </dd>
-<dd class="break"></dd>
-<dt id="RFC5990">[RFC5990]</dt>
-        <dd>
-<span class="refAuthor">Randall, J.</span>, <span class="refAuthor">Kaliski, B.</span>, <span class="refAuthor">Brainard, J.</span>, and <span class="refAuthor">S. Turner</span>, <span class="refTitle">"Use of the RSA-KEM Key Transport Algorithm in the Cryptographic Message Syntax (CMS)"</span>, <span class="seriesInfo">RFC 5990</span>, <span class="seriesInfo">DOI 10.17487/RFC5990</span>, <time datetime="2010-09" class="refDate">September 2010</time>, <span>&lt;<a href="https://www.rfc-editor.org/info/rfc5990">https://www.rfc-editor.org/info/rfc5990</a>&gt;</span>. </dd>
-<dd class="break"></dd>
-<dt id="RFC7748">[RFC7748]</dt>
-        <dd>
-<span class="refAuthor">Langley, A.</span>, <span class="refAuthor">Hamburg, M.</span>, and <span class="refAuthor">S. Turner</span>, <span class="refTitle">"Elliptic Curves for Security"</span>, <span class="seriesInfo">RFC 7748</span>, <span class="seriesInfo">DOI 10.17487/RFC7748</span>, <time datetime="2016-01" class="refDate">January 2016</time>, <span>&lt;<a href="https://www.rfc-editor.org/info/rfc7748">https://www.rfc-editor.org/info/rfc7748</a>&gt;</span>. </dd>
-<dd class="break"></dd>
-<dt id="SEC1">[SEC1]</dt>
       <dd>
-<span class="refTitle">"Standards for Efficient Cryptography Group, SEC1: Elliptic Curve Cryptography"</span>, <time datetime="2009-05" class="refDate">May 2009</time>, <span>&lt;<a href="&lt;https://www.secg.org/sec1-v2.pdf&gt;">&lt;https://www.secg.org/sec1-v2.pdf&gt;</a>&gt;</span>. </dd>
+<span class="refAuthor">Bradner, S.</span>, <span class="refTitle">"Key words for use in RFCs to Indicate Requirement Levels"</span>, <span class="seriesInfo">BCP 14</span>, <span class="seriesInfo">RFC 2119</span>, <span class="seriesInfo">DOI 10.17487/RFC2119</span>, <time datetime="1997-03" class="refDate">March 1997</time>, <span>&lt;<a href="https://www.rfc-editor.org/info/rfc2119">https://www.rfc-editor.org/info/rfc2119</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 </dl>
 </section>
@@ -1539,45 +1523,33 @@ ss = kemCombiner(ss1, ss2, ss3, ... )
 <a href="#section-6.2" class="section-number selfRef">6.2. </a><a href="#name-informative-references-2" class="section-name selfRef">Informative References</a>
         </h3>
 <dl class="references">
-<dt id="Aviram2022">[Aviram2022]</dt>
-        <dd>
-<span class="refAuthor">Aviram, N.</span>, <span class="refAuthor">Dowling, B.</span>, <span class="refAuthor">Komargodski, I.</span>, <span class="refAuthor">Paterson, K. G.</span>, <span class="refAuthor">Ronen, E.</span>, and <span class="refAuthor">E. Yogev</span>, <span class="refTitle">"Practical (Post-Quantum) Key Combiners from One-Wayness and Applications to TLS."</span>, <time datetime="2022" class="refDate">2022</time>, <span>&lt;<a href="https://eprint.iacr.org/2022/065">https://eprint.iacr.org/2022/065</a>&gt;</span>. </dd>
-<dd class="break"></dd>
-<dt id="Bellare2015">[Bellare2015]</dt>
-        <dd>
-<span class="refAuthor">Bellare, M.</span> and <span class="refAuthor">A. Lysyanskaya</span>, <span class="refTitle">"Symmetric and Dual PRFs from Standard Assumptions: A Generic Validation of an HMAC Assumption."</span>, <time datetime="2015" class="refDate">2015</time>, <span>&lt;<a href="https://eprint.iacr.org/2015/1198">https://eprint.iacr.org/2015/1198</a>&gt;</span>. </dd>
-<dd class="break"></dd>
-<dt id="I-D.cfrg-schwabe-kyber">[I-D.cfrg-schwabe-kyber]</dt>
-        <dd>
-<span class="refAuthor">Schwabe, P.</span> and <span class="refAuthor">B. Westerbaan</span>, <span class="refTitle">"Kyber Post-Quantum KEM"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-cfrg-schwabe-kyber-01</span>, <time datetime="2022-09-23" class="refDate">23 September 2022</time>, <span>&lt;<a href="https://www.ietf.org/archive/id/draft-cfrg-schwabe-kyber-01.txt">https://www.ietf.org/archive/id/draft-cfrg-schwabe-kyber-01.txt</a>&gt;</span>. </dd>
-<dd class="break"></dd>
 <dt id="I-D.driscoll-pqt-hybrid-terminology">[I-D.driscoll-pqt-hybrid-terminology]</dt>
         <dd>
-<span class="refAuthor">D, F.</span>, <span class="refTitle">"Terminology for Post-Quantum Traditional Hybrid Schemes"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-driscoll-pqt-hybrid-terminology-01</span>, <time datetime="2022-10-20" class="refDate">20 October 2022</time>, <span>&lt;<a href="https://www.ietf.org/archive/id/draft-driscoll-pqt-hybrid-terminology-01.txt">https://www.ietf.org/archive/id/draft-driscoll-pqt-hybrid-terminology-01.txt</a>&gt;</span>. </dd>
+<span class="refAuthor">D, F.</span>, <span class="refTitle">"Terminology for Post-Quantum Traditional Hybrid Schemes"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-driscoll-pqt-hybrid-terminology-01</span>, <time datetime="2022-10-20" class="refDate">20 October 2022</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-driscoll-pqt-hybrid-terminology-01">https://datatracker.ietf.org/doc/html/draft-driscoll-pqt-hybrid-terminology-01</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="I-D.ietf-ipsecme-ikev2-multiple-ke">[I-D.ietf-ipsecme-ikev2-multiple-ke]</dt>
         <dd>
-<span class="refAuthor">Tjhai, C.</span>, <span class="refAuthor">Tomlinson, M.</span>, <span class="refAuthor">Bartlett, G.</span>, <span class="refAuthor">Fluhrer, S.</span>, <span class="refAuthor">Van Geest, D.</span>, <span class="refAuthor">Garcia-Morchon, O.</span>, and <span class="refAuthor">V. Smyslov</span>, <span class="refTitle">"Multiple Key Exchanges in IKEv2"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-ietf-ipsecme-ikev2-multiple-ke-12</span>, <time datetime="2022-12-01" class="refDate">1 December 2022</time>, <span>&lt;<a href="https://www.ietf.org/archive/id/draft-ietf-ipsecme-ikev2-multiple-ke-12.txt">https://www.ietf.org/archive/id/draft-ietf-ipsecme-ikev2-multiple-ke-12.txt</a>&gt;</span>. </dd>
+<span class="refAuthor">Tjhai, C.</span>, <span class="refAuthor">Tomlinson, M.</span>, <span class="refAuthor">Bartlett, G.</span>, <span class="refAuthor">Fluhrer, S.</span>, <span class="refAuthor">Van Geest, D.</span>, <span class="refAuthor">Garcia-Morchon, O.</span>, and <span class="refAuthor">V. Smyslov</span>, <span class="refTitle">"Multiple Key Exchanges in IKEv2"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-ietf-ipsecme-ikev2-multiple-ke-12</span>, <time datetime="2022-12-01" class="refDate">1 December 2022</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-ietf-ipsecme-ikev2-multiple-ke-12">https://datatracker.ietf.org/doc/html/draft-ietf-ipsecme-ikev2-multiple-ke-12</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="I-D.ietf-lamps-cmp-updates">[I-D.ietf-lamps-cmp-updates]</dt>
         <dd>
-<span class="refAuthor">Brockhaus, H.</span>, <span class="refAuthor">von Oheimb, D.</span>, and <span class="refAuthor">J. Gray</span>, <span class="refTitle">"Certificate Management Protocol (CMP) Updates"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-ietf-lamps-cmp-updates-23</span>, <time datetime="2022-06-29" class="refDate">29 June 2022</time>, <span>&lt;<a href="https://www.ietf.org/archive/id/draft-ietf-lamps-cmp-updates-23.txt">https://www.ietf.org/archive/id/draft-ietf-lamps-cmp-updates-23.txt</a>&gt;</span>. </dd>
+<span class="refAuthor">Brockhaus, H.</span>, <span class="refAuthor">von Oheimb, D.</span>, and <span class="refAuthor">J. Gray</span>, <span class="refTitle">"Certificate Management Protocol (CMP) Updates"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-ietf-lamps-cmp-updates-23</span>, <time datetime="2022-06-29" class="refDate">29 June 2022</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-ietf-lamps-cmp-updates-23">https://datatracker.ietf.org/doc/html/draft-ietf-lamps-cmp-updates-23</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="I-D.ietf-tls-hybrid-design">[I-D.ietf-tls-hybrid-design]</dt>
         <dd>
-<span class="refAuthor">Stebila, D.</span>, <span class="refAuthor">Fluhrer, S.</span>, and <span class="refAuthor">S. Gueron</span>, <span class="refTitle">"Hybrid key exchange in TLS 1.3"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-ietf-tls-hybrid-design-05</span>, <time datetime="2022-08-28" class="refDate">28 August 2022</time>, <span>&lt;<a href="https://www.ietf.org/archive/id/draft-ietf-tls-hybrid-design-05.txt">https://www.ietf.org/archive/id/draft-ietf-tls-hybrid-design-05.txt</a>&gt;</span>. </dd>
+<span class="refAuthor">Stebila, D.</span>, <span class="refAuthor">Fluhrer, S.</span>, and <span class="refAuthor">S. Gueron</span>, <span class="refTitle">"Hybrid key exchange in TLS 1.3"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-ietf-tls-hybrid-design-06</span>, <time datetime="2023-02-27" class="refDate">27 February 2023</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-ietf-tls-hybrid-design-06">https://datatracker.ietf.org/doc/html/draft-ietf-tls-hybrid-design-06</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="I-D.ounsworth-pq-composite-kem">[I-D.ounsworth-pq-composite-kem]</dt>
         <dd>
-<span class="refAuthor">Ounsworth, M.</span> and <span class="refAuthor">J. Gray</span>, <span class="refTitle">"Composite KEM For Use In Internet PKI"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-ounsworth-pq-composite-kem-00</span>, <time datetime="2022-07-11" class="refDate">11 July 2022</time>, <span>&lt;<a href="https://www.ietf.org/archive/id/draft-ounsworth-pq-composite-kem-00.txt">https://www.ietf.org/archive/id/draft-ounsworth-pq-composite-kem-00.txt</a>&gt;</span>. </dd>
+<span class="refAuthor">Ounsworth, M.</span> and <span class="refAuthor">J. Gray</span>, <span class="refTitle">"Composite KEM For Use In Internet PKI"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-ounsworth-pq-composite-kem-00</span>, <time datetime="2022-07-11" class="refDate">11 July 2022</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-ounsworth-pq-composite-kem-00">https://datatracker.ietf.org/doc/html/draft-ounsworth-pq-composite-kem-00</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="I-D.wussler-openpgp-pqc">[I-D.wussler-openpgp-pqc]</dt>
+        <dd>
+<span class="refAuthor">Kousidis, S.</span>, <span class="refAuthor">Strenzke, F.</span>, and <span class="refAuthor">A. Wussler</span>, <span class="refTitle">"Post-Quantum Cryptography in OpenPGP"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-wussler-openpgp-pqc-00</span>, <time datetime="2022-12-21" class="refDate">21 December 2022</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-wussler-openpgp-pqc-00">https://datatracker.ietf.org/doc/html/draft-wussler-openpgp-pqc-00</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="PQCAPI">[PQCAPI]</dt>
         <dd>
 <span class="refAuthor">Project, N. P.-Q. C.</span>, <span class="refTitle">"PQC - API notes"</span>, <time datetime="2022-11" class="refDate">November 2022</time>, <span>&lt;<a href="https://csrc.nist.gov/CSRC/media/Projects/Post-Quantum-Cryptography/documents/example-files/api-notes.pdf">https://csrc.nist.gov/CSRC/media/Projects/Post-Quantum-Cryptography/documents/example-files/api-notes.pdf</a>&gt;</span>. </dd>
-<dd class="break"></dd>
-<dt id="RFC3447">[RFC3447]</dt>
-        <dd>
-<span class="refAuthor">Jonsson, J.</span> and <span class="refAuthor">B. Kaliski</span>, <span class="refTitle">"Public-Key Cryptography Standards (PKCS) #1: RSA Cryptography Specifications Version 2.1"</span>, <span class="seriesInfo">RFC 3447</span>, <span class="seriesInfo">DOI 10.17487/RFC3447</span>, <time datetime="2003-02" class="refDate">February 2003</time>, <span>&lt;<a href="https://www.rfc-editor.org/info/rfc3447">https://www.rfc-editor.org/info/rfc3447</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="RFC8174">[RFC8174]</dt>
         <dd>
@@ -1592,214 +1564,41 @@ ss = kemCombiner(ss1, ss2, ss3, ... )
 <span class="refAuthor">Housley, R.</span>, <span class="refTitle">"Using Pre-Shared Key (PSK) in the Cryptographic Message Syntax (CMS)"</span>, <span class="seriesInfo">RFC 8696</span>, <span class="seriesInfo">DOI 10.17487/RFC8696</span>, <time datetime="2019-12" class="refDate">December 2019</time>, <span>&lt;<a href="https://www.rfc-editor.org/info/rfc8696">https://www.rfc-editor.org/info/rfc8696</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="RFC8784">[RFC8784]</dt>
-      <dd>
+        <dd>
 <span class="refAuthor">Fluhrer, S.</span>, <span class="refAuthor">Kampanakis, P.</span>, <span class="refAuthor">McGrew, D.</span>, and <span class="refAuthor">V. Smyslov</span>, <span class="refTitle">"Mixing Preshared Keys in the Internet Key Exchange Protocol Version 2 (IKEv2) for Post-quantum Security"</span>, <span class="seriesInfo">RFC 8784</span>, <span class="seriesInfo">DOI 10.17487/RFC8784</span>, <time datetime="2020-06" class="refDate">June 2020</time>, <span>&lt;<a href="https://www.rfc-editor.org/info/rfc8784">https://www.rfc-editor.org/info/rfc8784</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="SP800-56A">[SP800-56A]</dt>
+        <dd>
+<span class="refAuthor">Barker, E.</span>, <span class="refAuthor">Chen, L.</span>, <span class="refAuthor">Roginsky, A.</span>, <span class="refAuthor">Vassilev, A.</span>, and <span class="refAuthor">R. Davis</span>, <span class="refTitle">"Recommendation for Pair-Wise Key-Establishment Schemes Using Discrete Logarithm Cryptography"</span>, <span class="seriesInfo">NIST Special Publication 800-56A </span>, <time datetime="2018-04" class="refDate">April 2018</time>, <span>&lt;<a href="https://doi.org/10.6028/NIST.SP.800-56Ar3">https://doi.org/10.6028/NIST.SP.800-56Ar3</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="SP800-56C">[SP800-56C]</dt>
+        <dd>
+<span class="refAuthor">Barker, E.</span>, <span class="refAuthor">Chen, L.</span>, and <span class="refAuthor">R. Davis</span>, <span class="refTitle">"Recommendation for Key-Derivation Methods in Key-Establishment Schemes"</span>, <span class="seriesInfo">NIST Special Publication 800-56C </span>, <time datetime="2020-08" class="refDate">August 2020</time>, <span>&lt;<a href="https://doi.org/10.6028/NIST.SP.800-56Cr2">https://doi.org/10.6028/NIST.SP.800-56Cr2</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="SPONGE">[SPONGE]</dt>
+      <dd>
+<span class="refAuthor">Bertoni, G.</span>, <span class="refAuthor">Daemen, J.</span>, <span class="refAuthor">Peters, M.</span>, and <span class="refAuthor">G. Assche</span>, <span class="refTitle">"Cryptographic sponge functions"</span>, <time datetime="2011-01" class="refDate">January 2011</time>, <span>&lt;<a href="https://keccak.team/files/CSF-0.1.pdf">https://keccak.team/files/CSF-0.1.pdf</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 </dl>
 </section>
 </section>
-<div id="sec-secanalysis">
+<div id="acknowledgements">
 <section id="appendix-A">
-      <h2 id="name-security-analysis-2">
-<a href="#appendix-A" class="section-number selfRef">Appendix A. </a><a href="#name-security-analysis-2" class="section-name selfRef">Security Analysis</a>
+      <h2 id="name-acknowledgements-2">
+<a href="#name-acknowledgements-2" class="section-name selfRef">Acknowledgements</a>
       </h2>
-<div id="sec-dualprf">
-<section id="appendix-A.1">
-        <h3 id="name-dual-prf-2">
-<a href="#appendix-A.1" class="section-number selfRef">A.1. </a><a href="#name-dual-prf-2" class="section-name selfRef">Dual PRF</a>
-        </h3>
-<p id="appendix-A.1-1">Dual PRFs are a active area of research. A dual PRF is a function which is a PRF when keyed by either of its two inputs - guaranteeing pseudo-randomness if one of the keys is compromised or even maliciously chosen by an adversary <span>[<a href="#Aviram2022" class="xref">Aviram2022</a>]</span>. As of publication of this document, no dual PRFs have been standardized for use. In practice we often use HMACs or HKDFs to serve the role of a dual PRF even though they have never been proved to be dual PRFs <span>[<a href="#Bellare2015" class="xref">Bellare2015</a>]</span>, <span>[<a href="#Aviram2022" class="xref">Aviram2022</a>]</span>.<a href="#appendix-A.1-1" class="pilcrow">¶</a></p>
-<p id="appendix-A.1-2">In essence, this document assumes that <code>KDF( H(input1) || H(input2))</code> is a dual PRF in practice, for suitable choices of key derivation function <code>KDF</code> and hash function <code>H</code>, despite not having formal security proofs. It has been proposed as a KEM combiner, for example in <span>[<a href="#I-D.ietf-tls-hybrid-design" class="xref">I-D.ietf-tls-hybrid-design</a>]</span>. As the academic literature evolves, it may become appropriate to obsolete this document with a KEM combiner based on a provably secure dual PRF.<a href="#appendix-A.1-2" class="pilcrow">¶</a></p>
-</section>
-</div>
-<div id="sec-kemprimitives">
-<section id="appendix-A.2">
-        <h3 id="name-kem-primitives-2">
-<a href="#appendix-A.2" class="section-number selfRef">A.2. </a><a href="#name-kem-primitives-2" class="section-name selfRef">KEM primitives</a>
-        </h3>
-<p id="appendix-A.2-1">In modern cryptographic design, KEM algorithms seek to have indistinguishability under adaptive chosen ciphertext attack (IND-CCA2). FFor hybrid KEMs we desire the additional property that even if one input is controlled by an attacker, then combiner leaks no information about the other input.<a href="#appendix-A.2-1" class="pilcrow">¶</a></p>
-<p id="appendix-A.2-2">There are two ways to achieve such a hybrid KEM combiner; either by designing a combiner that is robust to one of the inputs being maliciously-chosen, called a dual PRF. See <a href="#sec-dualprf" class="xref">Appendix A.1</a> for a discussion about the current state of dual PRF research. Or alternatively by only allowing the hybridization of KEMs where a malicious kemEncaps() algorithm cannot control the shared secret derived by the victim's kemDecaps() algorithm and then combining the shared secrets in a trivial way.<a href="#appendix-A.2-2" class="pilcrow">¶</a></p>
-<p id="appendix-A.2-3">The following sections analyze commonly-used KEM algorithms to show that they have the following two properties, and are therefore suitable for use with the simplified KEM combiner presented in <a href="#sec-kemcombiner" class="xref">Section 3</a>, <a href="#tab-simplifiedCombiner" class="xref">Figure 2</a>.<a href="#appendix-A.2-3" class="pilcrow">¶</a></p>
-<ol start="1" type="1" class="normal type-1" id="appendix-A.2-4">
-<li id="appendix-A.2-4.1">A malicious encapsulater cannot control the length of the KEM output (shared secret) that will be derived by the decapsulater.<a href="#appendix-A.2-4.1" class="pilcrow">¶</a>
-</li>
-          <li id="appendix-A.2-4.2">A malicious encapsulater cannot control the value of the KEM output (shared secret) that will be derived by the decapsulater. We define a KEM output to be "controlled by an attacker" if a maliciously-written kemEncaps() function can cause the victim's kemDecaps() algorithm to produce a shared secret either of a length chosen by the attacker, or to take on a given value with higher probability than can be obtained via rejection sampling on the shared secret output of kemEncaps().<a href="#appendix-A.2-4.2" class="pilcrow">¶</a>
-</li>
-        </ol>
-</section>
-</div>
-<div id="rsa-kem">
-<section id="appendix-A.3">
-        <h3 id="name-rsa-kem-2">
-<a href="#appendix-A.3" class="section-number selfRef">A.3. </a><a href="#name-rsa-kem-2" class="section-name selfRef">RSA-KEM</a>
-        </h3>
-<p id="appendix-A.3-1">RSA encryption <span>[<a href="#RFC3447" class="xref">RFC3447</a>]</span> can be promoted into a KEM as per <span>[<a href="#RFC5990" class="xref">RFC5990</a>]</span> which defines a key transport based on RSA-KEM.<a href="#appendix-A.3-1" class="pilcrow">¶</a></p>
-<div class="alignLeft art-text artwork" id="appendix-A.3-2">
-<pre>
-1. Generate a random integer z between 0 and n-1 (see note), and
-  convert z to a byte string Z of length nLen, most significant byte
-  first:
-
-      z = RandomInteger (0, n-1)
-
-      Z = IntegerToString (z, nLen)
-
-2. Encrypt the random integer z using the recipient's public key
-  (n,e), and convert the resulting integer c to a ciphertext C, a
-  byte string of length nLen:
-
-      c = z^e mod n
-
-      C = IntegerToString (c, nLen)
-
-3. Derive a key-encrypting key KEK of length kekLen bytes from the
-  byte string Z using the underlying key derivation function:
-
-      KEK = KDF (Z, kekLen)
-
-4. Wrap the keying data K with the key-encrypting key KEK using the
-  underlying key-wrapping scheme to obtain wrapped keying data WK:
-
-      WK = Wrap (KEK, K)
-
-5. Concatenate the ciphertext C and the wrapped keying data WK to
-  obtain the encrypted keying data EK:
-
-      EK = C || WK
-
-6. Output the encrypted keying data EK.
-</pre><a href="#appendix-A.3-2" class="pilcrow">¶</a>
-</div>
-<p id="appendix-A.3-3">where Steps 1 - 3 define "RSA-KEM", which is considered here. Steps 4 - 6 define "Key Transport based on RSA-KEM" and is out of scope for this analysis as we assume that any RSA-KEM construction intended for use in a hybrid KEM would use the <code>KEK</code> output from Step 3 as the final shared secret.<a href="#appendix-A.3-3" class="pilcrow">¶</a></p>
-<p id="appendix-A.3-4">Here the transported symmetric key, <code>KEK</code>, is the KEM output (shared secret) <code>ss</code> as defined in <a href="#sec-kem-defn" class="xref">Section 1.1</a>. The encapsulater must choose a key derivation function <code>KDF</code> and declare it in the RSA-KEM parameters. The decapsulater may refuse to perform the the decapsulation if it does not like the encapsulater's choice of <code>KDF</code>, therefore it can be modeled as a random oracle producing an output of fixed length. The attacker is free to choose <code>z</code>, but assuming a strong choice of <code>KDF</code>, they cannot control either the length or the value <code>KEK</code> beyond what can be obtained by rejection sampling, thus satisfying properties 1 and 2 and defined in {.sec-kemprimitives}}.<a href="#appendix-A.3-4" class="pilcrow">¶</a></p>
-<p id="appendix-A.3-5">Therefore RSA-KEM is considered to be suitable for use with the simplified KEM combiner defined in <a href="#sec-kemcombiner" class="xref">Section 3</a>, <a href="#tab-simplifiedCombiner" class="xref">Figure 2</a>.<a href="#appendix-A.3-5" class="pilcrow">¶</a></p>
-<p id="appendix-A.3-6">Security note: This analysis applies to the specific RSA-KEM construction defined above. This result is not intended to generalize to all RSA-based key transport mechanisms, as they may not have the same cryptographic properties.<a href="#appendix-A.3-6" class="pilcrow">¶</a></p>
-</section>
-</div>
-<div id="elliptic-curve-diffie-hellman-ecdh">
-<section id="appendix-A.4">
-        <h3 id="name-elliptic-curve-diffie-hellma">
-<a href="#appendix-A.4" class="section-number selfRef">A.4. </a><a href="#name-elliptic-curve-diffie-hellma" class="section-name selfRef">Elliptic Curve Diffie-Hellman (ECDH)</a>
-        </h3>
-<p id="appendix-A.4-1">The elliptic curve Diffie-Hellman key exchange <span>[<a href="#SEC1" class="xref">SEC1</a>]</span> can be promoted into a KEM in a straightforward way by assuming an ephemeral-static (ES) mode where <code>def kemEncaps(pk) -&gt; (ct, ss)</code> includes generation of an ephemeral key pair, the public key being included as part of the ciphertext <code>ct</code> and the private key being discarded upon completion of the encapsulation.<a href="#appendix-A.4-1" class="pilcrow">¶</a></p>
-<p id="appendix-A.4-2">According to <span>[<a href="#SEC1" class="xref">SEC1</a>]</span> section 6.1.3:<a href="#appendix-A.4-2" class="pilcrow">¶</a></p>
-<div class="alignLeft art-text artwork" id="appendix-A.4-3">
-<pre>
-1. Use one of the Diffie-Hellman primitives specified in Section 3.3 to
-   derive a shared secret field element z ∈ Fq from U's secret key d_U
-   established during the key deployment procedure and V's public key
-   Q_V obtained during the key deployment procedure. If the Diffie-
-   Hellman primitive outputs “invalid”, output “invalid” and stop.
-   Decide whether to use the “standard” elliptic curve Diffie-Hellman
-   primitive or the elliptic curve cofactor Diffie-Hellman primitive
-   according to the convention established during the setup procedure.
-
-2. Convert z ∈ Fq to an octet string Z using the conversion routine
-   specified in Section 2.3.5.
-
-3. Use the key derivation function KDF established during the setup
-   procedure to generate keying data K of length keydatalen octets
-   from Z and [SharedInfo]. If the key derivation function outputs
-   “invalid”, output “invalid” and stop.
-
-4. Output K.
-</pre><a href="#appendix-A.4-3" class="pilcrow">¶</a>
-</div>
-<p id="appendix-A.4-4">Other key exchange methods defined in <span>[<a href="#SEC1" class="xref">SEC1</a>]</span> follow a similar construction.<a href="#appendix-A.4-4" class="pilcrow">¶</a></p>
-<p id="appendix-A.4-5">The attacker is free to choose a private key <code>d_U</code> which yields a shared secret <code>Z</code>, but cannot force <code>Z</code> to take on a chosen value without solving the elliptic curve discrete logarithm problem or performing rejection sampling. Assuming a strong choice of <code>KDF</code>, the attacker cannot control either the length or the value of <code>KEK</code> beyond what can be obtained by rejection sampling, thus satisfying properties 1 and 2 and defined in <a href="#sec-kemprimitives" class="xref">Appendix A.2</a>.<a href="#appendix-A.4-5" class="pilcrow">¶</a></p>
-<p id="appendix-A.4-6">Therefore elliptic curve Diffie-Hellman is considered to be suitable for use with the simplified KEM combiner defined in <a href="#sec-kemcombiner" class="xref">Section 3</a>, <a href="#tab-simplifiedCombiner" class="xref">Figure 2</a>.<a href="#appendix-A.4-6" class="pilcrow">¶</a></p>
-</section>
-</div>
-<div id="edwards-curve-diffie-hellman-x25519-x448">
-<section id="appendix-A.5">
-        <h3 id="name-edwards-curve-diffie-hellman">
-<a href="#appendix-A.5" class="section-number selfRef">A.5. </a><a href="#name-edwards-curve-diffie-hellman" class="section-name selfRef">Edwards Curve Diffie-Hellman (X25519 / X448)</a>
-        </h3>
-<p id="appendix-A.5-1">The elliptic curve Diffie-Hellman key exchange <span>[<a href="#SEC1" class="xref">SEC1</a>]</span> can be promoted into a KEM in a straightforward way by assuming an ephemeral-static (ES) mode where <code>def kemEncaps(pk) -&gt; (ct, ss)</code> includes generation of an ephemeral key pair, the public key being included as part of the ciphertext <code>ct</code> and the private key being discarded upon completion of the encapsulation.<a href="#appendix-A.5-1" class="pilcrow">¶</a></p>
-<p id="appendix-A.5-2">According to <span>[<a href="#RFC7748" class="xref">RFC7748</a>]</span> section 6.1, the X25519 key exchange is defined as:<a href="#appendix-A.5-2" class="pilcrow">¶</a></p>
-<div class="alignLeft art-text artwork" id="appendix-A.5-3">
-<pre>
-Alice generates 32 random bytes in a[0] to a[31] and transmits K_A =
-X25519(a, 9) to Bob, where 9 is the u-coordinate of the base point
-and is encoded as a byte with value 9, followed by 31 zero bytes.
-
-Bob similarly generates 32 random bytes in b[0] to b[31], computes
-K_B = X25519(b, 9), and transmits it to Alice.
-
-Using their generated values and the received input, Alice computes
-X25519(a, K_B) and Bob computes X25519(b, K_A).
-
-Both now share K = X25519(a, X25519(b, 9)) = X25519(b, X25519(a, 9))
-as a shared secret.  Both MAY check, without leaking extra
-information about the value of K, whether K is the all-zero value and
-abort if so (see below).  Alice and Bob can then use a key-derivation
-function that includes K, K_A, and K_B to derive a symmetric key.
-</pre><a href="#appendix-A.5-3" class="pilcrow">¶</a>
-</div>
-<p id="appendix-A.5-4">The X448 key exchange follows a similar construction.<a href="#appendix-A.5-4" class="pilcrow">¶</a></p>
-<p id="appendix-A.5-5">The attacker is free to choose a private key <code>b</code> which yields a shared secret <code>K</code>, but cannot force <code>K</code> to take on a chosen value without solving the elliptic curve discrete logarithm problem or performing rejection sampling. Assuming a strong choice of <code>KDF</code>, the attacker cannot control either the length or the value of the derived symmetric key beyond what can be obtained by rejection sampling, thus satisfying properties 1 and 2 and defined in <a href="#sec-kemprimitives" class="xref">Appendix A.2</a>.<a href="#appendix-A.5-5" class="pilcrow">¶</a></p>
-<p id="appendix-A.5-6">Therefore Edwards curve Diffie-Hellman, X25519 and X448, are considered to be suitable for use with the simplified KEM combiner defined in <a href="#sec-kemcombiner" class="xref">Section 3</a>, <a href="#tab-simplifiedCombiner" class="xref">Figure 2</a>.<a href="#appendix-A.5-6" class="pilcrow">¶</a></p>
-</section>
-</div>
-<div id="crystals-kyber">
-<section id="appendix-A.6">
-        <h3 id="name-crystals-kyber-2">
-<a href="#appendix-A.6" class="section-number selfRef">A.6. </a><a href="#name-crystals-kyber-2" class="section-name selfRef">CRYSTALS-Kyber</a>
-        </h3>
-<p id="appendix-A.6-1">The CRYSTALS-Kyber kemEncaps() is defined as follows <span>[<a href="#I-D.cfrg-schwabe-kyber" class="xref">I-D.cfrg-schwabe-kyber</a>]</span>:<a href="#appendix-A.6-1" class="pilcrow">¶</a></p>
-<div class="alignLeft art-text artwork" id="appendix-A.6-2">
-<pre>
-1.Compute
-  1. m = H(seed)
-  2. (Kbar, cpaSeed) = G(m || H(pk))
-  3. cpaCipherText = InnerEnc(m, publicKey, cpaSeed)
-2.Return
-  1. cipherText = cpaCipherText
-  2. sharedSecret = KDF(KBar || H(cpaCipherText))
-</pre><a href="#appendix-A.6-2" class="pilcrow">¶</a>
-</div>
-<p id="appendix-A.6-3">with definitions as per <span>[<a href="#I-D.cfrg-schwabe-kyber" class="xref">I-D.cfrg-schwabe-kyber</a>]</span>.<a href="#appendix-A.6-3" class="pilcrow">¶</a></p>
-<p id="appendix-A.6-4">Here the hash functions <code>G</code>, <code>H</code> and the key derivation function <code>KDF</code> are in theory chosen by the encapsulater, but in practice are fixed by the Kyber specification to be <code>H: SHA3-256</code>, <code>G: SHA3-512</code>, and <code>KDF: SHAKE-256</code>, which can be modeled as random oracles. The attacker is free to choose <code>m</code>, but not the decapsulater's public key <code>pk</code>, nor do they have control of <code>cpaCipherText</code> so long as <code>InnerEnc</code> remains IND-CPA secure. Therefore the attacker cannot control the value or length of <code>K</code> beyond what can be obtained by rejection sampling.<a href="#appendix-A.6-4" class="pilcrow">¶</a></p>
-<p id="appendix-A.6-5">Therefore CRYSTALS-Kyber is considered to be suitable for use with the simplified KEM combiner defined in <a href="#sec-kemcombiner" class="xref">Section 3</a>, <a href="#tab-simplifiedCombiner" class="xref">Figure 2</a>.<a href="#appendix-A.6-5" class="pilcrow">¶</a></p>
-</section>
-</div>
-</section>
-</div>
-<div id="intellectual-property-considerations">
-<section id="appendix-B">
-      <h2 id="name-intellectual-property-consid">
-<a href="#appendix-B" class="section-number selfRef">Appendix B. </a><a href="#name-intellectual-property-consid" class="section-name selfRef">Intellectual Property Considerations</a>
-      </h2>
-<p id="appendix-B-1">None.<a href="#appendix-B-1" class="pilcrow">¶</a></p>
-</section>
-</div>
-<div id="contributors-and-acknowledgements">
-<section id="appendix-C">
-      <h2 id="name-contributors-and-acknowledge">
-<a href="#appendix-C" class="section-number selfRef">Appendix C. </a><a href="#name-contributors-and-acknowledge" class="section-name selfRef">Contributors and Acknowledgements</a>
-      </h2>
-<p id="appendix-C-1">This document incorporates contributions and comments from a large group of experts. The Editors would especially like to acknowledge the expertise and tireless dedication of the following people, who attended many long meetings and generated millions of bytes of electronic mail and VOIP traffic over the past years in pursuit of this document:<a href="#appendix-C-1" class="pilcrow">¶</a></p>
-<p id="appendix-C-2">Douglas Stebila, Nimrod Aviram.<a href="#appendix-C-2" class="pilcrow">¶</a></p>
-<p id="appendix-C-3">We are grateful to all, including any contributors who may have
-been inadvertently omitted from this list.<a href="#appendix-C-3" class="pilcrow">¶</a></p>
-<p id="appendix-C-4">This document borrows text from similar documents, including those referenced below. Thanks go to the authors of those
-   documents.  "Copying always makes things easier and less error prone" - <span>[<a href="#RFC8411" class="xref">RFC8411</a>]</span>.<a href="#appendix-C-4" class="pilcrow">¶</a></p>
-<div id="making-contributions">
-<section id="appendix-C.1">
-        <h3 id="name-making-contributions-2">
-<a href="#appendix-C.1" class="section-number selfRef">C.1. </a><a href="#name-making-contributions-2" class="section-name selfRef">Making contributions</a>
-        </h3>
-<p id="appendix-C.1-1">To be removed before publication.<a href="#appendix-C.1-1" class="pilcrow">¶</a></p>
-<p id="appendix-C.1-2">Additional contributions to this draft are welcome. Please see the working copy of this draft at, as well as open issues at:<a href="#appendix-C.1-2" class="pilcrow">¶</a></p>
-<p id="appendix-C.1-3">https://github.com/EntrustCorporation/draft-ounsworth-cfrg-kem-combiners<a href="#appendix-C.1-3" class="pilcrow">¶</a></p>
-</section>
-</div>
+<p id="appendix-A-1">This document incorporates contributions and comments from a large group of experts. The Editors would especially like to acknowledge the expertise and tireless dedication of the following people, who attended many long meetings and generated millions of bytes of electronic mail and VOIP traffic over the past years in pursuit of this document:<a href="#appendix-A-1" class="pilcrow">¶</a></p>
+<p id="appendix-A-2">Douglas Stebila, Nimrod Aviram, Andreas Huelsing, and Stavros Kousidis.<a href="#appendix-A-2" class="pilcrow">¶</a></p>
+<p id="appendix-A-3">We are grateful to all, including any contributors who may have
+been inadvertently omitted from this list.<a href="#appendix-A-3" class="pilcrow">¶</a></p>
+<p id="appendix-A-4">This document borrows text from similar documents, including those referenced below. Thanks go to the authors of those
+   documents.  "Copying always makes things easier and less error prone" - <span>[<a href="#RFC8411" class="xref">RFC8411</a>]</span>.<a href="#appendix-A-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="authors-addresses">
-<section id="appendix-D">
-      <h2 id="name-authors-address-2">
-<a href="#name-authors-address-2" class="section-name selfRef">Author's Address</a>
+<section id="appendix-B">
+      <h2 id="name-authors-addresses-2">
+<a href="#name-authors-addresses-2" class="section-name selfRef">Authors' Addresses</a>
       </h2>
 <address class="vcard">
         <div dir="auto" class="left"><span class="fn nameRole">Mike Ounsworth</span></div>
@@ -1812,6 +1611,15 @@ been inadvertently omitted from this list.<a href="#appendix-C-3" class="pilcrow
 <div class="email">
 <span>Email:</span>
 <a href="mailto:mike.ounsworth@entrust.com" class="email">mike.ounsworth@entrust.com</a>
+</div>
+</address>
+<address class="vcard">
+        <div dir="auto" class="left"><span class="fn nameRole">Aron Wussler</span></div>
+<div dir="auto" class="left"><span class="org">Proton AG</span></div>
+<div dir="auto" class="left"><span class="country-name">Switzerland</span></div>
+<div class="email">
+<span>Email:</span>
+<a href="mailto:aron@wussler.it" class="email">aron@wussler.it</a>
 </div>
 </address>
 </section>

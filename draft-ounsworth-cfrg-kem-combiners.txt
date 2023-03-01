@@ -4,8 +4,9 @@
 
 CFRG                                                        M. Ounsworth
 Internet-Draft                                                   Entrust
-Intended status: Informational                           28 January 2023
-Expires: 1 August 2023
+Intended status: Informational                                A. Wussler
+Expires: 2 September 2023                                         Proton
+                                                            1 March 2023
 
 
 Combiner function for hybrid key encapsulation mechanisms (Hybrid KEMs)
@@ -17,16 +18,9 @@ Abstract
    multiple key encapsulations in parallel and then combining their
    outputs to derive a single shared secret.
 
-   This document defines the KEM combiner KDF( H(ss1) || H(ss2) ) which
-   is considered to be a dual PRF in practice, even though not provably
-   secure.  This mechanism simplifies to KDF( ss1 || ss2 ) when used
-   with a KEM which internally uses a KDF to produce its shared secret.
-   RSA-KEM [RFC5990], ECDH [SEC1], Edwards curve DH [RFC7748], and
-   CRYSTALS-Kyber [I-D.cfrg-schwabe-kyber] are shown to meet this
-   criteria, when implemented as per the listed specification, and
-   therefore are safe to use with the simplified KEM combiner.  Care
-   should be taken with implementations that are similar but not
-   identical to those analyzed in this document.
+   This document defines a flexible multi-share KEM combiner, that
+   fulfils the security criteria to join an arbitrary number of key
+   shares.
 
 About This Document
 
@@ -50,25 +44,26 @@ Status of This Memo
    This Internet-Draft is submitted in full conformance with the
    provisions of BCP 78 and BCP 79.
 
-
-
-
-Ounsworth                 Expires 1 August 2023                 [Page 1]
-
-Internet-Draft                KEM Combiner                  January 2023
-
-
    Internet-Drafts are working documents of the Internet Engineering
    Task Force (IETF).  Note that other groups may also distribute
    working documents as Internet-Drafts.  The list of current Internet-
    Drafts is at https://datatracker.ietf.org/drafts/current/.
+
+
+
+
+
+Ounsworth & Wussler     Expires 2 September 2023                [Page 1]
+
+Internet-Draft                KEM Combiner                    March 2023
+
 
    Internet-Drafts are draft documents valid for a maximum of six months
    and may be updated, replaced, or obsoleted by other documents at any
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 1 August 2023.
+   This Internet-Draft will expire on 2 September 2023.
 
 Copyright Notice
 
@@ -83,36 +78,22 @@ Copyright Notice
 
 Table of Contents
 
-   1.  Terminology . . . . . . . . . . . . . . . . . . . . . . . . .   3
+   1.  Terminology . . . . . . . . . . . . . . . . . . . . . . . . .   2
      1.1.  Key Encapsulation Mechanisms  . . . . . . . . . . . . . .   3
    2.  Introduction  . . . . . . . . . . . . . . . . . . . . . . . .   3
-     2.1.  KEM/PSK hybrids . . . . . . . . . . . . . . . . . . . . .   4
-     2.2.  PQ/Traditional hybrid KEMs  . . . . . . . . . . . . . . .   4
+     2.1.  KEM/PSK hybrids . . . . . . . . . . . . . . . . . . . . .   3
+     2.2.  PQ/Traditional hybrid KEMs  . . . . . . . . . . . . . . .   3
      2.3.  KEM-based AKE . . . . . . . . . . . . . . . . . . . . . .   4
-   3.  KEM Combiner  . . . . . . . . . . . . . . . . . . . . . . . .   4
+   3.  KEM Combiner construction . . . . . . . . . . . . . . . . . .   4
+     3.1.  Protocol binding  . . . . . . . . . . . . . . . . . . . .   5
+     3.2.  Practical instantiations  . . . . . . . . . . . . . . . .   5
    4.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .   6
    5.  Security Considerations . . . . . . . . . . . . . . . . . . .   6
    6.  References  . . . . . . . . . . . . . . . . . . . . . . . . .   6
      6.1.  Normative References  . . . . . . . . . . . . . . . . . .   6
-     6.2.  Informative References  . . . . . . . . . . . . . . . . .   7
-   Appendix A.  Security Analysis  . . . . . . . . . . . . . . . . .   9
-     A.1.  Dual PRF  . . . . . . . . . . . . . . . . . . . . . . . .   9
-     A.2.  KEM primitives  . . . . . . . . . . . . . . . . . . . . .   9
-     A.3.  RSA-KEM . . . . . . . . . . . . . . . . . . . . . . . . .  10
-     A.4.  Elliptic Curve Diffie-Hellman (ECDH)  . . . . . . . . . .  12
-     A.5.  Edwards Curve Diffie-Hellman (X25519 / X448)  . . . . . .  13
-     A.6.  CRYSTALS-Kyber  . . . . . . . . . . . . . . . . . . . . .  14
-   Appendix B.  Intellectual Property Considerations . . . . . . . .  14
-   Appendix C.  Contributors and Acknowledgements  . . . . . . . . .  14
-     C.1.  Making contributions  . . . . . . . . . . . . . . . . . .  15
-   Author's Address  . . . . . . . . . . . . . . . . . . . . . . . .  15
-
-
-
-Ounsworth                 Expires 1 August 2023                 [Page 2]
-
-Internet-Draft                KEM Combiner                  January 2023
-
+     6.2.  Informative References  . . . . . . . . . . . . . . . . .   6
+   Acknowledgements  . . . . . . . . . . . . . . . . . . . . . . . .   8
+   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .   8
 
 1.  Terminology
 
@@ -124,6 +105,14 @@ Internet-Draft                KEM Combiner                  January 2023
 
    This document is consistent with all terminology defined in
    [I-D.driscoll-pqt-hybrid-terminology].
+
+
+
+
+Ounsworth & Wussler     Expires 2 September 2023                [Page 2]
+
+Internet-Draft                KEM Combiner                    March 2023
+
 
 1.1.  Key Encapsulation Mechanisms
 
@@ -152,23 +141,12 @@ Internet-Draft                KEM Combiner                  January 2023
    1.  KEM / PSK hybrids where the output of a KEM is combined with a
        static pre-shared key.
 
-   2.  Post-quantum / tradtional hybrid KEMs.
+   2.  Post-quantum / traditional hybrid KEMs.
 
    3.  KEM-based authenticated key exchanges (AKEs).
 
    This document normalizes a mechanisms for combining the output of two
    KEMs.
-
-
-
-
-
-
-
-Ounsworth                 Expires 1 August 2023                 [Page 3]
-
-Internet-Draft                KEM Combiner                  January 2023
-
 
 2.1.  KEM/PSK hybrids
 
@@ -183,6 +161,15 @@ Internet-Draft                KEM Combiner                  January 2023
    (hybrid KEM) as defined in [I-D.driscoll-pqt-hybrid-terminology] as
 
    PQ/T Hybrid Key Encapsulation Mechanism:  A Key Encapsulation
+
+
+
+
+Ounsworth & Wussler     Expires 2 September 2023                [Page 3]
+
+Internet-Draft                KEM Combiner                    March 2023
+
+
       Mechanism (KEM) made up of two or more component KEM algorithms
       where at least one is a post-quantum algorithm and at least one is
       a traditional algorithm.
@@ -193,8 +180,8 @@ Internet-Draft                KEM Combiner                  January 2023
    overall post-quantum migration strategies, examples include TLS 1.3
    [I-D.ietf-tls-hybrid-design], IKEv2
    [I-D.ietf-ipsecme-ikev2-multiple-ke], X.509; PKIX; CMS
-   [I-D.ounsworth-pq-composite-kem], OpenPGP (CITE once Aron's draft is
-   up), JOSE / COSE (CITE once Orie's drafts are up).
+   [I-D.ounsworth-pq-composite-kem], OpenPGP [I-D.wussler-openpgp-pqc],
+   JOSE / COSE (CITE once Orie's drafts are up).
 
 2.3.  KEM-based AKE
 
@@ -207,36 +194,13 @@ Internet-Draft                KEM Combiner                  January 2023
    Hellman mechanisms.  Examples include a KEM replacement for CMP's
    DHBasedMac [I-D.ietf-lamps-cmp-updates], .. TODO: cite others.
 
-3.  KEM Combiner
+3.  KEM Combiner construction
 
-   TODO: read and cite the ETSI doc "Quantum-safe Hybrid Key Exchanges"
-   https://www.etsi.org/deliver/
-   etsi_ts/103700_103799/103744/01.01.01_60/ts_103744v010101p.pdf
+   A KEM combiner is a function that takes in two or more shared secrets
+   and returns a combined shared secret, where all values are byte
+   arrays.
 
-   TODO: as per https://www.enisa.europa.eu/publications/post-quantum-
-   cryptography-integration-study section 4.2, might need to specify
-   behaviour in light of KEMs with a non-zero failure probility.
-
-
-
-
-
-Ounsworth                 Expires 1 August 2023                 [Page 4]
-
-Internet-Draft                KEM Combiner                  January 2023
-
-
-   TODO: read and cite Federico Giacon, Felix Heuer, and Bertram
-   Poettering.  KEM combiners.  In Michel Abdalla and Ricardo Dahab,
-   editors, PKC 2018: 21st International Conference on Theory and
-   Practice of Public Key Cryptography, Part I, volume 10769 of Lecture
-   Notes in Com- puter Science, pages 190-218.  Springer, Heidelberg,
-   March 2018.
-
-   A KEM combiner is a function that takes in two shared secrets and
-   returns a combined shared secret, where all values are byte arrays.
-
-   ss = kemCombiner(ss1, ss2)
+   SS = kemCombiner(SS_1, SS_2, ..., SS_n)
 
    This document assumes that shared secrets are the output of a KEM,
    but without loss of generality they may also be any other source of
@@ -244,55 +208,82 @@ Internet-Draft                KEM Combiner                  January 2023
    PSK being a quantum-safe migration strategy being made available by
    some protocols, see for example IKEv2 in [RFC8784].
 
-   In general it is desirable to use a dual PRF, a dual-input PRF which
-   is keyed off either input, as a KEM combiner (see Appendix A.1 for a
-   discussion of dual PRFs).  We take the following construction as a
-   dual PRF in practice, and therefore suitable for use in all IETF
-   protocols that need to combine the output of two KEMs:
+   In general it is desirable to use a multi-PRF as a KEM combiner, a
+   function that can be keyed by any input.  The following simple yet
+   generic construction can be used in all IETF protocols that need to
+   combine the output of two or more KEMs:
 
-   ss = kemCombiner(ss1, ss2) = KDF( H(ss1) || H(ss2) )
+   KDF(counter || K_1 || ... || K_n || fixedInfo)
 
                 Figure 1: general KEM combiner construction
 
-   where KDF represents a suitable choice of cryptographic key
-   derivation function, H represents a cryptographic hash function, ss1
-   and ss2 represent the outputs of the first and second KEMs, and ||
-   represents concatenation.  KDF and H are assumed to behave as random
-   oracles.
-
-   See Appendix A.2 for security analysis on the safety of using this
-   combiner with RSA-KEM [RFC5990], elliptic curve Diffie-Hellman
-   [SEC1], Edwards curve Diffie-Hellman [RFC7748], and CRYSTALS-Kyber
-   [I-D.cfrg-schwabe-kyber].  All of these cryptographic algorithms are
-   found to have a KDF or cryptographic hash as the last step before
-   output of the shared secret, and therefore the KEM combiner
-   construction may be simplified to the following when used with
-   combinations of the analyzed cryptographic algorithms.
-
-   ss = kemCombiner(ss1, ss2) = KDF( ss1 || ss2 )
-
-     Figure 2: simplified KEM combiner construction when both KEMs are
-                       known to provide strong output
 
 
 
 
-Ounsworth                 Expires 1 August 2023                 [Page 5]
+Ounsworth & Wussler     Expires 2 September 2023                [Page 4]
 
-Internet-Draft                KEM Combiner                  January 2023
+Internet-Draft                KEM Combiner                    March 2023
 
 
-   This simplified combiner proposed as a KEM combiner, for example in
-   [I-D.ietf-tls-hybrid-design].
+   where KDF represents a suitable choice of cryptographic key
+   derivation function, K_i represent the constant-length input keys,
+   fixedInfo is some protocol-specific KDF binding, and || represents
+   concatenation.  The counter parameter is instantiation specific.
 
-   In the case that more than two shared secrets need to be combined,
-   the above construction can be extended in the obvious way:
+   This construction is in line with NIST SP-800 56Cr2 [SP800-56C].  In
+   section Section 3.2 several possible practical instantiations will be
+   proposed.
 
-   ss = kemCombiner(ss1, ss2, ss3, ... )
-         = KDF( H(ss1) || H(ss2) || H(ss3) ... )
+   Each K_i MUST be constant in length, therefore the secret shares SS_i
+   can be used directly only if they are guaranteed to be constant
+   length.  For all other cases, it is REQUIRED to hash them first:
 
-      Figure 3: KEM combiner construction for combining more than two
-                               shared secrets
+   K_i = H(SS_i)
+
+3.1.  Protocol binding
+
+   The fixedInfo string is a fixed-length string containing some
+   context-specific information.  It MUST NOT depend on the secret
+   shares.
+
+   A non-comprehensive list of information that can be included in the
+   fixedInfo can be found in paragraph 5.8.2 of NIST SP800-56Ar3
+   [SP800-56A].
+
+   The fixedInfo string MUST have a definite structure depending on the
+   protocol where all parts are fixed length.  This prevents possible
+   cases where a variable length structure could be used to create
+   collisions between two different instances.  In cases some variable
+   length input is necessary, such as the representation of a public key
+   or an OID, then hashing or padding can be used.
+
+3.2.  Practical instantiations
+
+   The KDF MUST be instantiated with one of the following Keccak-based
+   option.  Each instance defines a function to be used as KDF, a hash
+   function to optionally derive the K_i, and a counter.
+
+   1.  KDF = SHA3-256 and H = SHA3-256.  The counter MUST be initialized
+       with the string 0x00000001 and MUST be increased by 0x01 if more
+       key material is needed.
+
+   2.  KDF = SHA3-512 and H = SHA3-512.  The counter MUST be initialized
+       with the string 0x00000001 and MUST be increased by 0x01 if more
+       key material is needed.
+
+   3.  KDF = KMAC128 and H = SHA3-256.  The counter MUST be the fixed
+       string 0x00000001.
+
+
+
+Ounsworth & Wussler     Expires 2 September 2023                [Page 5]
+
+Internet-Draft                KEM Combiner                    March 2023
+
+
+   4.  KDF = KMAC256 and H = SHA3-512.  The counter MUST be the fixed
+       string 0x00000001.
 
 4.  IANA Considerations
 
@@ -300,19 +291,18 @@ Internet-Draft                KEM Combiner                  January 2023
 
 5.  Security Considerations
 
-   This work assumes that the KEM combiner defined in Section 3 is a
-   dual PRF in practice, despite the lack of security proof.  As the
-   academic literature progresses towards provably secure dual PRFs,
-   this document may need to be obsoleted in favour of a more robust
-   primitive.
-
-   It is important to note that the analysis herein pertains to the
-   specific cryptographic algorithms analyzed and do not necessarily
-   generalize to other constructions, even if they are based on the same
-   underlying primitive.  Specifically it depends on whether the shared
-   secret produced by the KEM is the output of a fixed and secure key
-   derivation function which makes the length and value of the shared
-   secret beyond the direct control of the initiator of the KEM.
+   The proposed instantiations in Section 3.2 are practical multi-PRFs
+   and this specification limits to the use of Keccak-based
+   constructions.  The sponge construction was proven to be
+   indifferentiable from a random oracle [SPONGE].  More precisely, for
+   a given capacity c the indifferentiability proof shows that assuming
+   there are no weaknesses found in the Keccak permutation, an attacker
+   has to make an expected number of 2^(c/2) calls to the permutation to
+   tell Keccak from a random oracle.  For a random oracle, a difference
+   in only a single bit gives an unrelated, uniformly random output.
+   Hence, to be able to distinguish a key K, derived from shared keys
+   K_i from a random bit string, an adversary has to correctly guess all
+   key shares K_i entirely.
 
 6.  References
 
@@ -323,106 +313,62 @@ Internet-Draft                KEM Combiner                  January 2023
               DOI 10.17487/RFC2119, March 1997,
               <https://www.rfc-editor.org/info/rfc2119>.
 
-   [RFC5990]  Randall, J., Kaliski, B., Brainard, J., and S. Turner,
-              "Use of the RSA-KEM Key Transport Algorithm in the
-              Cryptographic Message Syntax (CMS)", RFC 5990,
-              DOI 10.17487/RFC5990, September 2010,
-              <https://www.rfc-editor.org/info/rfc5990>.
-
-
-
-
-
-Ounsworth                 Expires 1 August 2023                 [Page 6]
-
-Internet-Draft                KEM Combiner                  January 2023
-
-
-   [RFC7748]  Langley, A., Hamburg, M., and S. Turner, "Elliptic Curves
-              for Security", RFC 7748, DOI 10.17487/RFC7748, January
-              2016, <https://www.rfc-editor.org/info/rfc7748>.
-
-   [SEC1]     "Standards for Efficient Cryptography Group, SEC1:
-              Elliptic Curve Cryptography", May 2009,
-              <<https://www.secg.org/sec1-v2.pdf>>.
-
 6.2.  Informative References
-
-   [Aviram2022]
-              Aviram, N., Dowling, B., Komargodski, I., Paterson, K. G.,
-              Ronen, E., and E. Yogev, "Practical (Post-Quantum) Key
-              Combiners from One-Wayness and Applications to TLS.",
-              2022, <https://eprint.iacr.org/2022/065>.
-
-   [Bellare2015]
-              Bellare, M. and A. Lysyanskaya, "Symmetric and Dual PRFs
-              from Standard Assumptions: A Generic Validation of an HMAC
-              Assumption.", 2015, <https://eprint.iacr.org/2015/1198>.
-
-   [I-D.cfrg-schwabe-kyber]
-              Schwabe, P. and B. Westerbaan, "Kyber Post-Quantum KEM",
-              Work in Progress, Internet-Draft, draft-cfrg-schwabe-
-              kyber-01, 23 September 2022,
-              <https://www.ietf.org/archive/id/draft-cfrg-schwabe-kyber-
-              01.txt>.
 
    [I-D.driscoll-pqt-hybrid-terminology]
               D, F., "Terminology for Post-Quantum Traditional Hybrid
               Schemes", Work in Progress, Internet-Draft, draft-
               driscoll-pqt-hybrid-terminology-01, 20 October 2022,
-              <https://www.ietf.org/archive/id/draft-driscoll-pqt-
-              hybrid-terminology-01.txt>.
+              <https://datatracker.ietf.org/doc/html/draft-driscoll-pqt-
+              hybrid-terminology-01>.
 
    [I-D.ietf-ipsecme-ikev2-multiple-ke]
               Tjhai, C., Tomlinson, M., Bartlett, G., Fluhrer, S., Van
               Geest, D., Garcia-Morchon, O., and V. Smyslov, "Multiple
               Key Exchanges in IKEv2", Work in Progress, Internet-Draft,
               draft-ietf-ipsecme-ikev2-multiple-ke-12, 1 December 2022,
-              <https://www.ietf.org/archive/id/draft-ietf-ipsecme-ikev2-
-              multiple-ke-12.txt>.
+              <https://datatracker.ietf.org/doc/html/draft-ietf-ipsecme-
+              ikev2-multiple-ke-12>.
 
 
 
 
-
-
-
-
-
-Ounsworth                 Expires 1 August 2023                 [Page 7]
+Ounsworth & Wussler     Expires 2 September 2023                [Page 6]
 
-Internet-Draft                KEM Combiner                  January 2023
+Internet-Draft                KEM Combiner                    March 2023
 
 
    [I-D.ietf-lamps-cmp-updates]
               Brockhaus, H., von Oheimb, D., and J. Gray, "Certificate
               Management Protocol (CMP) Updates", Work in Progress,
               Internet-Draft, draft-ietf-lamps-cmp-updates-23, 29 June
-              2022, <https://www.ietf.org/archive/id/draft-ietf-lamps-
-              cmp-updates-23.txt>.
+              2022, <https://datatracker.ietf.org/doc/html/draft-ietf-
+              lamps-cmp-updates-23>.
 
    [I-D.ietf-tls-hybrid-design]
               Stebila, D., Fluhrer, S., and S. Gueron, "Hybrid key
               exchange in TLS 1.3", Work in Progress, Internet-Draft,
-              draft-ietf-tls-hybrid-design-05, 28 August 2022,
-              <https://www.ietf.org/archive/id/draft-ietf-tls-hybrid-
-              design-05.txt>.
+              draft-ietf-tls-hybrid-design-06, 27 February 2023,
+              <https://datatracker.ietf.org/doc/html/draft-ietf-tls-
+              hybrid-design-06>.
 
    [I-D.ounsworth-pq-composite-kem]
               Ounsworth, M. and J. Gray, "Composite KEM For Use In
               Internet PKI", Work in Progress, Internet-Draft, draft-
               ounsworth-pq-composite-kem-00, 11 July 2022,
-              <https://www.ietf.org/archive/id/draft-ounsworth-pq-
-              composite-kem-00.txt>.
+              <https://datatracker.ietf.org/doc/html/draft-ounsworth-pq-
+              composite-kem-00>.
+
+   [I-D.wussler-openpgp-pqc]
+              Kousidis, S., Strenzke, F., and A. Wussler, "Post-Quantum
+              Cryptography in OpenPGP", Work in Progress, Internet-
+              Draft, draft-wussler-openpgp-pqc-00, 21 December 2022,
+              <https://datatracker.ietf.org/doc/html/draft-wussler-
+              openpgp-pqc-00>.
 
    [PQCAPI]   Project, N. P.-Q. C., "PQC - API notes", November 2022,
               <https://csrc.nist.gov/CSRC/media/Projects/Post-Quantum-
               Cryptography/documents/example-files/api-notes.pdf>.
-
-   [RFC3447]  Jonsson, J. and B. Kaliski, "Public-Key Cryptography
-              Standards (PKCS) #1: RSA Cryptography Specifications
-              Version 2.1", RFC 3447, DOI 10.17487/RFC3447, February
-              2003, <https://www.rfc-editor.org/info/rfc3447>.
 
    [RFC8174]  Leiba, B., "Ambiguity of Uppercase vs Lowercase in RFC
               2119 Key Words", BCP 14, RFC 8174, DOI 10.17487/RFC8174,
@@ -443,11 +389,9 @@ Internet-Draft                KEM Combiner                  January 2023
 
 
 
-
-
-Ounsworth                 Expires 1 August 2023                 [Page 8]
+Ounsworth & Wussler     Expires 2 September 2023                [Page 7]
 
-Internet-Draft                KEM Combiner                  January 2023
+Internet-Draft                KEM Combiner                    March 2023
 
 
    [RFC8784]  Fluhrer, S., Kampanakis, P., McGrew, D., and V. Smyslov,
@@ -456,321 +400,24 @@ Internet-Draft                KEM Combiner                  January 2023
               RFC 8784, DOI 10.17487/RFC8784, June 2020,
               <https://www.rfc-editor.org/info/rfc8784>.
 
-Appendix A.  Security Analysis
-
-A.1.  Dual PRF
-
-   Dual PRFs are a active area of research.  A dual PRF is a function
-   which is a PRF when keyed by either of its two inputs - guaranteeing
-   pseudo-randomness if one of the keys is compromised or even
-   maliciously chosen by an adversary [Aviram2022].  As of publication
-   of this document, no dual PRFs have been standardized for use.  In
-   practice we often use HMACs or HKDFs to serve the role of a dual PRF
-   even though they have never been proved to be dual PRFs
-   [Bellare2015], [Aviram2022].
-
-   In essence, this document assumes that KDF( H(input1) || H(input2))
-   is a dual PRF in practice, for suitable choices of key derivation
-   function KDF and hash function H, despite not having formal security
-   proofs.  It has been proposed as a KEM combiner, for example in
-   [I-D.ietf-tls-hybrid-design].  As the academic literature evolves, it
-   may become appropriate to obsolete this document with a KEM combiner
-   based on a provably secure dual PRF.
-
-A.2.  KEM primitives
-
-   In modern cryptographic design, KEM algorithms seek to have
-   indistinguishability under adaptive chosen ciphertext attack (IND-
-   CCA2).  FFor hybrid KEMs we desire the additional property that even
-   if one input is controlled by an attacker, then combiner leaks no
-   information about the other input.
-
-   There are two ways to achieve such a hybrid KEM combiner; either by
-   designing a combiner that is robust to one of the inputs being
-   maliciously-chosen, called a dual PRF.  See Appendix A.1 for a
-   discussion about the current state of dual PRF research.  Or
-   alternatively by only allowing the hybridization of KEMs where a
-   malicious kemEncaps() algorithm cannot control the shared secret
-   derived by the victim's kemDecaps() algorithm and then combining the
-   shared secrets in a trivial way.
-
-   The following sections analyze commonly-used KEM algorithms to show
-   that they have the following two properties, and are therefore
-   suitable for use with the simplified KEM combiner presented in
-   Section 3, Figure 2.
-
-
-
-Ounsworth                 Expires 1 August 2023                 [Page 9]
-
-Internet-Draft                KEM Combiner                  January 2023
-
-
-   1.  A malicious encapsulater cannot control the length of the KEM
-       output (shared secret) that will be derived by the decapsulater.
-
-   2.  A malicious encapsulater cannot control the value of the KEM
-       output (shared secret) that will be derived by the decapsulater.
-       We define a KEM output to be "controlled by an attacker" if a
-       maliciously-written kemEncaps() function can cause the victim's
-       kemDecaps() algorithm to produce a shared secret either of a
-       length chosen by the attacker, or to take on a given value with
-       higher probability than can be obtained via rejection sampling on
-       the shared secret output of kemEncaps().
-
-A.3.  RSA-KEM
-
-   RSA encryption [RFC3447] can be promoted into a KEM as per [RFC5990]
-   which defines a key transport based on RSA-KEM.
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-Ounsworth                 Expires 1 August 2023                [Page 10]
-
-Internet-Draft                KEM Combiner                  January 2023
-
-
-   1. Generate a random integer z between 0 and n-1 (see note), and
-     convert z to a byte string Z of length nLen, most significant byte
-     first:
-
-         z = RandomInteger (0, n-1)
-
-         Z = IntegerToString (z, nLen)
-
-   2. Encrypt the random integer z using the recipient's public key
-     (n,e), and convert the resulting integer c to a ciphertext C, a
-     byte string of length nLen:
-
-         c = z^e mod n
-
-         C = IntegerToString (c, nLen)
-
-   3. Derive a key-encrypting key KEK of length kekLen bytes from the
-     byte string Z using the underlying key derivation function:
-
-         KEK = KDF (Z, kekLen)
-
-   4. Wrap the keying data K with the key-encrypting key KEK using the
-     underlying key-wrapping scheme to obtain wrapped keying data WK:
-
-         WK = Wrap (KEK, K)
-
-   5. Concatenate the ciphertext C and the wrapped keying data WK to
-     obtain the encrypted keying data EK:
-
-         EK = C || WK
-
-   6. Output the encrypted keying data EK.
-
-   where Steps 1 - 3 define "RSA-KEM", which is considered here.  Steps
-   4 - 6 define "Key Transport based on RSA-KEM" and is out of scope for
-   this analysis as we assume that any RSA-KEM construction intended for
-   use in a hybrid KEM would use the KEK output from Step 3 as the final
-   shared secret.
-
-
-
-
-
-
-
-
-
-
-
-
-
-Ounsworth                 Expires 1 August 2023                [Page 11]
-
-Internet-Draft                KEM Combiner                  January 2023
-
-
-   Here the transported symmetric key, KEK, is the KEM output (shared
-   secret) ss as defined in Section 1.1.  The encapsulater must choose a
-   key derivation function KDF and declare it in the RSA-KEM parameters.
-   The decapsulater may refuse to perform the the decapsulation if it
-   does not like the encapsulater's choice of KDF, therefore it can be
-   modeled as a random oracle producing an output of fixed length.  The
-   attacker is free to choose z, but assuming a strong choice of KDF,
-   they cannot control either the length or the value KEK beyond what
-   can be obtained by rejection sampling, thus satisfying properties 1
-   and 2 and defined in {.sec-kemprimitives}}.
-
-   Therefore RSA-KEM is considered to be suitable for use with the
-   simplified KEM combiner defined in Section 3, Figure 2.
-
-   Security note: This analysis applies to the specific RSA-KEM
-   construction defined above.  This result is not intended to
-   generalize to all RSA-based key transport mechanisms, as they may not
-   have the same cryptographic properties.
-
-A.4.  Elliptic Curve Diffie-Hellman (ECDH)
-
-   The elliptic curve Diffie-Hellman key exchange [SEC1] can be promoted
-   into a KEM in a straightforward way by assuming an ephemeral-static
-   (ES) mode where def kemEncaps(pk) -> (ct, ss) includes generation of
-   an ephemeral key pair, the public key being included as part of the
-   ciphertext ct and the private key being discarded upon completion of
-   the encapsulation.
-
-   According to [SEC1] section 6.1.3:
-
- 1. Use one of the Diffie-Hellman primitives specified in Section 3.3 to
-    derive a shared secret field element z ∈ Fq from U's secret key d_U
-    established during the key deployment procedure and V's public key
-    Q_V obtained during the key deployment procedure. If the Diffie-
-    Hellman primitive outputs “invalid”, output “invalid” and stop.
-    Decide whether to use the “standard” elliptic curve Diffie-Hellman
-    primitive or the elliptic curve cofactor Diffie-Hellman primitive
-    according to the convention established during the setup procedure.
-
- 2. Convert z ∈ Fq to an octet string Z using the conversion routine
-    specified in Section 2.3.5.
-
- 3. Use the key derivation function KDF established during the setup
-    procedure to generate keying data K of length keydatalen octets
-    from Z and [SharedInfo]. If the key derivation function outputs
-    “invalid”, output “invalid” and stop.
-
- 4. Output K.
-
-
-
-Ounsworth                 Expires 1 August 2023                [Page 12]
-
-Internet-Draft                KEM Combiner                  January 2023
-
-
-   Other key exchange methods defined in [SEC1] follow a similar
-   construction.
-
-   The attacker is free to choose a private key d_U which yields a
-   shared secret Z, but cannot force Z to take on a chosen value without
-   solving the elliptic curve discrete logarithm problem or performing
-   rejection sampling.  Assuming a strong choice of KDF, the attacker
-   cannot control either the length or the value of KEK beyond what can
-   be obtained by rejection sampling, thus satisfying properties 1 and 2
-   and defined in Appendix A.2.
-
-   Therefore elliptic curve Diffie-Hellman is considered to be suitable
-   for use with the simplified KEM combiner defined in Section 3,
-   Figure 2.
-
-A.5.  Edwards Curve Diffie-Hellman (X25519 / X448)
-
-   The elliptic curve Diffie-Hellman key exchange [SEC1] can be promoted
-   into a KEM in a straightforward way by assuming an ephemeral-static
-   (ES) mode where def kemEncaps(pk) -> (ct, ss) includes generation of
-   an ephemeral key pair, the public key being included as part of the
-   ciphertext ct and the private key being discarded upon completion of
-   the encapsulation.
-
-   According to [RFC7748] section 6.1, the X25519 key exchange is
-   defined as:
-
-   Alice generates 32 random bytes in a[0] to a[31] and transmits K_A =
-   X25519(a, 9) to Bob, where 9 is the u-coordinate of the base point
-   and is encoded as a byte with value 9, followed by 31 zero bytes.
-
-   Bob similarly generates 32 random bytes in b[0] to b[31], computes
-   K_B = X25519(b, 9), and transmits it to Alice.
-
-   Using their generated values and the received input, Alice computes
-   X25519(a, K_B) and Bob computes X25519(b, K_A).
-
-   Both now share K = X25519(a, X25519(b, 9)) = X25519(b, X25519(a, 9))
-   as a shared secret.  Both MAY check, without leaking extra
-   information about the value of K, whether K is the all-zero value and
-   abort if so (see below).  Alice and Bob can then use a key-derivation
-   function that includes K, K_A, and K_B to derive a symmetric key.
-
-   The X448 key exchange follows a similar construction.
-
-   The attacker is free to choose a private key b which yields a shared
-   secret K, but cannot force K to take on a chosen value without
-   solving the elliptic curve discrete logarithm problem or performing
-
-
-
-Ounsworth                 Expires 1 August 2023                [Page 13]
-
-Internet-Draft                KEM Combiner                  January 2023
-
-
-   rejection sampling.  Assuming a strong choice of KDF, the attacker
-   cannot control either the length or the value of the derived
-   symmetric key beyond what can be obtained by rejection sampling, thus
-   satisfying properties 1 and 2 and defined in Appendix A.2.
-
-   Therefore Edwards curve Diffie-Hellman, X25519 and X448, are
-   considered to be suitable for use with the simplified KEM combiner
-   defined in Section 3, Figure 2.
-
-A.6.  CRYSTALS-Kyber
-
-   The CRYSTALS-Kyber kemEncaps() is defined as follows
-   [I-D.cfrg-schwabe-kyber]:
-
-   1.Compute
-     1. m = H(seed)
-     2. (Kbar, cpaSeed) = G(m || H(pk))
-     3. cpaCipherText = InnerEnc(m, publicKey, cpaSeed)
-   2.Return
-     1. cipherText = cpaCipherText
-     2. sharedSecret = KDF(KBar || H(cpaCipherText))
-
-   with definitions as per [I-D.cfrg-schwabe-kyber].
-
-   Here the hash functions G, H and the key derivation function KDF are
-   in theory chosen by the encapsulater, but in practice are fixed by
-   the Kyber specification to be H: SHA3-256, G: SHA3-512, and KDF:
-   SHAKE-256, which can be modeled as random oracles.  The attacker is
-   free to choose m, but not the decapsulater's public key pk, nor do
-   they have control of cpaCipherText so long as InnerEnc remains IND-
-   CPA secure.  Therefore the attacker cannot control the value or
-   length of K beyond what can be obtained by rejection sampling.
-
-   Therefore CRYSTALS-Kyber is considered to be suitable for use with
-   the simplified KEM combiner defined in Section 3, Figure 2.
-
-Appendix B.  Intellectual Property Considerations
-
-   None.
-
-Appendix C.  Contributors and Acknowledgements
+   [SP800-56A]
+              Barker, E., Chen, L., Roginsky, A., Vassilev, A., and R.
+              Davis, "Recommendation for Pair-Wise Key-Establishment
+              Schemes Using Discrete Logarithm Cryptography", NIST
+              Special Publication 800-56A , April 2018,
+              <https://doi.org/10.6028/NIST.SP.800-56Ar3>.
+
+   [SP800-56C]
+              Barker, E., Chen, L., and R. Davis, "Recommendation for
+              Key-Derivation Methods in Key-Establishment Schemes", NIST
+              Special Publication 800-56C , August 2020,
+              <https://doi.org/10.6028/NIST.SP.800-56Cr2>.
+
+   [SPONGE]   Bertoni, G., Daemen, J., Peters, M., and G. Assche,
+              "Cryptographic sponge functions", January 2011,
+              <https://keccak.team/files/CSF-0.1.pdf>.
+
+Acknowledgements
 
    This document incorporates contributions and comments from a large
    group of experts.  The Editors would especially like to acknowledge
@@ -779,14 +426,8 @@ Appendix C.  Contributors and Acknowledgements
    electronic mail and VOIP traffic over the past years in pursuit of
    this document:
 
-
-
-Ounsworth                 Expires 1 August 2023                [Page 14]
-
-Internet-Draft                KEM Combiner                  January 2023
-
-
-   Douglas Stebila, Nimrod Aviram.
+   Douglas Stebila, Nimrod Aviram, Andreas Huelsing, and Stavros
+   Kousidis.
 
    We are grateful to all, including any contributors who may have been
    inadvertently omitted from this list.
@@ -796,17 +437,18 @@ Internet-Draft                KEM Combiner                  January 2023
    "Copying always makes things easier and less error prone" -
    [RFC8411].
 
-C.1.  Making contributions
+Authors' Addresses
 
-   To be removed before publication.
 
-   Additional contributions to this draft are welcome.  Please see the
-   working copy of this draft at, as well as open issues at:
 
-   https://github.com/EntrustCorporation/draft-ounsworth-cfrg-kem-
-   combiners
 
-Author's Address
+
+
+
+Ounsworth & Wussler     Expires 2 September 2023                [Page 8]
+
+Internet-Draft                KEM Combiner                    March 2023
+
 
    Mike Ounsworth
    Entrust Limited
@@ -816,6 +458,10 @@ Author's Address
    Email: mike.ounsworth@entrust.com
 
 
+   Aron Wussler
+   Proton AG
+   Switzerland
+   Email: aron@wussler.it
 
 
 
@@ -837,4 +483,22 @@ Author's Address
 
 
 
-Ounsworth                 Expires 1 August 2023                [Page 15]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Ounsworth & Wussler     Expires 2 September 2023                [Page 9]
