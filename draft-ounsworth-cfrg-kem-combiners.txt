@@ -18,9 +18,9 @@ Abstract
    multiple key encapsulations in parallel and then combining their
    outputs to derive a single shared secret.
 
-   This document defines a flexible multi-share KEM combiner, that
-   fulfils the security criteria to join an arbitrary number of key
-   shares.
+   This document defines a flexible multi-share KEM combiner to join an
+   arbitrary number of key shares, that is a multi-PRF compatible with
+   NIST SP 800-56Cr2 [[SP800-56C]].
 
 About This Document
 
@@ -149,7 +149,7 @@ Internet-Draft                KEM Combiner                    March 2023
    3.  KEM-based authenticated key exchanges (AKEs).
 
    This document normalizes a mechanisms for combining the output of two
-   KEMs.
+   or more KEMs.
 
 2.1.  KEM/PSK hybrids
 
@@ -191,20 +191,20 @@ Internet-Draft                KEM Combiner                    March 2023
    (for example in X.509 certificates), and wish to involve both KEM
    keys in deriving a mutually-authenticated shared secret.  In
    particular this will arise for any protocol that needs to provide
-   post-quantum replacements for static-static (elliptic curve) Diffie-
+   post-quantum replacements for static-static (Elliptic Curve) Diffie-
    Hellman mechanisms.  Examples include a KEM replacement for CMP's
    DHBasedMac [I-D.ietf-lamps-cmp-updates], .. TODO: cite others.
 
 3.  KEM Combiner construction
 
    A KEM combiner is a function that takes in two or more shared secrets
-   and returns a combined shared secret SS, where all values are byte
-   arrays.
+   SS_i and returns a combined shared secret SS, where all values are
+   byte arrays.
 
    SS = kemCombiner(SS_1, SS_2, ..., SS_n)
 
    This document assumes that shared secrets are the output of a KEM,
-   but without loss of generality they may also be any other source of
+   but without loss of generality they MAY also be any other source of
    cryptographic key material, such as pre-shared keys (PSKs), with PQ/
    PSK being a quantum-safe migration strategy being made available by
    some protocols, see for example IKEv2 in [RFC8784].
@@ -226,15 +226,23 @@ Ounsworth & Wussler     Expires 4 September 2023                [Page 4]
 Internet-Draft                KEM Combiner                    March 2023
 
 
-   where KDF represents a suitable choice of cryptographic key
-   derivation function, K_i represent the constant-length input keys,
-   fixedInfo is some protocol-specific KDF binding, and || represents
-   concatenation.  The counter parameter is instantiation specific, and
-   outputBits determines the length of the key.
+   where:
+
+   *  KDF represents a suitable choice of cryptographic key derivation
+      function,
+
+   *  K_i represent the constant-length input keys,
+
+   *  fixedInfo is some protocol-specific KDF binding,
+
+   *  counter parameter is instantiation specific,
+
+   *  outputBits determines the length of the key,
+
+   *  || represents concatenation.
 
    In section Section 4 are listed several possible practical
-   instantiations, all compliant with with NIST SP-800 56Cr2
-   [SP800-56C].
+   instantiations, in compliance with NIST SP-800 56Cr2 [SP800-56C].
 
    Each K_i MUST be constant in length, therefore the secret shares SS_i
    can be used directly only if they are guaranteed to be constant
@@ -249,11 +257,11 @@ Internet-Draft                KEM Combiner                    March 2023
    shares.
 
    The fixedInfo string MUST have a definite structure depending on the
-   protocol where all parts are fixed length.  This prevents possible
-   cases where a variable length structure could be used to create
-   collisions between two different instances.  In cases some variable
-   length input is necessary, such as the representation of a public key
-   or an OID, then hashing or padding can be used.
+   protocol where all parts are fixed length.  This prevents a variable
+   length structure from creating collisions between two different
+   instances.  In cases some variable length input is necessary, such as
+   the representation of a public key or an OID, then hashing or padding
+   can be used.
 
    The parameter fixedInfo MAY contain any of the following information:
 
@@ -267,20 +275,18 @@ Internet-Draft                KEM Combiner                    March 2023
       communication parties before or during the transaction, such as
       nonces or pre-shared secrets.
 
-   *  An indication of the protocol or application employing the key-
-      derivation method.
-
-   *  Protocol-related information, such as a label or session
-      identifier.
-
-
-
 
 
 Ounsworth & Wussler     Expires 4 September 2023                [Page 5]
 
 Internet-Draft                KEM Combiner                    March 2023
 
+
+   *  An indication of the protocol or application employing the key-
+      derivation method.
+
+   *  Protocol-related information, such as a label or session
+      identifier.
 
    *  An indication of the key-agreement scheme and/or key-derivation
       method used.
@@ -300,7 +306,7 @@ Internet-Draft                KEM Combiner                    March 2023
 4.  Practical instantiations
 
    The KDF MUST be instantiated with one of the following Keccak-based
-   option.  Each instance defines a function to be used as KDF, a hash
+   option.  Each instance defines a function to be used as KDF, a hash H
    function to optionally derive the K_i, and a counter.
 
    1.  KDF = SHA3-256 and H = SHA3-256, with hashSize = 256 bit.
@@ -314,8 +320,7 @@ Internet-Draft                KEM Combiner                    March 2023
 4.1.  Hash-and-counter based construction
 
    Options 1 and 2 instantiate the KDF using SHA3, specified in NIST
-   FIPS 202 [FIPS202].  To generate an arbitrarily long output of
-   outputBits:
+   FIPS 202 [FIPS202].  To generate an outputBits long secret share SS:
 
    *  the counter MUST be initialized with the string 0x00000001.
 
@@ -325,11 +330,6 @@ Internet-Draft                KEM Combiner                    March 2023
 
    *  The strings are concatenated ordered by counter.
 
-   *  The leftmost outputBits are returned as SS.
-
-   An implementation MUST NOT reuse the counter in case of overflow and
-   MUST return an error when producing more than 2^32 consecutive
-   hashes.
 
 
 
@@ -337,6 +337,12 @@ Ounsworth & Wussler     Expires 4 September 2023                [Page 6]
 
 Internet-Draft                KEM Combiner                    March 2023
 
+
+   *  The leftmost outputBits are returned as SS.
+
+   An implementation MUST NOT overflow and reuse the counter and an
+   error MUST be returned when producing more than 2^32 consecutive
+   hashes.
 
 4.2.  KMAC based construction
 
@@ -348,8 +354,8 @@ Internet-Draft                KEM Combiner                    March 2023
    where fixedInfo is not sufficient.
 
    To derive a shared secret SS of desired length, KMAC is called a
-   single time with X defined in Section 3 and lenght L being
-   outputBits.
+   single time with the input string X defined in Section 3 and length L
+   being outputBits.
 
 5.  IANA Considerations
 
@@ -381,18 +387,17 @@ Internet-Draft                KEM Combiner                    March 2023
 
 7.2.  Informative References
 
-   [FIPS202]  "SHA-3 Standard: Permutation-Based Hash and Extendable-
-              Output Functions", Federal information Processing
-              Standards Publication (FIPS) 202 , 2015,
-              <https://doi.org/10.6028/NIST.FIPS.202>.
-
-
 
 
 Ounsworth & Wussler     Expires 4 September 2023                [Page 7]
 
 Internet-Draft                KEM Combiner                    March 2023
 
+
+   [FIPS202]  "SHA-3 Standard: Permutation-Based Hash and Extendable-
+              Output Functions", Federal information Processing
+              Standards Publication (FIPS) 202 , 2015,
+              <https://doi.org/10.6028/NIST.FIPS.202>.
 
    [I-D.driscoll-pqt-hybrid-terminology]
               D, F., "Terminology for Post-Quantum Traditional Hybrid
@@ -437,11 +442,6 @@ Internet-Draft                KEM Combiner                    March 2023
               <https://datatracker.ietf.org/doc/html/draft-wussler-
               openpgp-pqc-00>.
 
-   [PQCAPI]   Project, N. P.-Q. C., "PQC - API notes", November 2022,
-              <https://csrc.nist.gov/CSRC/media/Projects/Post-Quantum-
-              Cryptography/documents/example-files/api-notes.pdf>.
-
-
 
 
 
@@ -449,6 +449,10 @@ Ounsworth & Wussler     Expires 4 September 2023                [Page 8]
 
 Internet-Draft                KEM Combiner                    March 2023
 
+
+   [PQCAPI]   Project, N. P.-Q. C., "PQC - API notes", November 2022,
+              <https://csrc.nist.gov/CSRC/media/Projects/Post-Quantum-
+              Cryptography/documents/example-files/api-notes.pdf>.
 
    [RFC8174]  Leiba, B., "Ambiguity of Uppercase vs Lowercase in RFC
               2119 Key Words", BCP 14, RFC 8174, DOI 10.17487/RFC8174,
@@ -497,10 +501,6 @@ Internet-Draft                KEM Combiner                    March 2023
 
 
 
-
-
-
-
 Ounsworth & Wussler     Expires 4 September 2023                [Page 9]
 
 Internet-Draft                KEM Combiner                    March 2023
@@ -509,7 +509,7 @@ Internet-Draft                KEM Combiner                    March 2023
 Acknowledgements
 
    This document incorporates contributions and comments from a large
-   group of experts.  The Editors would especially like to acknowledge
+   group of experts.  The authors would especially like to acknowledge
    the expertise and tireless dedication of the following people, who
    attended many long meetings and generated millions of bytes of
    electronic mail and VOIP traffic over the past years in pursuit of

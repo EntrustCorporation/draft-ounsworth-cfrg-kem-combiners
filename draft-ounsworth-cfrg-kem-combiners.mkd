@@ -145,14 +145,11 @@ informative:
         name: Gilles van Assche
     date: January 2011
 
-
-
-
 --- abstract
 
 The migration to post-quantum cryptography often calls for performing multiple key encapsulations in parallel and then combining their outputs to derive a single shared secret.
 
-This document defines a flexible multi-share KEM combiner, that fulfils the security criteria to join an arbitrary number of key shares.
+This document defines a flexible multi-share KEM combiner to join an arbitrary number of key shares, that is a multi-PRF compatible with NIST SP 800-56Cr2 [[SP800-56C]].
 
 <!-- End of Abstract -->
 
@@ -187,7 +184,7 @@ The need for a KEM combiner function arises in three different contexts within I
 1. Post-quantum / traditional hybrid KEMs.
 1. KEM-based authenticated key exchanges (AKEs).
 
-This document normalizes a mechanisms for combining the output of two KEMs.
+This document normalizes a mechanisms for combining the output of two or more KEMs.
 
 ## KEM/PSK hybrids
 
@@ -205,7 +202,7 @@ Building a PQ/T hybrid KEM requires a secure function which combines the output 
 
 ## KEM-based AKE
 
-The need for a KEM-based authenticated key establishment arises, for example, when two communicating parties each have long-term KEM keys (for example in X.509 certificates), and wish to involve both KEM keys in deriving a mutually-authenticated shared secret. In particular this will arise for any protocol that needs to provide post-quantum replacements for static-static (elliptic curve) Diffie-Hellman mechanisms. Examples include a KEM replacement for CMP's DHBasedMac {{I-D.ietf-lamps-cmp-updates}}, .. TODO: cite others.
+The need for a KEM-based authenticated key establishment arises, for example, when two communicating parties each have long-term KEM keys (for example in X.509 certificates), and wish to involve both KEM keys in deriving a mutually-authenticated shared secret. In particular this will arise for any protocol that needs to provide post-quantum replacements for static-static (Elliptic Curve) Diffie-Hellman mechanisms. Examples include a KEM replacement for CMP's DHBasedMac {{I-D.ietf-lamps-cmp-updates}}, .. TODO: cite others.
 
 
 # KEM Combiner construction {#sec-kem-combiner}
@@ -223,13 +220,13 @@ and Practice of Public Key Cryptography, Part I, volume 10769 of Lecture Notes i
 -->
 
 
-A KEM combiner is a function that takes in two or more shared secrets and returns a combined shared secret `SS`, where all values are byte arrays.
+A KEM combiner is a function that takes in two or more shared secrets `SS_i` and returns a combined shared secret `SS`, where all values are byte arrays.
 
 ~~~
 SS = kemCombiner(SS_1, SS_2, ..., SS_n)
 ~~~
 
-This document assumes that shared secrets are the output of a KEM, but without loss of generality they may also be any other source of cryptographic key material, such as pre-shared keys (PSKs), with PQ/PSK being a quantum-safe migration strategy being made available by some protocols, see for example IKEv2 in [RFC8784].
+This document assumes that shared secrets are the output of a KEM, but without loss of generality they MAY also be any other source of cryptographic key material, such as pre-shared keys (PSKs), with PQ/PSK being a quantum-safe migration strategy being made available by some protocols, see for example IKEv2 in [RFC8784].
 
 In general it is desirable to use a multi-PRF as a KEM combiner, a function that can be keyed by any input.
 The following simple yet generic construction can be used in all IETF protocols that need to combine the output of two or more KEMs:
@@ -239,10 +236,16 @@ KDF(counter || K_1 || ... || K_n || fixedInfo, outputBits)
 ~~~
 {: title="general KEM combiner construction" }
 
-where `KDF` represents a suitable choice of cryptographic key derivation function, `K_i` represent the constant-length input keys, `fixedInfo` is some protocol-specific KDF binding, and `||` represents concatenation.
-The `counter` parameter is instantiation specific, and `outputBits` determines the length of the key.
+where:
 
-In section {{sec-instantiation}} are listed several possible practical instantiations, all compliant with with NIST SP-800 56Cr2 {{SP800-56C}}.
+- `KDF` represents a suitable choice of cryptographic key derivation function,
+- `K_i` represent the constant-length input keys,
+- `fixedInfo` is some protocol-specific KDF binding,
+- `counter` parameter is instantiation specific,
+- `outputBits` determines the length of the key,
+- `||` represents concatenation.
+
+In section {{sec-instantiation}} are listed several possible practical instantiations, in compliance with NIST SP-800 56Cr2 {{SP800-56C}}.
 
 Each `K_i` MUST be constant in length, therefore the secret shares `SS_i` can be used directly only if they are guaranteed to be constant length. For all other cases, it is REQUIRED to hash them first:
 
@@ -254,7 +257,7 @@ K_i = H(SS_i)
 The `fixedInfo` string is a fixed-length string containing some context-specific information.
 It MUST NOT depend on the secret shares.
 
-The `fixedInfo` string MUST have a definite structure depending on the protocol where all parts are fixed length. This prevents possible cases where a variable length structure could be used to create collisions between two different instances.
+The `fixedInfo` string MUST have a definite structure depending on the protocol where all parts are fixed length. This prevents a variable length structure from creating collisions between two different instances.
 In cases some variable length input is necessary, such as the representation of a public key or an OID, then hashing or padding can be used.
 
 The parameter fixedInfo MAY contain any of the following information:
@@ -274,7 +277,7 @@ This is a non-comprehensive list, further information can be found in paragraph 
 # Practical instantiations {#sec-instantiation}
 
 The KDF MUST be instantiated with one of the following Keccak-based option.
-Each instance defines a function to be used as KDF, a hash function to optionally derive the `K_i`, and a counter.
+Each instance defines a function to be used as `KDF`, a hash `H` function to optionally derive the `K_i`, and a `counter`.
 
 1. `KDF = SHA3-256` and `H = SHA3-256`, with `hashSize = 256 bit`.
 2. `KDF = SHA3-512` and `H = SHA3-512`, with `hashSize = 512 bit`.
@@ -283,21 +286,21 @@ Each instance defines a function to be used as KDF, a hash function to optionall
 
 ## Hash-and-counter based construction
 Options 1 and 2 instantiate the KDF using SHA3, specified in NIST FIPS 202 {{FIPS202}}.
-To generate an arbitrarily long output of `outputBits`:
+To generate an `outputBits` long secret share `SS`:
 
 * the `counter` MUST be initialized with the string `0x00000001`.
 * The hash is performed over the string defined in {{sec-kem-combiner}}, and repeated `ceil(outputBits/hashSize)` times. For each iteration the `counter` MUST be increased by `0x01`.
 * The strings are concatenated ordered by `counter`.
 * The leftmost `outputBits` are returned as `SS`.
 
-An implementation MUST NOT reuse the `counter` in case of overflow and MUST return an error when producing more than 2^32 consecutive hashes.
+An implementation MUST NOT overflow and reuse the `counter` and an error MUST be returned when producing more than 2^32 consecutive hashes.
 
 ## KMAC based construction
 Options 3 and 4 are KMAC-based, as specified in NIST SP 800-185 {{SP800-185}}.
 The context `S` MUST be the utf-8 string "KDF", the key `K` MUST be a context-specific string of at least `hashSize` bits, and `counter` MUST be the fixed string `0x00000001`.
 The key `K` MAY be used as an additional option to perform context separation, in scenarios where `fixedInfo` is not sufficient.
 
-To derive a shared secret `SS` of desired length, KMAC is called a single time with `X` defined in {{sec-kem-combiner}} and lenght `L` being `outputBits`.
+To derive a shared secret `SS` of desired length, KMAC is called a single time with the input string `X` defined in {{sec-kem-combiner}} and length `L` being `outputBits`.
 
 # IANA Considerations {#sec-iana}
 
@@ -316,7 +319,7 @@ Hence, to be able to distinguish a key `K`, derived from shared keys `K_i` from 
 # Acknowledgements
 {:numbered="false"}
 
-This document incorporates contributions and comments from a large group of experts. The Editors would especially like to acknowledge the expertise and tireless dedication of the following people, who attended many long meetings and generated millions of bytes of electronic mail and VOIP traffic over the past years in pursuit of this document:
+This document incorporates contributions and comments from a large group of experts. The authors would especially like to acknowledge the expertise and tireless dedication of the following people, who attended many long meetings and generated millions of bytes of electronic mail and VOIP traffic over the past years in pursuit of this document:
 
 Douglas Stebila, Nimrod Aviram, Andreas Huelsing, and Stavros Kousidis.
 

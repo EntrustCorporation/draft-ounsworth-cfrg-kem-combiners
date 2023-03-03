@@ -9,7 +9,7 @@
 <meta content="Aron Wussler" name="author">
 <meta content="
        The migration to post-quantum cryptography often calls for performing multiple key encapsulations in parallel and then combining their outputs to derive a single shared secret. 
-       This document defines a flexible multi-share KEM combiner, that fulfils the security criteria to join an arbitrary number of key shares. 
+       This document defines a flexible multi-share KEM combiner to join an arbitrary number of key shares, that is a multi-PRF compatible with NIST SP 800-56Cr2 [ ]. 
        
 
 
@@ -1217,7 +1217,7 @@ li > p:last-of-type {
 <section id="section-abstract">
       <h2 id="abstract"><a href="#abstract" class="selfRef">Abstract</a></h2>
 <p id="section-abstract-1">The migration to post-quantum cryptography often calls for performing multiple key encapsulations in parallel and then combining their outputs to derive a single shared secret.<a href="#section-abstract-1" class="pilcrow">¶</a></p>
-<p id="section-abstract-2">This document defines a flexible multi-share KEM combiner, that fulfils the security criteria to join an arbitrary number of key shares.<a href="#section-abstract-2" class="pilcrow">¶</a></p>
+<p id="section-abstract-2">This document defines a flexible multi-share KEM combiner to join an arbitrary number of key shares, that is a multi-PRF compatible with NIST SP 800-56Cr2 [<span>[<a href="#SP800-56C" class="xref">SP800-56C</a>]</span>].<a href="#section-abstract-2" class="pilcrow">¶</a></p>
 </section>
 <section class="note rfcEditorRemove" id="section-note.1">
       <h2 id="name-about-this-document-2">
@@ -1387,7 +1387,7 @@ def kemDecaps(ct, sk) -&gt; ss
         <li id="section-2-2.3">KEM-based authenticated key exchanges (AKEs).<a href="#section-2-2.3" class="pilcrow">¶</a>
 </li>
       </ol>
-<p id="section-2-3">This document normalizes a mechanisms for combining the output of two KEMs.<a href="#section-2-3" class="pilcrow">¶</a></p>
+<p id="section-2-3">This document normalizes a mechanisms for combining the output of two or more KEMs.<a href="#section-2-3" class="pilcrow">¶</a></p>
 <div id="kempsk-hybrids">
 <section id="section-2.1">
         <h3 id="name-kem-psk-hybrids-2">
@@ -1417,7 +1417,7 @@ def kemDecaps(ct, sk) -&gt; ss
         <h3 id="name-kem-based-ake-2">
 <a href="#section-2.3" class="section-number selfRef">2.3. </a><a href="#name-kem-based-ake-2" class="section-name selfRef">KEM-based AKE</a>
         </h3>
-<p id="section-2.3-1">The need for a KEM-based authenticated key establishment arises, for example, when two communicating parties each have long-term KEM keys (for example in X.509 certificates), and wish to involve both KEM keys in deriving a mutually-authenticated shared secret. In particular this will arise for any protocol that needs to provide post-quantum replacements for static-static (elliptic curve) Diffie-Hellman mechanisms. Examples include a KEM replacement for CMP's DHBasedMac <span>[<a href="#I-D.ietf-lamps-cmp-updates" class="xref">I-D.ietf-lamps-cmp-updates</a>]</span>, .. TODO: cite others.<a href="#section-2.3-1" class="pilcrow">¶</a></p>
+<p id="section-2.3-1">The need for a KEM-based authenticated key establishment arises, for example, when two communicating parties each have long-term KEM keys (for example in X.509 certificates), and wish to involve both KEM keys in deriving a mutually-authenticated shared secret. In particular this will arise for any protocol that needs to provide post-quantum replacements for static-static (Elliptic Curve) Diffie-Hellman mechanisms. Examples include a KEM replacement for CMP's DHBasedMac <span>[<a href="#I-D.ietf-lamps-cmp-updates" class="xref">I-D.ietf-lamps-cmp-updates</a>]</span>, .. TODO: cite others.<a href="#section-2.3-1" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
@@ -1427,13 +1427,13 @@ def kemDecaps(ct, sk) -&gt; ss
       <h2 id="name-kem-combiner-construction-2">
 <a href="#section-3" class="section-number selfRef">3. </a><a href="#name-kem-combiner-construction-2" class="section-name selfRef">KEM Combiner construction</a>
       </h2>
-<p id="section-3-1">A KEM combiner is a function that takes in two or more shared secrets and returns a combined shared secret <code>SS</code>, where all values are byte arrays.<a href="#section-3-1" class="pilcrow">¶</a></p>
+<p id="section-3-1">A KEM combiner is a function that takes in two or more shared secrets <code>SS_i</code> and returns a combined shared secret <code>SS</code>, where all values are byte arrays.<a href="#section-3-1" class="pilcrow">¶</a></p>
 <div class="alignLeft art-text artwork" id="section-3-2">
 <pre>
 SS = kemCombiner(SS_1, SS_2, ..., SS_n)
 </pre><a href="#section-3-2" class="pilcrow">¶</a>
 </div>
-<p id="section-3-3">This document assumes that shared secrets are the output of a KEM, but without loss of generality they may also be any other source of cryptographic key material, such as pre-shared keys (PSKs), with PQ/PSK being a quantum-safe migration strategy being made available by some protocols, see for example IKEv2 in <span>[<a href="#RFC8784" class="xref">RFC8784</a>]</span>.<a href="#section-3-3" class="pilcrow">¶</a></p>
+<p id="section-3-3">This document assumes that shared secrets are the output of a KEM, but without loss of generality they MAY also be any other source of cryptographic key material, such as pre-shared keys (PSKs), with PQ/PSK being a quantum-safe migration strategy being made available by some protocols, see for example IKEv2 in <span>[<a href="#RFC8784" class="xref">RFC8784</a>]</span>.<a href="#section-3-3" class="pilcrow">¶</a></p>
 <p id="section-3-4">In general it is desirable to use a multi-PRF as a KEM combiner, a function that can be keyed by any input.
 The following simple yet generic construction can be used in all IETF protocols that need to combine the output of two or more KEMs:<a href="#section-3-4" class="pilcrow">¶</a></p>
 <span id="name-general-kem-combiner-constru"></span><figure id="figure-1">
@@ -1445,14 +1445,33 @@ KDF(counter || K_1 || ... || K_n || fixedInfo, outputBits)
 <figcaption><a href="#figure-1" class="selfRef">Figure 1</a>:
 <a href="#name-general-kem-combiner-constru" class="selfRef">general KEM combiner construction</a>
         </figcaption></figure>
-<p id="section-3-6">where <code>KDF</code> represents a suitable choice of cryptographic key derivation function, <code>K_i</code> represent the constant-length input keys, <code>fixedInfo</code> is some protocol-specific KDF binding, and <code>||</code> represents concatenation.
-The <code>counter</code> parameter is instantiation specific, and <code>outputBits</code> determines the length of the key.<a href="#section-3-6" class="pilcrow">¶</a></p>
-<p id="section-3-7">In section <a href="#sec-instantiation" class="xref">Section 4</a> are listed several possible practical instantiations, all compliant with with NIST SP-800 56Cr2 <span>[<a href="#SP800-56C" class="xref">SP800-56C</a>]</span>.<a href="#section-3-7" class="pilcrow">¶</a></p>
-<p id="section-3-8">Each <code>K_i</code> MUST be constant in length, therefore the secret shares <code>SS_i</code> can be used directly only if they are guaranteed to be constant length. For all other cases, it is REQUIRED to hash them first:<a href="#section-3-8" class="pilcrow">¶</a></p>
-<div class="alignLeft art-text artwork" id="section-3-9">
+<p id="section-3-6">where:<a href="#section-3-6" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-3-7.1">
+          <code>KDF</code> represents a suitable choice of cryptographic key derivation function,<a href="#section-3-7.1" class="pilcrow">¶</a>
+</li>
+        <li class="normal" id="section-3-7.2">
+          <code>K_i</code> represent the constant-length input keys,<a href="#section-3-7.2" class="pilcrow">¶</a>
+</li>
+        <li class="normal" id="section-3-7.3">
+          <code>fixedInfo</code> is some protocol-specific KDF binding,<a href="#section-3-7.3" class="pilcrow">¶</a>
+</li>
+        <li class="normal" id="section-3-7.4">
+          <code>counter</code> parameter is instantiation specific,<a href="#section-3-7.4" class="pilcrow">¶</a>
+</li>
+        <li class="normal" id="section-3-7.5">
+          <code>outputBits</code> determines the length of the key,<a href="#section-3-7.5" class="pilcrow">¶</a>
+</li>
+        <li class="normal" id="section-3-7.6">
+          <code>||</code> represents concatenation.<a href="#section-3-7.6" class="pilcrow">¶</a>
+</li>
+      </ul>
+<p id="section-3-8">In section <a href="#sec-instantiation" class="xref">Section 4</a> are listed several possible practical instantiations, in compliance with NIST SP-800 56Cr2 <span>[<a href="#SP800-56C" class="xref">SP800-56C</a>]</span>.<a href="#section-3-8" class="pilcrow">¶</a></p>
+<p id="section-3-9">Each <code>K_i</code> MUST be constant in length, therefore the secret shares <code>SS_i</code> can be used directly only if they are guaranteed to be constant length. For all other cases, it is REQUIRED to hash them first:<a href="#section-3-9" class="pilcrow">¶</a></p>
+<div class="alignLeft art-text artwork" id="section-3-10">
 <pre>
 K_i = H(SS_i)
-</pre><a href="#section-3-9" class="pilcrow">¶</a>
+</pre><a href="#section-3-10" class="pilcrow">¶</a>
 </div>
 <div id="protocol-binding">
 <section id="section-3.1">
@@ -1461,7 +1480,7 @@ K_i = H(SS_i)
         </h3>
 <p id="section-3.1-1">The <code>fixedInfo</code> string is a fixed-length string containing some context-specific information.
 It MUST NOT depend on the secret shares.<a href="#section-3.1-1" class="pilcrow">¶</a></p>
-<p id="section-3.1-2">The <code>fixedInfo</code> string MUST have a definite structure depending on the protocol where all parts are fixed length. This prevents possible cases where a variable length structure could be used to create collisions between two different instances.
+<p id="section-3.1-2">The <code>fixedInfo</code> string MUST have a definite structure depending on the protocol where all parts are fixed length. This prevents a variable length structure from creating collisions between two different instances.
 In cases some variable length input is necessary, such as the representation of a public key or an OID, then hashing or padding can be used.<a href="#section-3.1-2" class="pilcrow">¶</a></p>
 <p id="section-3.1-3">The parameter fixedInfo MAY contain any of the following information:<a href="#section-3.1-3" class="pilcrow">¶</a></p>
 <ul class="normal">
@@ -1495,7 +1514,7 @@ In cases some variable length input is necessary, such as the representation of 
 <a href="#section-4" class="section-number selfRef">4. </a><a href="#name-practical-instantiations-2" class="section-name selfRef">Practical instantiations</a>
       </h2>
 <p id="section-4-1">The KDF MUST be instantiated with one of the following Keccak-based option.
-Each instance defines a function to be used as KDF, a hash function to optionally derive the <code>K_i</code>, and a counter.<a href="#section-4-1" class="pilcrow">¶</a></p>
+Each instance defines a function to be used as <code>KDF</code>, a hash <code>H</code> function to optionally derive the <code>K_i</code>, and a <code>counter</code>.<a href="#section-4-1" class="pilcrow">¶</a></p>
 <ol start="1" type="1" class="normal type-1" id="section-4-2">
 <li id="section-4-2.1">
           <code>KDF = SHA3-256</code> and <code>H = SHA3-256</code>, with <code>hashSize = 256 bit</code>.<a href="#section-4-2.1" class="pilcrow">¶</a>
@@ -1516,7 +1535,7 @@ Each instance defines a function to be used as KDF, a hash function to optionall
 <a href="#section-4.1" class="section-number selfRef">4.1. </a><a href="#name-hash-and-counter-based-const" class="section-name selfRef">Hash-and-counter based construction</a>
         </h3>
 <p id="section-4.1-1">Options 1 and 2 instantiate the KDF using SHA3, specified in NIST FIPS 202 <span>[<a href="#FIPS202" class="xref">FIPS202</a>]</span>.
-To generate an arbitrarily long output of <code>outputBits</code>:<a href="#section-4.1-1" class="pilcrow">¶</a></p>
+To generate an <code>outputBits</code> long secret share <code>SS</code>:<a href="#section-4.1-1" class="pilcrow">¶</a></p>
 <ul class="normal">
 <li class="normal" id="section-4.1-2.1">the <code>counter</code> MUST be initialized with the string <code>0x00000001</code>.<a href="#section-4.1-2.1" class="pilcrow">¶</a>
 </li>
@@ -1527,7 +1546,7 @@ To generate an arbitrarily long output of <code>outputBits</code>:<a href="#sect
           <li class="normal" id="section-4.1-2.4">The leftmost <code>outputBits</code> are returned as <code>SS</code>.<a href="#section-4.1-2.4" class="pilcrow">¶</a>
 </li>
         </ul>
-<p id="section-4.1-3">An implementation MUST NOT reuse the <code>counter</code> in case of overflow and MUST return an error when producing more than 2^32 consecutive hashes.<a href="#section-4.1-3" class="pilcrow">¶</a></p>
+<p id="section-4.1-3">An implementation MUST NOT overflow and reuse the <code>counter</code> and an error MUST be returned when producing more than 2^32 consecutive hashes.<a href="#section-4.1-3" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="kmac-based-construction">
@@ -1538,7 +1557,7 @@ To generate an arbitrarily long output of <code>outputBits</code>:<a href="#sect
 <p id="section-4.2-1">Options 3 and 4 are KMAC-based, as specified in NIST SP 800-185 <span>[<a href="#SP800-185" class="xref">SP800-185</a>]</span>.
 The context <code>S</code> MUST be the utf-8 string "KDF", the key <code>K</code> MUST be a context-specific string of at least <code>hashSize</code> bits, and <code>counter</code> MUST be the fixed string <code>0x00000001</code>.
 The key <code>K</code> MAY be used as an additional option to perform context separation, in scenarios where <code>fixedInfo</code> is not sufficient.<a href="#section-4.2-1" class="pilcrow">¶</a></p>
-<p id="section-4.2-2">To derive a shared secret <code>SS</code> of desired length, KMAC is called a single time with <code>X</code> defined in <a href="#sec-kem-combiner" class="xref">Section 3</a> and lenght <code>L</code> being <code>outputBits</code>.<a href="#section-4.2-2" class="pilcrow">¶</a></p>
+<p id="section-4.2-2">To derive a shared secret <code>SS</code> of desired length, KMAC is called a single time with the input string <code>X</code> defined in <a href="#sec-kem-combiner" class="xref">Section 3</a> and length <code>L</code> being <code>outputBits</code>.<a href="#section-4.2-2" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
@@ -1654,7 +1673,7 @@ Hence, to be able to distinguish a key <code>K</code>, derived from shared keys 
       <h2 id="name-acknowledgements-2">
 <a href="#name-acknowledgements-2" class="section-name selfRef">Acknowledgements</a>
       </h2>
-<p id="appendix-A-1">This document incorporates contributions and comments from a large group of experts. The Editors would especially like to acknowledge the expertise and tireless dedication of the following people, who attended many long meetings and generated millions of bytes of electronic mail and VOIP traffic over the past years in pursuit of this document:<a href="#appendix-A-1" class="pilcrow">¶</a></p>
+<p id="appendix-A-1">This document incorporates contributions and comments from a large group of experts. The authors would especially like to acknowledge the expertise and tireless dedication of the following people, who attended many long meetings and generated millions of bytes of electronic mail and VOIP traffic over the past years in pursuit of this document:<a href="#appendix-A-1" class="pilcrow">¶</a></p>
 <p id="appendix-A-2">Douglas Stebila, Nimrod Aviram, Andreas Huelsing, and Stavros Kousidis.<a href="#appendix-A-2" class="pilcrow">¶</a></p>
 <p id="appendix-A-3">We are grateful to all, including any contributors who may have
 been inadvertently omitted from this list.<a href="#appendix-A-3" class="pilcrow">¶</a></p>
