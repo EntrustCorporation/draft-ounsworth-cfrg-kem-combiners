@@ -9,7 +9,7 @@
 <meta content="Aron Wussler" name="author">
 <meta content="
        The migration to post-quantum cryptography often calls for performing multiple key encapsulations in parallel and then combining their outputs to derive a single shared secret. 
-       This document defines a flexible multi-share KEM combiner to join an arbitrary number of key shares, that is a multi-PRF compatible with NIST SP 800-56Cr2 [ ]. 
+       This document defines a flexible multi-share KEM combiner to join an arbitrary number of key shares, that is a multi-PRF compatible with NIST SP 800-56Cr2  . 
        
 
 
@@ -21,6 +21,7 @@
 <!-- Generator version information:
   xml2rfc 3.12.2
     Python 3.10.6
+    weasyprint 54.1
 -->
 <link href="draft-ounsworth-cfrg-kem-combiners.xml" rel="alternate" type="application/rfc+xml">
 <link href="#copyright" rel="license">
@@ -1181,7 +1182,7 @@ li > p:last-of-type {
 </tr></thead>
 <tfoot><tr>
 <td class="left">Ounsworth &amp; Wussler</td>
-<td class="center">Expires 4 September 2023</td>
+<td class="center">Expires 5 September 2023</td>
 <td class="right">[Page]</td>
 </tr></tfoot>
 </table>
@@ -1194,12 +1195,12 @@ li > p:last-of-type {
 <dd class="internet-draft">draft-ounsworth-cfrg-kem-combiners-00</dd>
 <dt class="label-published">Published:</dt>
 <dd class="published">
-<time datetime="2023-03-03" class="published">3 March 2023</time>
+<time datetime="2023-03-04" class="published">4 March 2023</time>
     </dd>
 <dt class="label-intended-status">Intended Status:</dt>
 <dd class="intended-status">Informational</dd>
 <dt class="label-expires">Expires:</dt>
-<dd class="expires"><time datetime="2023-09-04">4 September 2023</time></dd>
+<dd class="expires"><time datetime="2023-09-05">5 September 2023</time></dd>
 <dt class="label-authors">Authors:</dt>
 <dd class="authors">
 <div class="author">
@@ -1217,7 +1218,7 @@ li > p:last-of-type {
 <section id="section-abstract">
       <h2 id="abstract"><a href="#abstract" class="selfRef">Abstract</a></h2>
 <p id="section-abstract-1">The migration to post-quantum cryptography often calls for performing multiple key encapsulations in parallel and then combining their outputs to derive a single shared secret.<a href="#section-abstract-1" class="pilcrow">¶</a></p>
-<p id="section-abstract-2">This document defines a flexible multi-share KEM combiner to join an arbitrary number of key shares, that is a multi-PRF compatible with NIST SP 800-56Cr2 [<span>[<a href="#SP800-56C" class="xref">SP800-56C</a>]</span>].<a href="#section-abstract-2" class="pilcrow">¶</a></p>
+<p id="section-abstract-2">This document defines a flexible multi-share KEM combiner to join an arbitrary number of key shares, that is a multi-PRF compatible with NIST SP 800-56Cr2 <span>[<a href="#SP800-56C" class="xref">SP800-56C</a>]</span>.<a href="#section-abstract-2" class="pilcrow">¶</a></p>
 </section>
 <section class="note rfcEditorRemove" id="section-note.1">
       <h2 id="name-about-this-document-2">
@@ -1253,7 +1254,7 @@ li > p:last-of-type {
         time. It is inappropriate to use Internet-Drafts as reference
         material or to cite them other than as "work in progress."<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
 <p id="section-boilerplate.1-4">
-        This Internet-Draft will expire on 4 September 2023.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
+        This Internet-Draft will expire on 5 September 2023.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="copyright">
@@ -1367,7 +1368,7 @@ def kemEncaps(pk) -&gt; (ct, ss)
 def kemDecaps(ct, sk) -&gt; ss
 </pre><a href="#section-1.1-2" class="pilcrow">¶</a>
 </div>
-<p id="section-1.1-3">where <code>pk</code> is public key, <code>sk</code> is secret key, <code>ct</code> is ciphertext, and <code>ss</code> is shared secret.<a href="#section-1.1-3" class="pilcrow">¶</a></p>
+<p id="section-1.1-3">where <code>pk</code> is public key, <code>sk</code> is secret key, <code>ct</code> is the ciphertext repseresting an encapsulated key, and <code>ss</code> is shared secret.<a href="#section-1.1-3" class="pilcrow">¶</a></p>
 <p id="section-1.1-4">KEMs are typically used in cases where two parties, hereby refereed to as the "encapsulater" and the "decapsulater", wish to establish a shared secret via public key cryptography, where the decapsulater has an asymmetric key pair and has previously shared the public key with the encapsulater.<a href="#section-1.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
@@ -1382,9 +1383,9 @@ def kemDecaps(ct, sk) -&gt; ss
 <ol start="1" type="1" class="normal type-1" id="section-2-2">
 <li id="section-2-2.1">KEM / PSK hybrids where the output of a KEM is combined with a static pre-shared key.<a href="#section-2-2.1" class="pilcrow">¶</a>
 </li>
-        <li id="section-2-2.2">Post-quantum / traditional hybrid KEMs.<a href="#section-2-2.2" class="pilcrow">¶</a>
+        <li id="section-2-2.2">Post-quantum / traditional hybrid KEMs where output of a post-quantum KEM is combined with the output of a classical key transport or key exchenge algorithm.<a href="#section-2-2.2" class="pilcrow">¶</a>
 </li>
-        <li id="section-2-2.3">KEM-based authenticated key exchanges (AKEs).<a href="#section-2-2.3" class="pilcrow">¶</a>
+        <li id="section-2-2.3">KEM-based authenticated key exchanges (AKEs) where the ouput of two or more KEMs performed in different directions are combined.<a href="#section-2-2.3" class="pilcrow">¶</a>
 </li>
       </ol>
 <p id="section-2-3">This document normalizes a mechanisms for combining the output of two or more KEMs.<a href="#section-2-3" class="pilcrow">¶</a></p>
@@ -1457,7 +1458,7 @@ KDF(counter || K_1 || ... || K_n || fixedInfo, outputBits)
           <code>fixedInfo</code> is some protocol-specific KDF binding,<a href="#section-3-7.3" class="pilcrow">¶</a>
 </li>
         <li class="normal" id="section-3-7.4">
-          <code>counter</code> parameter is instantiation specific,<a href="#section-3-7.4" class="pilcrow">¶</a>
+          <code>counter</code> parameter is instantiation-specific and is discussed in <a href="#sec-instantiation" class="xref">Section 4</a>.<a href="#section-3-7.4" class="pilcrow">¶</a>
 </li>
         <li class="normal" id="section-3-7.5">
           <code>outputBits</code> determines the length of the key,<a href="#section-3-7.5" class="pilcrow">¶</a>
@@ -1473,13 +1474,14 @@ KDF(counter || K_1 || ... || K_n || fixedInfo, outputBits)
 K_i = H(SS_i)
 </pre><a href="#section-3-10" class="pilcrow">¶</a>
 </div>
+<p id="section-3-11">Any protocols making use of this construction MUST either hash all inputs <code>SS_i</code>, or justify that any un-hashed inputs will always be fixed length.<a href="#section-3-11" class="pilcrow">¶</a></p>
 <div id="protocol-binding">
 <section id="section-3.1">
         <h3 id="name-protocol-binding-2">
 <a href="#section-3.1" class="section-number selfRef">3.1. </a><a href="#name-protocol-binding-2" class="section-name selfRef">Protocol binding</a>
         </h3>
 <p id="section-3.1-1">The <code>fixedInfo</code> string is a fixed-length string containing some context-specific information.
-It MUST NOT depend on the secret shares.<a href="#section-3.1-1" class="pilcrow">¶</a></p>
+It MUST NOT depend on the secret shares. The intention is to prevent cross-protocol attacks by making this key derivation unique to its protocol context.<a href="#section-3.1-1" class="pilcrow">¶</a></p>
 <p id="section-3.1-2">The <code>fixedInfo</code> string MUST have a definite structure depending on the protocol where all parts are fixed length. This prevents a variable length structure from creating collisions between two different instances.
 In cases some variable length input is necessary, such as the representation of a public key or an OID, then hashing or padding can be used.<a href="#section-3.1-2" class="pilcrow">¶</a></p>
 <p id="section-3.1-3">The parameter fixedInfo MAY contain any of the following information:<a href="#section-3.1-3" class="pilcrow">¶</a></p>
