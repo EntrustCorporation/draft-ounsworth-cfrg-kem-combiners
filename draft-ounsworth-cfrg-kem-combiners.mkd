@@ -181,7 +181,7 @@ KEMs are typically used in cases where two parties, hereby refereed to as the "e
 The need for a KEM combiner function arises in three different contexts within IETF security protocols:
 
 1. KEM / PSK hybrids where the output of a KEM is combined with a static pre-shared key.
-1. Post-quantum / traditional hybrid KEMs where output of a post-quantum KEM is combined with the output of a classical key transport or key exchenge algorithm.
+1. Post-quantum / traditional hybrid KEMs where output of a post-quantum KEM is combined with the output of a classical key transport or key exchange algorithm.
 1. KEM-based authenticated key exchanges (AKEs) where the ouput of two or more KEMs performed in different directions are combined.
 
 This document normalizes a mechanisms for combining the output of two or more KEMs.
