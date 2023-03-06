@@ -149,7 +149,7 @@ informative:
 
 The migration to post-quantum cryptography often calls for performing multiple key encapsulations in parallel and then combining their outputs to derive a single shared secret.
 
-This document defines a flexible multi-share KEM combiner to join an arbitrary number of key shares, that is a multi-PRF compatible with NIST SP 800-56Cr2 [[SP800-56C]].
+This document defines a flexible multi-share KEM combiner to join an arbitrary number of key shares, that is a multi-PRF compatible with NIST SP 800-56Cr2 [SP800-56C].
 
 <!-- End of Abstract -->
 
@@ -171,7 +171,7 @@ def kemEncaps(pk) -> (ct, ss)
 def kemDecaps(ct, sk) -> ss
 ~~~
 
-where `pk` is public key, `sk` is secret key, `ct` is ciphertext, and `ss` is shared secret.
+where `pk` is public key, `sk` is secret key, `ct` is the ciphertext representing an encapsulated key, and `ss` is shared secret.
 
 KEMs are typically used in cases where two parties, hereby refereed to as the "encapsulater" and the "decapsulater", wish to establish a shared secret via public key cryptography, where the decapsulater has an asymmetric key pair and has previously shared the public key with the encapsulater.
 
@@ -181,8 +181,8 @@ KEMs are typically used in cases where two parties, hereby refereed to as the "e
 The need for a KEM combiner function arises in three different contexts within IETF security protocols:
 
 1. KEM / PSK hybrids where the output of a KEM is combined with a static pre-shared key.
-1. Post-quantum / traditional hybrid KEMs.
-1. KEM-based authenticated key exchanges (AKEs).
+1. Post-quantum / traditional hybrid KEMs where output of a post-quantum KEM is combined with the output of a classical key transport or key exchange algorithm.
+1. KEM-based authenticated key exchanges (AKEs) where the ouput of two or more KEMs performed in different directions are combined.
 
 This document normalizes a mechanisms for combining the output of two or more KEMs.
 
@@ -241,7 +241,7 @@ where:
 - `KDF` represents a suitable choice of cryptographic key derivation function,
 - `K_i` represent the constant-length input keys,
 - `fixedInfo` is some protocol-specific KDF binding,
-- `counter` parameter is instantiation specific,
+- `counter` parameter is instantiation-specific and is discussed in {{sec-instantiation}}.
 - `outputBits` determines the length of the key,
 - `||` represents concatenation.
 
@@ -253,9 +253,11 @@ Each `K_i` MUST be constant in length, therefore the secret shares `SS_i` can be
 K_i = H(SS_i)
 ~~~
 
+Any protocols making use of this construction MUST either hash all inputs `SS_i`, or justify that any un-hashed inputs will always be fixed length.
+
 ## Protocol binding
 The `fixedInfo` string is a fixed-length string containing some context-specific information.
-It MUST NOT depend on the secret shares.
+It MUST NOT depend on the secret shares. The intention is to prevent cross-protocol attacks by making this key derivation unique to its protocol context.
 
 The `fixedInfo` string MUST have a definite structure depending on the protocol where all parts are fixed length. This prevents a variable length structure from creating collisions between two different instances.
 In cases some variable length input is necessary, such as the representation of a public key or an OID, then hashing or padding can be used.
