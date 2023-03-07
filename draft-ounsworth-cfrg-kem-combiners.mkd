@@ -182,7 +182,7 @@ The need for a KEM combiner function arises in three different contexts within I
 
 1. KEM / PSK hybrids where the output of a KEM is combined with a static pre-shared key.
 1. Post-quantum / traditional hybrid KEMs where output of a post-quantum KEM is combined with the output of a classical key transport or key exchange algorithm.
-1. KEM-based authenticated key exchanges (AKEs) where the ouput of two or more KEMs performed in different directions are combined.
+1. KEM-based authenticated key exchanges (AKEs) where the output of two or more KEMs performed in different directions are combined.
 
 This document normalizes a mechanisms for combining the output of two or more KEMs.
 
@@ -202,7 +202,7 @@ Building a PQ/T hybrid KEM requires a secure function which combines the output 
 
 ## KEM-based AKE
 
-The need for a KEM-based authenticated key establishment arises, for example, when two communicating parties each have long-term KEM keys (for example in X.509 certificates), and wish to involve both KEM keys in deriving a mutually-authenticated shared secret. In particular this will arise for any protocol that needs to provide post-quantum replacements for static-static (Elliptic Curve) Diffie-Hellman mechanisms. Examples include a KEM replacement for CMP's DHBasedMac {{I-D.ietf-lamps-cmp-updates}}, .. TODO: cite others.
+The need for a KEM-based authenticated key establishment arises, for example, when two communicating parties each have long-term KEM keys (for example in X.509 certificates), and wish to involve both KEM keys in deriving a mutually-authenticated shared secret. In particular this will arise for any protocol that needs to provide post-quantum replacements for static-static (Elliptic Curve) Diffie-Hellman mechanisms. Examples include a KEM replacement for CMP's DHBasedMac {{I-D.ietf-lamps-cmp-updates}}.
 
 
 # KEM Combiner construction {#sec-kem-combiner}
@@ -220,10 +220,10 @@ and Practice of Public Key Cryptography, Part I, volume 10769 of Lecture Notes i
 -->
 
 
-A KEM combiner is a function that takes in two or more shared secrets `SS_i` and returns a combined shared secret `SS`, where all values are byte arrays.
+A KEM combiner is a function that takes in two or more shared secrets `ss_i` and returns a combined shared secret `ss`, where all values are byte arrays.
 
 ~~~
-SS = kemCombiner(SS_1, SS_2, ..., SS_n)
+ss = kemCombiner(ss_1, ss_2, ..., ss_n)
 ~~~
 
 This document assumes that shared secrets are the output of a KEM, but without loss of generality they MAY also be any other source of cryptographic key material, such as pre-shared keys (PSKs), with PQ/PSK being a quantum-safe migration strategy being made available by some protocols, see for example IKEv2 in [RFC8784].
@@ -232,28 +232,29 @@ In general it is desirable to use a multi-PRF as a KEM combiner, a function that
 The following simple yet generic construction can be used in all IETF protocols that need to combine the output of two or more KEMs:
 
 ~~~
-KDF(counter || K_1 || ... || K_n || fixedInfo, outputBits)
+KDF(counter || k_1 || ... || k_n || fixedInfo, outputBits)
 ~~~
 {: title="general KEM combiner construction" }
 
 where:
 
 - `KDF` represents a suitable choice of cryptographic key derivation function,
-- `K_i` represent the constant-length input keys,
+- `k_i` represent the constant-length input keys,
 - `fixedInfo` is some protocol-specific KDF binding,
 - `counter` parameter is instantiation-specific and is discussed in {{sec-instantiation}}.
 - `outputBits` determines the length of the key,
 - `||` represents concatenation.
 
 In section {{sec-instantiation}} are listed several possible practical instantiations, in compliance with NIST SP-800 56Cr2 {{SP800-56C}}.
+The shared secret `ss` MAY be used as a Key Encryption Key (KEK) for key encapsulation.
 
-Each `K_i` MUST be constant in length, therefore the secret shares `SS_i` can be used directly only if they are guaranteed to be constant length. For all other cases, it is REQUIRED to hash them first:
+Each `k_i` MUST be constant in length, therefore the secret shares `ss_i` can be used directly only if they are guaranteed to be constant length. For all other cases, it is REQUIRED to hash them first:
 
 ~~~
-K_i = H(SS_i)
+k_i = H(ss_i)
 ~~~
 
-Any protocols making use of this construction MUST either hash all inputs `SS_i`, or justify that any un-hashed inputs will always be fixed length.
+Any protocols making use of this construction MUST either hash all inputs `ss_i`, or justify that any un-hashed inputs will always be fixed length.
 
 ## Protocol binding
 The `fixedInfo` string is a fixed-length string containing some context-specific information.
@@ -279,7 +280,7 @@ This is a non-comprehensive list, further information can be found in paragraph 
 # Practical instantiations {#sec-instantiation}
 
 The KDF MUST be instantiated with one of the following Keccak-based option.
-Each instance defines a function to be used as `KDF`, a hash `H` function to optionally derive the `K_i`, and a `counter`.
+Each instance defines a function to be used as `KDF`, a hash `H` function to optionally derive the `k_i`, and a `counter`.
 
 1. `KDF = SHA3-256` and `H = SHA3-256`, with `hashSize = 256 bit`.
 2. `KDF = SHA3-512` and `H = SHA3-512`, with `hashSize = 512 bit`.
@@ -288,21 +289,24 @@ Each instance defines a function to be used as `KDF`, a hash `H` function to opt
 
 ## Hash-and-counter based construction
 Options 1 and 2 instantiate the KDF using SHA3, specified in NIST FIPS 202 {{FIPS202}}.
-To generate an `outputBits` long secret share `SS`:
+To generate an `outputBits` long secret share `ss`:
 
 * the `counter` MUST be initialized with the string `0x00000001`.
 * The hash is performed over the string defined in {{sec-kem-combiner}}, and repeated `ceil(outputBits/hashSize)` times. For each iteration the `counter` MUST be increased by `0x01`.
 * The strings are concatenated ordered by `counter`.
-* The leftmost `outputBits` are returned as `SS`.
+* The leftmost `outputBits` are returned as `ss`.
 
 An implementation MUST NOT overflow and reuse the `counter` and an error MUST be returned when producing more than 2^32 consecutive hashes.
 
 ## KMAC based construction
 Options 3 and 4 are KMAC-based, as specified in NIST SP 800-185 {{SP800-185}}.
-The context `S` MUST be the utf-8 string "KDF", the key `K` MUST be a context-specific string of at least `hashSize` bits, and `counter` MUST be the fixed string `0x00000001`.
-The key `K` MAY be used as an additional option to perform context separation, in scenarios where `fixedInfo` is not sufficient.
+To instantiate the function:
 
-To derive a shared secret `SS` of desired length, KMAC is called a single time with the input string `X` defined in {{sec-kem-combiner}} and length `L` being `outputBits`.
+* The context `S` MUST be the utf-8 string "KDF".
+* The key `K` MUST be a context-specific string of at least `hashSize` bits, and it MAY be used as an additional option to perform context separation, in scenarios where `fixedInfo` is not sufficient.
+* The parameter `counter` MUST be the fixed string `0x00000001`.
+
+To derive a shared secret `ss` of desired length, KMAC is called a single time with the input string `X` defined in {{sec-kem-combiner}} and length `L` being `outputBits`.
 
 # IANA Considerations {#sec-iana}
 
@@ -313,7 +317,7 @@ None.
 The proposed instantiations in {{sec-instantiation}} are practical multi-PRFs and this specification limits to the use of Keccak-based constructions. The sponge construction was proven to be indifferentiable from a random oracle {{SPONGE}}.
 More precisely, for a given capacity `c` the indifferentiability proof shows that assuming there are no weaknesses found in the Keccak permutation, an attacker has to make an expected number of `2^(c/2)` calls to the permutation to tell Keccak from a random oracle.
 For a random oracle, a difference in only a single bit gives an unrelated, uniformly random output.
-Hence, to be able to distinguish a key `K`, derived from shared keys `K_i` from a random bit string, an adversary has to correctly guess all key shares `K_i` entirely.
+Hence, to be able to distinguish a key `k`, derived from shared keys `k_i` from a random bit string, an adversary has to correctly guess all key shares `k_i` entirely.
 
 <!-- Start of Appendices -->
 --- back
