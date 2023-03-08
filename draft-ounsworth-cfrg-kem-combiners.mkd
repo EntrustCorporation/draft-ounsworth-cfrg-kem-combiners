@@ -184,7 +184,7 @@ The need for a KEM combiner function arises in three different contexts within I
 1. Post-quantum / traditional hybrid KEMs where output of a post-quantum KEM is combined with the output of a classical key transport or key exchange algorithm.
 1. KEM-based authenticated key exchanges (AKEs) where the output of two or more KEMs performed in different directions are combined.
 
-This document normalizes a mechanisms for combining the output of two or more KEMs.
+This document normalizes a mechanism for combining the output of two or more KEMs.
 
 ## KEM/PSK hybrids
 
@@ -228,7 +228,7 @@ ss = kemCombiner(ss_1, ss_2, ..., ss_n)
 
 This document assumes that shared secrets are the output of a KEM, but without loss of generality they MAY also be any other source of cryptographic key material, such as pre-shared keys (PSKs), with PQ/PSK being a quantum-safe migration strategy being made available by some protocols, see for example IKEv2 in [RFC8784].
 
-In general it is desirable to use a multi-PRF as a KEM combiner, a function that can be keyed by any input.
+In general it is desirable to use a multi-PRF as a KEM combiner, meaning a PRF when keyed by any of its single inputs.
 The following simple yet generic construction can be used in all IETF protocols that need to combine the output of two or more KEMs:
 
 ~~~
@@ -267,7 +267,8 @@ The parameter fixedInfo MAY contain any of the following information:
 
 * Public information about the communication parties, such as their identifiers.
 * The public keys or certificates contributed by each party to the key-agreement transaction.
-* Other public and/or private information shared between communication parties before or during the transaction, such as nonces or pre-shared secrets.
+* The ciphertext of each Key Encapsulation Mechanism.
+* Other public information shared between communication parties before or during the transaction, such as nonces.
 * An indication of the protocol or application employing the key-derivation method.
 * Protocol-related information, such as a label or session identifier.
 * An indication of the key-agreement scheme and/or key-derivation method used.
@@ -291,7 +292,7 @@ Each instance defines a function to be used as `KDF`, a hash `H` function to opt
 Options 1 and 2 instantiate the KDF using SHA3, specified in NIST FIPS 202 {{FIPS202}}.
 To generate an `outputBits` long secret share `ss`:
 
-* the `counter` MUST be initialized with the string `0x00000001`.
+* the `counter` MUST be initialized with the value `0x00000001`.
 * The hash is performed over the string defined in {{sec-kem-combiner}}, and repeated `ceil(outputBits/hashSize)` times. For each iteration the `counter` MUST be increased by `0x01`.
 * The strings are concatenated ordered by `counter`.
 * The leftmost `outputBits` are returned as `ss`.
@@ -304,9 +305,10 @@ To instantiate the function:
 
 * The context `S` MUST be the utf-8 string "KDF".
 * The key `K` MUST be a context-specific string of at least `hashSize` bits, and it MAY be used as an additional option to perform context separation, in scenarios where `fixedInfo` is not sufficient.
-* The parameter `counter` MUST be the fixed string `0x00000001`.
+* The parameter `counter` MUST be the fixed value `0x00000001`.
 
 To derive a shared secret `ss` of desired length, KMAC is called a single time with the input string `X` defined in {{sec-kem-combiner}} and length `L` being `outputBits`.
+This is compatible with the one-step KDF definition given in NIST SP800-56Cr2 {{SP800-56C}}, Section 4.
 
 # IANA Considerations {#sec-iana}
 

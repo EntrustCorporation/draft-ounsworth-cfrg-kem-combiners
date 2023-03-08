@@ -5,8 +5,8 @@
 CFRG                                                        M. Ounsworth
 Internet-Draft                                                   Entrust
 Intended status: Informational                                A. Wussler
-Expires: 8 September 2023                                         Proton
-                                                            7 March 2023
+Expires: 9 September 2023                                         Proton
+                                                            8 March 2023
 
 
 Combiner function for hybrid key encapsulation mechanisms (Hybrid KEMs)
@@ -53,7 +53,7 @@ Status of This Memo
 
 
 
-Ounsworth & Wussler     Expires 8 September 2023                [Page 1]
+Ounsworth & Wussler     Expires 9 September 2023                [Page 1]
 
 Internet-Draft                KEM Combiner                    March 2023
 
@@ -63,7 +63,7 @@ Internet-Draft                KEM Combiner                    March 2023
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 8 September 2023.
+   This Internet-Draft will expire on 9 September 2023.
 
 Copyright Notice
 
@@ -109,7 +109,7 @@ Table of Contents
 
 
 
-Ounsworth & Wussler     Expires 8 September 2023                [Page 2]
+Ounsworth & Wussler     Expires 9 September 2023                [Page 2]
 
 Internet-Draft                KEM Combiner                    March 2023
 
@@ -151,7 +151,7 @@ Internet-Draft                KEM Combiner                    March 2023
    3.  KEM-based authenticated key exchanges (AKEs) where the output of
        two or more KEMs performed in different directions are combined.
 
-   This document normalizes a mechanisms for combining the output of two
+   This document normalizes a mechanism for combining the output of two
    or more KEMs.
 
 2.1.  KEM/PSK hybrids
@@ -165,7 +165,7 @@ Internet-Draft                KEM Combiner                    March 2023
 
 
 
-Ounsworth & Wussler     Expires 8 September 2023                [Page 3]
+Ounsworth & Wussler     Expires 9 September 2023                [Page 3]
 
 Internet-Draft                KEM Combiner                    March 2023
 
@@ -214,14 +214,14 @@ Internet-Draft                KEM Combiner                    March 2023
    PSK being a quantum-safe migration strategy being made available by
    some protocols, see for example IKEv2 in [RFC8784].
 
-   In general it is desirable to use a multi-PRF as a KEM combiner, a
-   function that can be keyed by any input.  The following simple yet
-   generic construction can be used in all IETF protocols that need to
-   combine the output of two or more KEMs:
+   In general it is desirable to use a multi-PRF as a KEM combiner,
+   meaning a PRF when keyed by any of its single inputs.  The following
+   simple yet generic construction can be used in all IETF protocols
+   that need to combine the output of two or more KEMs:
 
 
 
-Ounsworth & Wussler     Expires 8 September 2023                [Page 4]
+Ounsworth & Wussler     Expires 9 September 2023                [Page 4]
 
 Internet-Draft                KEM Combiner                    March 2023
 
@@ -277,7 +277,7 @@ Internet-Draft                KEM Combiner                    March 2023
 
 
 
-Ounsworth & Wussler     Expires 8 September 2023                [Page 5]
+Ounsworth & Wussler     Expires 9 September 2023                [Page 5]
 
 Internet-Draft                KEM Combiner                    March 2023
 
@@ -290,9 +290,10 @@ Internet-Draft                KEM Combiner                    March 2023
    *  The public keys or certificates contributed by each party to the
       key-agreement transaction.
 
-   *  Other public and/or private information shared between
-      communication parties before or during the transaction, such as
-      nonces or pre-shared secrets.
+   *  The ciphertext of each Key Encapsulation Mechanism.
+
+   *  Other public information shared between communication parties
+      before or during the transaction, such as nonces.
 
    *  An indication of the protocol or application employing the key-
       derivation method.
@@ -332,8 +333,7 @@ Internet-Draft                KEM Combiner                    March 2023
 
 
 
-
-Ounsworth & Wussler     Expires 8 September 2023                [Page 6]
+Ounsworth & Wussler     Expires 9 September 2023                [Page 6]
 
 Internet-Draft                KEM Combiner                    March 2023
 
@@ -343,7 +343,7 @@ Internet-Draft                KEM Combiner                    March 2023
    Options 1 and 2 instantiate the KDF using SHA3, specified in NIST
    FIPS 202 [FIPS202].  To generate an outputBits long secret share ss:
 
-   *  the counter MUST be initialized with the string 0x00000001.
+   *  the counter MUST be initialized with the value 0x00000001.
 
    *  The hash is performed over the string defined in Section 3, and
       repeated ceil(outputBits/hashSize) times.  For each iteration the
@@ -369,11 +369,12 @@ Internet-Draft                KEM Combiner                    March 2023
       context separation, in scenarios where fixedInfo is not
       sufficient.
 
-   *  The parameter counter MUST be the fixed string 0x00000001.
+   *  The parameter counter MUST be the fixed value 0x00000001.
 
    To derive a shared secret ss of desired length, KMAC is called a
    single time with the input string X defined in Section 3 and length L
-   being outputBits.
+   being outputBits.  This is compatible with the one-step KDF
+   definition given in NIST SP800-56Cr2 [SP800-56C], Section 4.
 
 5.  IANA Considerations
 
@@ -388,8 +389,7 @@ Internet-Draft                KEM Combiner                    March 2023
 
 
 
-
-Ounsworth & Wussler     Expires 8 September 2023                [Page 7]
+Ounsworth & Wussler     Expires 9 September 2023                [Page 7]
 
 Internet-Draft                KEM Combiner                    March 2023
 
@@ -445,7 +445,7 @@ Internet-Draft                KEM Combiner                    March 2023
 
 
 
-Ounsworth & Wussler     Expires 8 September 2023                [Page 8]
+Ounsworth & Wussler     Expires 9 September 2023                [Page 8]
 
 Internet-Draft                KEM Combiner                    March 2023
 
@@ -501,7 +501,7 @@ Internet-Draft                KEM Combiner                    March 2023
 
 
 
-Ounsworth & Wussler     Expires 8 September 2023                [Page 9]
+Ounsworth & Wussler     Expires 9 September 2023                [Page 9]
 
 Internet-Draft                KEM Combiner                    March 2023
 
@@ -557,7 +557,7 @@ Acknowledgements
 
 
 
-Ounsworth & Wussler     Expires 8 September 2023               [Page 10]
+Ounsworth & Wussler     Expires 9 September 2023               [Page 10]
 
 Internet-Draft                KEM Combiner                    March 2023
 
@@ -613,4 +613,4 @@ Authors' Addresses
 
 
 
-Ounsworth & Wussler     Expires 8 September 2023               [Page 11]
+Ounsworth & Wussler     Expires 9 September 2023               [Page 11]

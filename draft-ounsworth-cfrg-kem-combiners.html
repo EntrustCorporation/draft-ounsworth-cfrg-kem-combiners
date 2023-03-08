@@ -1181,7 +1181,7 @@ li > p:last-of-type {
 </tr></thead>
 <tfoot><tr>
 <td class="left">Ounsworth &amp; Wussler</td>
-<td class="center">Expires 8 September 2023</td>
+<td class="center">Expires 9 September 2023</td>
 <td class="right">[Page]</td>
 </tr></tfoot>
 </table>
@@ -1194,12 +1194,12 @@ li > p:last-of-type {
 <dd class="internet-draft">draft-ounsworth-cfrg-kem-combiners-00</dd>
 <dt class="label-published">Published:</dt>
 <dd class="published">
-<time datetime="2023-03-07" class="published">7 March 2023</time>
+<time datetime="2023-03-08" class="published">8 March 2023</time>
     </dd>
 <dt class="label-intended-status">Intended Status:</dt>
 <dd class="intended-status">Informational</dd>
 <dt class="label-expires">Expires:</dt>
-<dd class="expires"><time datetime="2023-09-08">8 September 2023</time></dd>
+<dd class="expires"><time datetime="2023-09-09">9 September 2023</time></dd>
 <dt class="label-authors">Authors:</dt>
 <dd class="authors">
 <div class="author">
@@ -1253,7 +1253,7 @@ li > p:last-of-type {
         time. It is inappropriate to use Internet-Drafts as reference
         material or to cite them other than as "work in progress."<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
 <p id="section-boilerplate.1-4">
-        This Internet-Draft will expire on 8 September 2023.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
+        This Internet-Draft will expire on 9 September 2023.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="copyright">
@@ -1387,7 +1387,7 @@ def kemDecaps(ct, sk) -&gt; ss
         <li id="section-2-2.3">KEM-based authenticated key exchanges (AKEs) where the output of two or more KEMs performed in different directions are combined.<a href="#section-2-2.3" class="pilcrow">¶</a>
 </li>
       </ol>
-<p id="section-2-3">This document normalizes a mechanisms for combining the output of two or more KEMs.<a href="#section-2-3" class="pilcrow">¶</a></p>
+<p id="section-2-3">This document normalizes a mechanism for combining the output of two or more KEMs.<a href="#section-2-3" class="pilcrow">¶</a></p>
 <div id="kempsk-hybrids">
 <section id="section-2.1">
         <h3 id="name-kem-psk-hybrids-2">
@@ -1434,7 +1434,7 @@ ss = kemCombiner(ss_1, ss_2, ..., ss_n)
 </pre><a href="#section-3-2" class="pilcrow">¶</a>
 </div>
 <p id="section-3-3">This document assumes that shared secrets are the output of a KEM, but without loss of generality they MAY also be any other source of cryptographic key material, such as pre-shared keys (PSKs), with PQ/PSK being a quantum-safe migration strategy being made available by some protocols, see for example IKEv2 in <span>[<a href="#RFC8784" class="xref">RFC8784</a>]</span>.<a href="#section-3-3" class="pilcrow">¶</a></p>
-<p id="section-3-4">In general it is desirable to use a multi-PRF as a KEM combiner, a function that can be keyed by any input.
+<p id="section-3-4">In general it is desirable to use a multi-PRF as a KEM combiner, meaning a PRF when keyed by any of its single inputs.
 The following simple yet generic construction can be used in all IETF protocols that need to combine the output of two or more KEMs:<a href="#section-3-4" class="pilcrow">¶</a></p>
 <span id="name-general-kem-combiner-constru"></span><figure id="figure-1">
         <div class="alignLeft art-text artwork" id="section-3-5.1">
@@ -1490,19 +1490,21 @@ In cases some variable length input is necessary, such as the representation of 
 </li>
           <li class="normal" id="section-3.1-4.2">The public keys or certificates contributed by each party to the key-agreement transaction.<a href="#section-3.1-4.2" class="pilcrow">¶</a>
 </li>
-          <li class="normal" id="section-3.1-4.3">Other public and/or private information shared between communication parties before or during the transaction, such as nonces or pre-shared secrets.<a href="#section-3.1-4.3" class="pilcrow">¶</a>
+          <li class="normal" id="section-3.1-4.3">The ciphertext of each Key Encapsulation Mechanism.<a href="#section-3.1-4.3" class="pilcrow">¶</a>
 </li>
-          <li class="normal" id="section-3.1-4.4">An indication of the protocol or application employing the key-derivation method.<a href="#section-3.1-4.4" class="pilcrow">¶</a>
+          <li class="normal" id="section-3.1-4.4">Other public information shared between communication parties before or during the transaction, such as nonces.<a href="#section-3.1-4.4" class="pilcrow">¶</a>
 </li>
-          <li class="normal" id="section-3.1-4.5">Protocol-related information, such as a label or session identifier.<a href="#section-3.1-4.5" class="pilcrow">¶</a>
+          <li class="normal" id="section-3.1-4.5">An indication of the protocol or application employing the key-derivation method.<a href="#section-3.1-4.5" class="pilcrow">¶</a>
 </li>
-          <li class="normal" id="section-3.1-4.6">An indication of the key-agreement scheme and/or key-derivation method used.<a href="#section-3.1-4.6" class="pilcrow">¶</a>
+          <li class="normal" id="section-3.1-4.6">Protocol-related information, such as a label or session identifier.<a href="#section-3.1-4.6" class="pilcrow">¶</a>
 </li>
-          <li class="normal" id="section-3.1-4.7">An indication of the domain parameters associated with the asymmetric key pairs employed for key establishment.<a href="#section-3.1-4.7" class="pilcrow">¶</a>
+          <li class="normal" id="section-3.1-4.7">An indication of the key-agreement scheme and/or key-derivation method used.<a href="#section-3.1-4.7" class="pilcrow">¶</a>
 </li>
-          <li class="normal" id="section-3.1-4.8">An indication of other parameter or primitive choices.<a href="#section-3.1-4.8" class="pilcrow">¶</a>
+          <li class="normal" id="section-3.1-4.8">An indication of the domain parameters associated with the asymmetric key pairs employed for key establishment.<a href="#section-3.1-4.8" class="pilcrow">¶</a>
 </li>
-          <li class="normal" id="section-3.1-4.9">An indication of how the derived keying material should be parsed, including an indication of which algorithm(s) will use the (parsed) keying material.<a href="#section-3.1-4.9" class="pilcrow">¶</a>
+          <li class="normal" id="section-3.1-4.9">An indication of other parameter or primitive choices.<a href="#section-3.1-4.9" class="pilcrow">¶</a>
+</li>
+          <li class="normal" id="section-3.1-4.10">An indication of how the derived keying material should be parsed, including an indication of which algorithm(s) will use the (parsed) keying material.<a href="#section-3.1-4.10" class="pilcrow">¶</a>
 </li>
         </ul>
 <p id="section-3.1-5">This is a non-comprehensive list, further information can be found in paragraph 5.8.2 of NIST SP800-56Ar3 <span>[<a href="#SP800-56A" class="xref">SP800-56A</a>]</span>.<a href="#section-3.1-5" class="pilcrow">¶</a></p>
@@ -1539,7 +1541,7 @@ Each instance defines a function to be used as <code>KDF</code>, a hash <code>H<
 <p id="section-4.1-1">Options 1 and 2 instantiate the KDF using SHA3, specified in NIST FIPS 202 <span>[<a href="#FIPS202" class="xref">FIPS202</a>]</span>.
 To generate an <code>outputBits</code> long secret share <code>ss</code>:<a href="#section-4.1-1" class="pilcrow">¶</a></p>
 <ul class="normal">
-<li class="normal" id="section-4.1-2.1">the <code>counter</code> MUST be initialized with the string <code>0x00000001</code>.<a href="#section-4.1-2.1" class="pilcrow">¶</a>
+<li class="normal" id="section-4.1-2.1">the <code>counter</code> MUST be initialized with the value <code>0x00000001</code>.<a href="#section-4.1-2.1" class="pilcrow">¶</a>
 </li>
           <li class="normal" id="section-4.1-2.2">The hash is performed over the string defined in <a href="#sec-kem-combiner" class="xref">Section 3</a>, and repeated <code>ceil(outputBits/hashSize)</code> times. For each iteration the <code>counter</code> MUST be increased by <code>0x01</code>.<a href="#section-4.1-2.2" class="pilcrow">¶</a>
 </li>
@@ -1563,10 +1565,11 @@ To instantiate the function:<a href="#section-4.2-1" class="pilcrow">¶</a></p>
 </li>
           <li class="normal" id="section-4.2-2.2">The key <code>K</code> MUST be a context-specific string of at least <code>hashSize</code> bits, and it MAY be used as an additional option to perform context separation, in scenarios where <code>fixedInfo</code> is not sufficient.<a href="#section-4.2-2.2" class="pilcrow">¶</a>
 </li>
-          <li class="normal" id="section-4.2-2.3">The parameter <code>counter</code> MUST be the fixed string <code>0x00000001</code>.<a href="#section-4.2-2.3" class="pilcrow">¶</a>
+          <li class="normal" id="section-4.2-2.3">The parameter <code>counter</code> MUST be the fixed value <code>0x00000001</code>.<a href="#section-4.2-2.3" class="pilcrow">¶</a>
 </li>
         </ul>
-<p id="section-4.2-3">To derive a shared secret <code>ss</code> of desired length, KMAC is called a single time with the input string <code>X</code> defined in <a href="#sec-kem-combiner" class="xref">Section 3</a> and length <code>L</code> being <code>outputBits</code>.<a href="#section-4.2-3" class="pilcrow">¶</a></p>
+<p id="section-4.2-3">To derive a shared secret <code>ss</code> of desired length, KMAC is called a single time with the input string <code>X</code> defined in <a href="#sec-kem-combiner" class="xref">Section 3</a> and length <code>L</code> being <code>outputBits</code>.
+This is compatible with the one-step KDF definition given in NIST SP800-56Cr2 <span>[<a href="#SP800-56C" class="xref">SP800-56C</a>]</span>, Section 4.<a href="#section-4.2-3" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
