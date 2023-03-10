@@ -128,7 +128,7 @@ informative:
     seriesinfo:
       Federal information Processing Standards Publication (FIPS) 202
   SPONGE:
-    target: https://keccak.team/files/CSF-0.1.pdf
+    target: "https://keccak.team/files/CSF-0.1.pdf"
     title: Cryptographic sponge functions
     author:
       -
@@ -144,6 +144,20 @@ informative:
         ins: G. Assche
         name: Gilles van Assche
     date: January 2011
+  KEMCombiners:
+    target: "https://eprint.iacr.org/2018/024"
+    title: KEM Combiners
+    author:
+      -
+        ins: F. Giacon
+        name: Federico Giacon
+      -
+        ins: F. Heuer
+        name: Felix Heuer
+      -
+        ins: B. Poettering
+        name: Bertram Poettering
+    date: 2018
 
 --- abstract
 
@@ -239,7 +253,7 @@ KDF(counter || k_1 || ... || k_n || fixedInfo, outputBits)
 where:
 
 - `KDF` represents a suitable choice of cryptographic key derivation function,
-- `k_i` represent the constant-length input keys,
+- `k_i` represent the i-th constant-length input key,
 - `fixedInfo` is some protocol-specific KDF binding,
 - `counter` parameter is instantiation-specific and is discussed in {{sec-instantiation}}.
 - `outputBits` determines the length of the key,
@@ -248,26 +262,34 @@ where:
 In section {{sec-instantiation}} are listed several possible practical instantiations, in compliance with NIST SP-800 56Cr2 {{SP800-56C}}.
 The shared secret `ss` MAY be used as a Key Encryption Key (KEK) for key encapsulation.
 
-Each `k_i` MUST be constant in length, therefore the secret shares `ss_i` can be used directly only if they are guaranteed to be constant length. For all other cases, it is REQUIRED to hash them first:
+Each `k_i` MUST be constant in length, therefore it is the concatenation of the secret share `ss_i` and ciphertext `ct_i` only if they are guaranteed to be constant length:
 
 ~~~
-k_i = H(ss_i)
+k_i = ss_i || ct_i
 ~~~
 
-Any protocols making use of this construction MUST either hash all inputs `ss_i`, or justify that any un-hashed inputs will always be fixed length.
+For all other cases, it is REQUIRED to concatenate and hash them first:
+
+~~~
+k_i = H(ss_i || ct_i)
+~~~
+
+Any protocols making use of this construction MUST either hash all inputs `ss_i || ct_i`, or justify that any un-hashed inputs will always be fixed length.
+
+Including the ciphertext guarantees that the combined kem is IND-CCA secure as long as one of the ingredient KEMs is, as stated by {{KEMCombiners}}.
 
 ## Protocol binding
 The `fixedInfo` string is a fixed-length string containing some context-specific information.
-It MUST NOT depend on the secret shares. The intention is to prevent cross-protocol attacks by making this key derivation unique to its protocol context.
+The intention is to prevent cross-context attacks by making this key derivation unique to its protocol context.
 
 The `fixedInfo` string MUST have a definite structure depending on the protocol where all parts are fixed length. This prevents a variable length structure from creating collisions between two different instances.
 In cases some variable length input is necessary, such as the representation of a public key or an OID, then hashing or padding can be used.
+`fixedInfo` MUST NOT include the shared secrets and ciphertexts, as they are already represented in the KDF input.
 
 The parameter fixedInfo MAY contain any of the following information:
 
 * Public information about the communication parties, such as their identifiers.
 * The public keys or certificates contributed by each party to the key-agreement transaction.
-* The ciphertext of each Key Encapsulation Mechanism.
 * Other public information shared between communication parties before or during the transaction, such as nonces.
 * An indication of the protocol or application employing the key-derivation method.
 * Protocol-related information, such as a label or session identifier.
@@ -324,12 +346,17 @@ Hence, to be able to distinguish a key `k`, derived from shared keys `k_i` from 
 <!-- Start of Appendices -->
 --- back
 
+# Contributors
+{:numbered="false"}
+
+Stavros Kousidis (BSI)
+
 # Acknowledgements
 {:numbered="false"}
 
 This document incorporates contributions and comments from a large group of experts. The authors would especially like to acknowledge the expertise and tireless dedication of the following people, who attended many long meetings and generated millions of bytes of electronic mail and VOIP traffic over the past years in pursuit of this document:
 
-Douglas Stebila, Nimrod Aviram, Andreas Huelsing, and Stavros Kousidis.
+Douglas Stebila, Nimrod Aviram, and Andreas Huelsing.
 
 We are grateful to all, including any contributors who may have
 been inadvertently omitted from this list.
