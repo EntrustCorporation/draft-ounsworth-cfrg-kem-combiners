@@ -165,7 +165,12 @@ informative:
       -
         ins: B. Poettering
         name: Bertram Poettering
-
+  ETSI-hybridKEM:
+    target: https://www.etsi.org/deliver/etsi_ts/103700_103799/103744/01.01.01_60/ts_103744v010101p.pdf
+    title: Quantum-safe Hybrid Key Exchanges
+    date: 2020-12
+    seriesinfo:
+      ETSI TS 103 744 V1.1.1
 
 --- abstract
 
@@ -232,13 +237,10 @@ The need for a KEM-based authenticated key establishment arises, for example, wh
 
 # KEM Combiner construction {#sec-kem-combiner}
 
-<!--
 TODO: read and cite the ETSI doc "Quantum-safe Hybrid Key Exchanges"
 https://www.etsi.org/deliver/etsi_ts/103700_103799/103744/01.01.01_60/ts_103744v010101p.pdf
 
 TODO: as per https://www.enisa.europa.eu/publications/post-quantum-cryptography-integration-study section 4.2, might need to specify behaviour in light of KEMs with a non-zero failure probability.
-
--->
 
 
 A KEM combiner is a function that takes in two or more shared secrets `ss_i` and returns a combined shared secret `ss`, where all values are byte arrays.
