@@ -15,12 +15,27 @@
 
 
     " name="description">
-<meta content="xml2rfc 3.12.2" name="generator">
+<meta content="xml2rfc 3.12.8" name="generator">
 <meta content="Internet-Draft" name="keyword">
 <meta content="draft-ounsworth-cfrg-kem-combiners-00" name="ietf.draft">
 <!-- Generator version information:
-  xml2rfc 3.12.2
-    Python 3.10.6
+  xml2rfc 3.12.8
+    Python 3.9.16
+    appdirs 1.4.4
+    ConfigArgParse 1.5.3
+    google-i18n-address 2.5.1
+    html5lib 1.1
+    intervaltree 3.1.0
+    Jinja2 2.11.3
+    kitchen 1.2.6
+    lxml 4.8.0
+    MarkupSafe 2.0.1
+    pycountry 22.3.5
+    pyflakes 2.4.0
+    PyYAML 6.0
+    requests 2.27.1
+    setuptools 65.6.3
+    six 1.16.0
 -->
 <link href="draft-ounsworth-cfrg-kem-combiners.xml" rel="alternate" type="application/rfc+xml">
 <link href="#copyright" rel="license">
@@ -646,6 +661,9 @@ hr.addr {
   figure {
     overflow: scroll;
   }
+  pre.breakable {
+    break-inside: auto;
+  }
   h1, h2, h3, h4, h5, h6 {
     page-break-after: avoid;
   }
@@ -1181,7 +1199,7 @@ li > p:last-of-type {
 </tr></thead>
 <tfoot><tr>
 <td class="left">Ounsworth &amp; Wussler</td>
-<td class="center">Expires 10 September 2023</td>
+<td class="center">Expires 12 September 2023</td>
 <td class="right">[Page]</td>
 </tr></tfoot>
 </table>
@@ -1194,12 +1212,12 @@ li > p:last-of-type {
 <dd class="internet-draft">draft-ounsworth-cfrg-kem-combiners-00</dd>
 <dt class="label-published">Published:</dt>
 <dd class="published">
-<time datetime="2023-03-09" class="published">9 March 2023</time>
+<time datetime="2023-03-11" class="published">11 March 2023</time>
     </dd>
 <dt class="label-intended-status">Intended Status:</dt>
 <dd class="intended-status">Informational</dd>
 <dt class="label-expires">Expires:</dt>
-<dd class="expires"><time datetime="2023-09-10">10 September 2023</time></dd>
+<dd class="expires"><time datetime="2023-09-12">12 September 2023</time></dd>
 <dt class="label-authors">Authors:</dt>
 <dd class="authors">
 <div class="author">
@@ -1229,8 +1247,7 @@ li > p:last-of-type {
 <p id="section-note.1-3">
         Discussion of this document takes place on the
         Limited Additional Mechanisms for PKIX and SMIME (lamps) Working Group mailing list (<span><a href="mailto:spasm@ietf.org">mailto:spasm@ietf.org</a></span>),
-        which is archived at <span><a href="https://mailarchive.ietf.org/arch/browse/spasm/">https://mailarchive.ietf.org/arch/browse/spasm/</a></span>.
-        Subscribe at <span><a href="https://www.ietf.org/mailman/listinfo/spasm/">https://www.ietf.org/mailman/listinfo/spasm/</a></span>.<a href="#section-note.1-3" class="pilcrow">¶</a></p>
+        which is archived at <span><a href="https://mailarchive.ietf.org/arch/browse/spasm/">https://mailarchive.ietf.org/arch/browse/spasm/</a></span>.<a href="#section-note.1-3" class="pilcrow">¶</a></p>
 <p id="section-note.1-4">Source for this draft and an issue tracker can be found at
         <span><a href="https://github.com/EntrustCorporation/draft-ounsworth-cfrg-kem-combiners">https://github.com/EntrustCorporation/draft-ounsworth-cfrg-kem-combiners</a></span>.<a href="#section-note.1-4" class="pilcrow">¶</a></p>
 </section>
@@ -1253,7 +1270,7 @@ li > p:last-of-type {
         time. It is inappropriate to use Internet-Drafts as reference
         material or to cite them other than as "work in progress."<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
 <p id="section-boilerplate.1-4">
-        This Internet-Draft will expire on 10 September 2023.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
+        This Internet-Draft will expire on 12 September 2023.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="copyright">
@@ -1430,13 +1447,13 @@ def kemDecaps(ct, sk) -&gt; ss
       <h2 id="name-kem-combiner-construction-2">
 <a href="#section-3" class="section-number selfRef">3. </a><a href="#name-kem-combiner-construction-2" class="section-name selfRef">KEM Combiner construction</a>
       </h2>
-<p id="section-3-1">A KEM combiner is a function that takes in two or more shared secrets <code>ss_i</code> and returns a combined shared secret <code>ss</code>, where all values are byte arrays.<a href="#section-3-1" class="pilcrow">¶</a></p>
+<p id="section-3-1">A KEM combiner is a function that takes in the shared secrets <code>ss_i</code> and ciphertexts <code>ct_i</code> of two or more ingredient KEMs (possibly some further context information) and returns a combined shared secret <code>ss</code>.<a href="#section-3-1" class="pilcrow">¶</a></p>
 <div class="alignLeft art-text artwork" id="section-3-2">
 <pre>
-ss = kemCombiner(ss_1, ss_2, ..., ss_n)
+ss = kemCombiner(ss_1, ss_2, ..., ss_n, ct_1, ct_2, ..., ct_n)
 </pre><a href="#section-3-2" class="pilcrow">¶</a>
 </div>
-<p id="section-3-3">This document assumes that shared secrets are the output of a KEM, but without loss of generality they MAY also be any other source of cryptographic key material, such as pre-shared keys (PSKs), with PQ/PSK being a quantum-safe migration strategy being made available by some protocols, see for example IKEv2 in <span>[<a href="#RFC8784" class="xref">RFC8784</a>]</span>.<a href="#section-3-3" class="pilcrow">¶</a></p>
+<p id="section-3-3">This document assumes that shared secrets are the output of a KEM, but without loss of generality they MAY also be any other source of cryptographic key material, such as pre-shared keys (PSKs), with PQ/PSK being a quantum-safe migration strategy being made available by some protocols, see for example IKEv2 in <span>[<a href="#RFC8784" class="xref">RFC8784</a>]</span>. In the case of a PSK there is no associated ciphertext present.<a href="#section-3-3" class="pilcrow">¶</a></p>
 <p id="section-3-4">In general it is desirable to use a multi-PRF as a KEM combiner, meaning a PRF when keyed by any of its single inputs.
 The following simple yet generic construction can be used in all IETF protocols that need to combine the output of two or more KEMs:<a href="#section-3-4" class="pilcrow">¶</a></p>
 <span id="name-general-kem-combiner-constru"></span><figure id="figure-1">
@@ -1484,7 +1501,6 @@ k_i = H(ss_i || ct_i)
 </pre><a href="#section-3-12" class="pilcrow">¶</a>
 </div>
 <p id="section-3-13">Any protocols making use of this construction MUST either hash all inputs <code>ss_i || ct_i</code>, or justify that any un-hashed inputs will always be fixed length.<a href="#section-3-13" class="pilcrow">¶</a></p>
-<p id="section-3-14">Including the ciphertext guarantees that the combined kem is IND-CCA secure as long as one of the ingredient KEMs is, as stated by <span>[<a href="#KEMCombiners" class="xref">KEMCombiners</a>]</span>.<a href="#section-3-14" class="pilcrow">¶</a></p>
 <div id="protocol-binding">
 <section id="section-3.1">
         <h3 id="name-protocol-binding-2">
@@ -1600,6 +1616,16 @@ This is compatible with the one-step KDF definition given in NIST SP800-56Cr2 <s
 More precisely, for a given capacity <code>c</code> the indifferentiability proof shows that assuming there are no weaknesses found in the Keccak permutation, an attacker has to make an expected number of <code>2^(c/2)</code> calls to the permutation to tell Keccak from a random oracle.
 For a random oracle, a difference in only a single bit gives an unrelated, uniformly random output.
 Hence, to be able to distinguish a key <code>k</code>, derived from shared keys <code>k_i</code> from a random bit string, an adversary has to correctly guess all key shares <code>k_i</code> entirely.<a href="#section-6-1" class="pilcrow">¶</a></p>
+<p id="section-6-2">The proposed construction in <a href="#sec-kem-combiner" class="xref">Section 3</a> with the instantiations in
+<a href="#sec-instantiation" class="xref">Section 4</a> preserves IND-CCA2 of any of its ingredient KEMs, i.e.
+the newly formed combined KEM is IND-CCA2 secure as long as at least one of the
+ingredient KEMs is. Indeed, the above stated indifferentiability from a random
+oracle qualifies Keccak as a split-key pseudorandom function as defined in
+<span>[<a href="#KEMCombiners" class="xref">KEMCombiners</a>]</span>. That is, Keccak behaves like a random function if at least
+one input shared secret <code>ss_i</code> is picked uniformly at random. Our construction
+can thus be seen as an instantiation of the IND-CCA2 preserving Example 3 in
+Figure 1 of <span>[<a href="#KEMCombiners" class="xref">KEMCombiners</a>]</span>, up to some reordering of input shared secrets and
+ciphertexts and their potential compression by a cryptographic hash function.<a href="#section-6-2" class="pilcrow">¶</a></p>
 </section>
 </div>
 <section id="section-7">
@@ -1628,7 +1654,7 @@ Hence, to be able to distinguish a key <code>k</code>, derived from shared keys 
 <dd class="break"></dd>
 <dt id="I-D.driscoll-pqt-hybrid-terminology">[I-D.driscoll-pqt-hybrid-terminology]</dt>
         <dd>
-<span class="refAuthor">D, F.</span>, <span class="refTitle">"Terminology for Post-Quantum Traditional Hybrid Schemes"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-driscoll-pqt-hybrid-terminology-01</span>, <time datetime="2022-10-20" class="refDate">20 October 2022</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-driscoll-pqt-hybrid-terminology-01">https://datatracker.ietf.org/doc/html/draft-driscoll-pqt-hybrid-terminology-01</a>&gt;</span>. </dd>
+<span class="refAuthor">D, F.</span>, <span class="refTitle">"Terminology for Post-Quantum Traditional Hybrid Schemes"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-driscoll-pqt-hybrid-terminology-02</span>, <time datetime="2023-03-07" class="refDate">7 March 2023</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-driscoll-pqt-hybrid-terminology-02">https://datatracker.ietf.org/doc/html/draft-driscoll-pqt-hybrid-terminology-02</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="I-D.ietf-ipsecme-ikev2-multiple-ke">[I-D.ietf-ipsecme-ikev2-multiple-ke]</dt>
         <dd>
@@ -1652,7 +1678,7 @@ Hence, to be able to distinguish a key <code>k</code>, derived from shared keys 
 <dd class="break"></dd>
 <dt id="KEMCombiners">[KEMCombiners]</dt>
         <dd>
-<span class="refAuthor">Giacon, F.</span>, <span class="refAuthor">Heuer, F.</span>, and <span class="refAuthor">B. Poettering</span>, <span class="refTitle">"KEM Combiners"</span>, <time datetime="2018" class="refDate">2018</time>, <span>&lt;<a href="https://eprint.iacr.org/2018/024">https://eprint.iacr.org/2018/024</a>&gt;</span>. </dd>
+<span class="refAuthor">Giacon, F.</span>, <span class="refAuthor">Heuer, F.</span>, and <span class="refAuthor">B. Poettering</span>, <span class="refTitle">"KEM Combiners"</span>, <time datetime="2018" class="refDate">2018</time>, <span>&lt;<a href="https://doi.org/10.1007/978-3-319-76578-5_7">https://doi.org/10.1007/978-3-319-76578-5_7</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="PQCAPI">[PQCAPI]</dt>
         <dd>
@@ -1688,7 +1714,7 @@ Hence, to be able to distinguish a key <code>k</code>, derived from shared keys 
 <dd class="break"></dd>
 <dt id="SPONGE">[SPONGE]</dt>
       <dd>
-<span class="refAuthor">Bertoni, G.</span>, <span class="refAuthor">Daemen, J.</span>, <span class="refAuthor">Peters, M.</span>, and <span class="refAuthor">G. Assche</span>, <span class="refTitle">"Cryptographic sponge functions"</span>, <time datetime="2011-01" class="refDate">January 2011</time>, <span>&lt;<a href="https://keccak.team/files/CSF-0.1.pdf">https://keccak.team/files/CSF-0.1.pdf</a>&gt;</span>. </dd>
+<span class="refAuthor">Bertoni, G.</span>, <span class="refAuthor">Daemen, J.</span>, <span class="refAuthor">Peters, M.</span>, and <span class="refAuthor">G. Assche</span>, <span class="refTitle">"On the Indifferentiability of the Sponge Construction"</span>, <time datetime="2008" class="refDate">2008</time>, <span>&lt;<a href="https://doi.org/10.1007/978-3-540-78967-3_11">https://doi.org/10.1007/978-3-540-78967-3_11</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 </dl>
 </section>

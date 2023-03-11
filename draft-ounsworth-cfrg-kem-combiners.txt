@@ -5,8 +5,8 @@
 CFRG                                                        M. Ounsworth
 Internet-Draft                                                   Entrust
 Intended status: Informational                                A. Wussler
-Expires: 10 September 2023                                        Proton
-                                                            9 March 2023
+Expires: 12 September 2023                                        Proton
+                                                           11 March 2023
 
 
 Combiner function for hybrid key encapsulation mechanisms (Hybrid KEMs)
@@ -32,8 +32,7 @@ About This Document
    Discussion of this document takes place on the Limited Additional
    Mechanisms for PKIX and SMIME (lamps) Working Group mailing list
    (mailto:spasm@ietf.org), which is archived at
-   https://mailarchive.ietf.org/arch/browse/spasm/.  Subscribe at
-   https://www.ietf.org/mailman/listinfo/spasm/.
+   https://mailarchive.ietf.org/arch/browse/spasm/.
 
    Source for this draft and an issue tracker can be found at
    https://github.com/EntrustCorporation/draft-ounsworth-cfrg-kem-
@@ -53,7 +52,8 @@ Status of This Memo
 
 
 
-Ounsworth & Wussler     Expires 10 September 2023               [Page 1]
+
+Ounsworth & Wussler     Expires 12 September 2023               [Page 1]
 
 Internet-Draft                KEM Combiner                    March 2023
 
@@ -63,7 +63,7 @@ Internet-Draft                KEM Combiner                    March 2023
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 10 September 2023.
+   This Internet-Draft will expire on 12 September 2023.
 
 Copyright Notice
 
@@ -94,7 +94,7 @@ Table of Contents
    7.  References  . . . . . . . . . . . . . . . . . . . . . . . . .   8
      7.1.  Normative References  . . . . . . . . . . . . . . . . . .   8
      7.2.  Informative References  . . . . . . . . . . . . . . . . .   8
-   Contributors  . . . . . . . . . . . . . . . . . . . . . . . . . .  10
+   Contributors  . . . . . . . . . . . . . . . . . . . . . . . . . .  11
    Acknowledgements  . . . . . . . . . . . . . . . . . . . . . . . .  11
    Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  11
 
@@ -109,7 +109,7 @@ Table of Contents
 
 
 
-Ounsworth & Wussler     Expires 10 September 2023               [Page 2]
+Ounsworth & Wussler     Expires 12 September 2023               [Page 2]
 
 Internet-Draft                KEM Combiner                    March 2023
 
@@ -165,7 +165,7 @@ Internet-Draft                KEM Combiner                    March 2023
 
 
 
-Ounsworth & Wussler     Expires 10 September 2023               [Page 3]
+Ounsworth & Wussler     Expires 12 September 2023               [Page 3]
 
 Internet-Draft                KEM Combiner                    March 2023
 
@@ -202,29 +202,34 @@ Internet-Draft                KEM Combiner                    March 2023
 
 3.  KEM Combiner construction
 
-   A KEM combiner is a function that takes in two or more shared secrets
-   ss_i and returns a combined shared secret ss, where all values are
-   byte arrays.
+   A KEM combiner is a function that takes in the shared secrets ss_i
+   and ciphertexts ct_i of two or more ingredient KEMs (possibly some
+   further context information) and returns a combined shared secret ss.
 
-   ss = kemCombiner(ss_1, ss_2, ..., ss_n)
+   ss = kemCombiner(ss_1, ss_2, ..., ss_n, ct_1, ct_2, ..., ct_n)
 
    This document assumes that shared secrets are the output of a KEM,
    but without loss of generality they MAY also be any other source of
    cryptographic key material, such as pre-shared keys (PSKs), with PQ/
    PSK being a quantum-safe migration strategy being made available by
-   some protocols, see for example IKEv2 in [RFC8784].
+   some protocols, see for example IKEv2 in [RFC8784].  In the case of a
+   PSK there is no associated ciphertext present.
+
+
+
+
+
+
+
+Ounsworth & Wussler     Expires 12 September 2023               [Page 4]
+
+Internet-Draft                KEM Combiner                    March 2023
+
 
    In general it is desirable to use a multi-PRF as a KEM combiner,
    meaning a PRF when keyed by any of its single inputs.  The following
    simple yet generic construction can be used in all IETF protocols
    that need to combine the output of two or more KEMs:
-
-
-
-Ounsworth & Wussler     Expires 10 September 2023               [Page 4]
-
-Internet-Draft                KEM Combiner                    March 2023
-
 
    KDF(counter || k_1 || ... || k_n || fixedInfo, outputBits)
 
@@ -266,18 +271,13 @@ Internet-Draft                KEM Combiner                    March 2023
    inputs ss_i || ct_i, or justify that any un-hashed inputs will always
    be fixed length.
 
-   Including the ciphertext guarantees that the combined kem is IND-CCA
-   secure as long as one of the ingredient KEMs is, as stated by
-   [KEMCombiners].
 
 
 
 
 
 
-
-
-Ounsworth & Wussler     Expires 10 September 2023               [Page 5]
+Ounsworth & Wussler     Expires 12 September 2023               [Page 5]
 
 Internet-Draft                KEM Combiner                    March 2023
 
@@ -333,7 +333,7 @@ Internet-Draft                KEM Combiner                    March 2023
 
 
 
-Ounsworth & Wussler     Expires 10 September 2023               [Page 6]
+Ounsworth & Wussler     Expires 12 September 2023               [Page 6]
 
 Internet-Draft                KEM Combiner                    March 2023
 
@@ -389,7 +389,7 @@ Internet-Draft                KEM Combiner                    March 2023
 
 
 
-Ounsworth & Wussler     Expires 10 September 2023               [Page 7]
+Ounsworth & Wussler     Expires 12 September 2023               [Page 7]
 
 Internet-Draft                KEM Combiner                    March 2023
 
@@ -418,6 +418,19 @@ Internet-Draft                KEM Combiner                    March 2023
    bit string, an adversary has to correctly guess all key shares k_i
    entirely.
 
+   The proposed construction in Section 3 with the instantiations in
+   Section 4 preserves IND-CCA2 of any of its ingredient KEMs, i.e. the
+   newly formed combined KEM is IND-CCA2 secure as long as at least one
+   of the ingredient KEMs is.  Indeed, the above stated
+   indifferentiability from a random oracle qualifies Keccak as a split-
+   key pseudorandom function as defined in [KEMCombiners].  That is,
+   Keccak behaves like a random function if at least one input shared
+   secret ss_i is picked uniformly at random.  Our construction can thus
+   be seen as an instantiation of the IND-CCA2 preserving Example 3 in
+   Figure 1 of [KEMCombiners], up to some reordering of input shared
+   secrets and ciphertexts and their potential compression by a
+   cryptographic hash function.
+
 7.  References
 
 7.1.  Normative References
@@ -429,6 +442,14 @@ Internet-Draft                KEM Combiner                    March 2023
 
 7.2.  Informative References
 
+
+
+
+Ounsworth & Wussler     Expires 12 September 2023               [Page 8]
+
+Internet-Draft                KEM Combiner                    March 2023
+
+
    [FIPS202]  "SHA-3 Standard: Permutation-Based Hash and Extendable-
               Output Functions", Federal information Processing
               Standards Publication (FIPS) 202 , 2015,
@@ -437,18 +458,9 @@ Internet-Draft                KEM Combiner                    March 2023
    [I-D.driscoll-pqt-hybrid-terminology]
               D, F., "Terminology for Post-Quantum Traditional Hybrid
               Schemes", Work in Progress, Internet-Draft, draft-
-              driscoll-pqt-hybrid-terminology-01, 20 October 2022,
+              driscoll-pqt-hybrid-terminology-02, 7 March 2023,
               <https://datatracker.ietf.org/doc/html/draft-driscoll-pqt-
-              hybrid-terminology-01>.
-
-
-
-
-
-Ounsworth & Wussler     Expires 10 September 2023               [Page 8]
-
-Internet-Draft                KEM Combiner                    March 2023
-
+              hybrid-terminology-02>.
 
    [I-D.ietf-ipsecme-ikev2-multiple-ke]
               Tjhai, C., Tomlinson, M., Bartlett, G., Fluhrer, S., Van
@@ -486,9 +498,17 @@ Internet-Draft                KEM Combiner                    March 2023
               <https://datatracker.ietf.org/doc/html/draft-wussler-
               openpgp-pqc-00>.
 
+
+
+
+Ounsworth & Wussler     Expires 12 September 2023               [Page 9]
+
+Internet-Draft                KEM Combiner                    March 2023
+
+
    [KEMCombiners]
               Giacon, F., Heuer, F., and B. Poettering, "KEM Combiners",
-              2018, <https://eprint.iacr.org/2018/024>.
+              2018, <https://doi.org/10.1007/978-3-319-76578-5_7>.
 
    [PQCAPI]   Project, N. P.-Q. C., "PQC - API notes", November 2022,
               <https://csrc.nist.gov/CSRC/media/Projects/Post-Quantum-
@@ -497,14 +517,6 @@ Internet-Draft                KEM Combiner                    March 2023
    [RFC8174]  Leiba, B., "Ambiguity of Uppercase vs Lowercase in RFC
               2119 Key Words", BCP 14, RFC 8174, DOI 10.17487/RFC8174,
               May 2017, <https://www.rfc-editor.org/info/rfc8174>.
-
-
-
-
-Ounsworth & Wussler     Expires 10 September 2023               [Page 9]
-
-Internet-Draft                KEM Combiner                    March 2023
-
 
    [RFC8411]  Schaad, J. and R. Andrews, "IANA Registration for the
               Cryptographic Algorithm Object Identifier Range",
@@ -541,26 +553,22 @@ Internet-Draft                KEM Combiner                    March 2023
               Special Publication 800-56C , August 2020,
               <https://doi.org/10.6028/NIST.SP.800-56Cr2>.
 
-   [SPONGE]   Bertoni, G., Daemen, J., Peters, M., and G. Assche,
-              "Cryptographic sponge functions", January 2011,
-              <https://keccak.team/files/CSF-0.1.pdf>.
+
+
+
+
+Ounsworth & Wussler     Expires 12 September 2023              [Page 10]
+
+Internet-Draft                KEM Combiner                    March 2023
+
+
+   [SPONGE]   Bertoni, G., Daemen, J., Peters, M., and G. Assche, "On
+              the Indifferentiability of the Sponge Construction", 2008,
+              <https://doi.org/10.1007/978-3-540-78967-3_11>.
 
 Contributors
 
    Stavros Kousidis (BSI)
-
-
-
-
-
-
-
-
-
-Ounsworth & Wussler     Expires 10 September 2023              [Page 10]
-
-Internet-Draft                KEM Combiner                    March 2023
-
 
 Acknowledgements
 
@@ -605,12 +613,4 @@ Authors' Addresses
 
 
 
-
-
-
-
-
-
-
-
-Ounsworth & Wussler     Expires 10 September 2023              [Page 11]
+Ounsworth & Wussler     Expires 12 September 2023              [Page 11]

@@ -128,8 +128,8 @@ informative:
     seriesinfo:
       Federal information Processing Standards Publication (FIPS) 202
   SPONGE:
-    target: "https://keccak.team/files/CSF-0.1.pdf"
-    title: Cryptographic sponge functions
+    target: "https://doi.org/10.1007/978-3-540-78967-3_11"
+    title: On the Indifferentiability of the Sponge Construction
     author:
       -
         ins: G. Bertoni
@@ -143,9 +143,9 @@ informative:
       -
         ins: G. Assche
         name: Gilles van Assche
-    date: January 2011
+    date: 2008
   KEMCombiners:
-    target: "https://eprint.iacr.org/2018/024"
+    target: "https://doi.org/10.1007/978-3-319-76578-5_7"
     title: KEM Combiners
     author:
       -
@@ -227,20 +227,20 @@ https://www.etsi.org/deliver/etsi_ts/103700_103799/103744/01.01.01_60/ts_103744v
 
 TODO: as per https://www.enisa.europa.eu/publications/post-quantum-cryptography-integration-study section 4.2, might need to specify behaviour in light of KEMs with a non-zero failure probability.
 
-TODO: read and cite
+TODO (DONE): read and cite
 Federico Giacon, Felix Heuer, and Bertram Poettering. KEM combiners. In Michel
 Abdalla and Ricardo Dahab, editors, PKC 2018: 21st International Conference on Theory
 and Practice of Public Key Cryptography, Part I, volume 10769 of Lecture Notes in Computer Science, pages 190–218. Springer, Heidelberg, March 2018.
 -->
 
 
-A KEM combiner is a function that takes in two or more shared secrets `ss_i` and returns a combined shared secret `ss`, where all values are byte arrays.
+A KEM combiner is a function that takes in the shared secrets `ss_i` and ciphertexts `ct_i` of two or more ingredient KEMs (possibly some further context information) and returns a combined shared secret `ss`.
 
 ~~~
-ss = kemCombiner(ss_1, ss_2, ..., ss_n)
+ss = kemCombiner(ss_1, ss_2, ..., ss_n, ct_1, ct_2, ..., ct_n)
 ~~~
 
-This document assumes that shared secrets are the output of a KEM, but without loss of generality they MAY also be any other source of cryptographic key material, such as pre-shared keys (PSKs), with PQ/PSK being a quantum-safe migration strategy being made available by some protocols, see for example IKEv2 in [RFC8784].
+This document assumes that shared secrets are the output of a KEM, but without loss of generality they MAY also be any other source of cryptographic key material, such as pre-shared keys (PSKs), with PQ/PSK being a quantum-safe migration strategy being made available by some protocols, see for example IKEv2 in [RFC8784]. In the case of a PSK there is no associated ciphertext present.
 
 In general it is desirable to use a multi-PRF as a KEM combiner, meaning a PRF when keyed by any of its single inputs.
 The following simple yet generic construction can be used in all IETF protocols that need to combine the output of two or more KEMs:
@@ -275,8 +275,6 @@ k_i = H(ss_i || ct_i)
 ~~~
 
 Any protocols making use of this construction MUST either hash all inputs `ss_i || ct_i`, or justify that any un-hashed inputs will always be fixed length.
-
-Including the ciphertext guarantees that the combined kem is IND-CCA secure as long as one of the ingredient KEMs is, as stated by {{KEMCombiners}}.
 
 ## Protocol binding
 The `fixedInfo` string is a fixed-length string containing some context-specific information.
@@ -342,6 +340,17 @@ The proposed instantiations in {{sec-instantiation}} are practical multi-PRFs an
 More precisely, for a given capacity `c` the indifferentiability proof shows that assuming there are no weaknesses found in the Keccak permutation, an attacker has to make an expected number of `2^(c/2)` calls to the permutation to tell Keccak from a random oracle.
 For a random oracle, a difference in only a single bit gives an unrelated, uniformly random output.
 Hence, to be able to distinguish a key `k`, derived from shared keys `k_i` from a random bit string, an adversary has to correctly guess all key shares `k_i` entirely.
+
+The proposed construction in {{sec-kem-combiner}} with the instantiations in
+{{sec-instantiation}} preserves IND-CCA2 of any of its ingredient KEMs, i.e.
+the newly formed combined KEM is IND-CCA2 secure as long as at least one of the
+ingredient KEMs is. Indeed, the above stated indifferentiability from a random
+oracle qualifies Keccak as a split-key pseudorandom function as defined in
+{{KEMCombiners}}. That is, Keccak behaves like a random function if at least
+one input shared secret `ss_i` is picked uniformly at random. Our construction
+can thus be seen as an instantiation of the IND-CCA2 preserving Example 3 in
+Figure 1 of {{KEMCombiners}}, up to some reordering of input shared secrets and
+ciphertexts and their potential compression by a cryptographic hash function. 
 
 <!-- Start of Appendices -->
 --- back
