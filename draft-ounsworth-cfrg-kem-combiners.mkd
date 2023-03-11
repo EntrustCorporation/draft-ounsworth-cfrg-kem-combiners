@@ -135,8 +135,8 @@ informative:
     seriesinfo:
       Federal information Processing Standards Publication (FIPS) 202
   SPONGE:
-    target: https://keccak.team/files/CSF-0.1.pdf
-    title: Cryptographic sponge functions
+    target: "https://doi.org/10.1007/978-3-540-78967-3_11"
+    title: On the Indifferentiability of the Sponge Construction
     author:
       -
         ins: G. Bertoni
@@ -150,9 +150,9 @@ informative:
       -
         ins: G. Assche
         name: Gilles van Assche
-    date: January 2011
-  Giacon2018:
-    target: https://eprint.iacr.org/2018/024
+    date: 2008
+  KEMCombiners:
+    target: https://doi.org/10.1007/978-3-319-76578-5_7
     title: KEM Combiners
     date: 2018
     author:
@@ -273,11 +273,13 @@ The shared secret `ss` MAY be used directly as a symmetric key, for example as a
 
 ## k_i construction {#sec-k_i-construction}
 
-Following the guidance of Giacon et al. [Giacon2018], we wish for a KEM combiner that is (CCA) secure as long as at least one of the ingredient KEMs is. Ir order to protect against chosen ciphertext attacks, it is necessary to include both the shared secret `ss_i` and its corresponding ciphertext `ct_i`. In addition, each `k_i` MUST be constant in length to prevent abuse of the underlying hash function, therefore the secret shares `ss_i || ct_i` MUST be hashed prior to inclusion in the overall construction described in {{tab-kemCombiner}}:
+Following the guidance of Giacon et al. [KEMCombiners], we wish for a KEM combiner that is (CCA) secure as long as at least one of the ingredient KEMs is. Ir order to protect against chosen ciphertext attacks, it is necessary to include both the shared secret `ss_i` and its corresponding ciphertext `ct_i`. In addition, each `k_i` MUST be constant in length to prevent abuse of the underlying hash function, therefore the secret shares `ss_i || ct_i` MUST be hashed prior to inclusion in the overall construction described in {{tab-kemCombiner}}:
 
 ~~~
 k_i = H(ss_i || ct_i)
 ~~~
+
+In the case of a PSK there is no associated ciphertext present.
 
 
 BEGIN EDNOTE
@@ -368,6 +370,17 @@ The proposed instantiations in {{sec-instantiation}} are practical multi-PRFs an
 More precisely, for a given capacity `c` the indifferentiability proof shows that assuming there are no weaknesses found in the Keccak permutation, an attacker has to make an expected number of `2^(c/2)` calls to the permutation to tell Keccak from a random oracle.
 For a random oracle, a difference in only a single bit gives an unrelated, uniformly random output.
 Hence, to be able to distinguish a key `k`, derived from shared keys `k_i` from a random bit string, an adversary has to correctly guess all key shares `k_i` entirely.
+
+The proposed construction in {{sec-kem-combiner}} with the instantiations in
+{{sec-instantiation}} preserves IND-CCA2 of any of its ingredient KEMs, i.e.
+the newly formed combined KEM is IND-CCA2 secure as long as at least one of the
+ingredient KEMs is. Indeed, the above stated indifferentiability from a random
+oracle qualifies Keccak as a split-key pseudorandom function as defined in
+{{KEMCombiners}}. That is, Keccak behaves like a random function if at least
+one input shared secret `ss_i` is picked uniformly at random. Our construction
+can thus be seen as an instantiation of the IND-CCA2 preserving Example 3 in
+Figure 1 of {{KEMCombiners}}, up to some reordering of input shared secrets and
+ciphertexts and their potential compression by a cryptographic hash function. 
 
 <!-- Start of Appendices -->
 --- back
