@@ -2,7 +2,7 @@
 title: Combiner function for hybrid key encapsulation mechanisms (Hybrid KEMs)
 abbrev: KEM Combiner
 # <!-- EDNOTE: Edits the draft name -->
-docname: draft-ounsworth-cfrg-kem-combiners-00
+docname: draft-ounsworth-cfrg-kem-combiners-01
 
 # <!-- stand_alone: true -->
 ipr: trust200902
@@ -42,6 +42,13 @@ author:
       abbrev: Proton
       country: Switzerland
       email: aron@wussler.it
+
+    -
+      ins: S. Kousidis
+      name: Stavros Kousidis
+      org: BSI
+      country: Germany
+      email: stavros.kousidis@bsi.bund.de
 
 
 normative:
@@ -144,12 +151,28 @@ informative:
         ins: G. Assche
         name: Gilles van Assche
     date: January 2011
+  Giacon2018:
+    target: https://eprint.iacr.org/2018/024
+    title: KEM Combiners
+    date: 2018
+    author:
+      - 
+        ins: F. Giacon
+        name: Federico Giacon
+      -
+        ins: F. Heuer
+        name: Felix Heuer
+      -
+        ins: B. Poettering
+        name: Bertram Poettering
+
 
 --- abstract
 
 The migration to post-quantum cryptography often calls for performing multiple key encapsulations in parallel and then combining their outputs to derive a single shared secret.
 
-This document defines a flexible multi-share KEM combiner to join an arbitrary number of key shares, that is a multi-PRF compatible with NIST SP 800-56Cr2 [SP800-56C].
+This document defines a flexible multi-share KEM combiner to join an arbitrary number of key shares, that is a multi-PRF compatible with NIST SP 800-56Cr2 [SP800-56C]. The combiner defined here is (CCA) secure as long as at least one of the ingredient
+KEMs is.
 
 <!-- End of Abstract -->
 
@@ -200,6 +223,8 @@ A post-quantum / traditional hybrid key encapsulation mechanism (hybrid KEM) as 
 
 Building a PQ/T hybrid KEM requires a secure function which combines the output of both component KEMs to form a single output. Several IETF protocols are adding PQ/T hybrid KEM mechanisms as part of their overall post-quantum migration strategies, examples include TLS 1.3 [I-D.ietf-tls-hybrid-design], IKEv2 [I-D.ietf-ipsecme-ikev2-multiple-ke], X.509; PKIX; CMS [I-D.ounsworth-pq-composite-kem], OpenPGP [I-D.wussler-openpgp-pqc], JOSE / COSE (CITE once Orie's drafts are up).
 
+The traditional algorithm may in fact be a key transport or key agreement scheme, but since simple transformations exist to turn both of those schemes into KEMs, this document assumes that all cryptograhpic algorithms satisfy the KEM interface described in {{sec-kem-defn}}.
+
 ## KEM-based AKE
 
 The need for a KEM-based authenticated key establishment arises, for example, when two communicating parties each have long-term KEM keys (for example in X.509 certificates), and wish to involve both KEM keys in deriving a mutually-authenticated shared secret. In particular this will arise for any protocol that needs to provide post-quantum replacements for static-static (Elliptic Curve) Diffie-Hellman mechanisms. Examples include a KEM replacement for CMP's DHBasedMac {{I-D.ietf-lamps-cmp-updates}}.
@@ -213,10 +238,6 @@ https://www.etsi.org/deliver/etsi_ts/103700_103799/103744/01.01.01_60/ts_103744v
 
 TODO: as per https://www.enisa.europa.eu/publications/post-quantum-cryptography-integration-study section 4.2, might need to specify behaviour in light of KEMs with a non-zero failure probability.
 
-TODO: read and cite
-Federico Giacon, Felix Heuer, and Bertram Poettering. KEM combiners. In Michel
-Abdalla and Ricardo Dahab, editors, PKC 2018: 21st International Conference on Theory
-and Practice of Public Key Cryptography, Part I, volume 10769 of Lecture Notes in Computer Science, pages 190–218. Springer, Heidelberg, March 2018.
 -->
 
 
@@ -228,40 +249,53 @@ ss = kemCombiner(ss_1, ss_2, ..., ss_n)
 
 This document assumes that shared secrets are the output of a KEM, but without loss of generality they MAY also be any other source of cryptographic key material, such as pre-shared keys (PSKs), with PQ/PSK being a quantum-safe migration strategy being made available by some protocols, see for example IKEv2 in [RFC8784].
 
-In general it is desirable to use a multi-PRF as a KEM combiner, meaning a PRF when keyed by any of its single inputs.
+In general it is desirable to use a multi-PRF as a KEM combiner, meaning that the combiner has the properties of a PRF when keyed by any of its single inputs.
 The following simple yet generic construction can be used in all IETF protocols that need to combine the output of two or more KEMs:
 
 ~~~
 KDF(counter || k_1 || ... || k_n || fixedInfo, outputBits)
 ~~~
-{: title="general KEM combiner construction" }
+{: #tab-kemCombiner title="general KEM combiner construction" }
 
 where:
 
 - `KDF` represents a suitable choice of cryptographic key derivation function,
-- `k_i` represent the constant-length input keys,
+- `k_i` represent the constant-length input keys and is discussed in {{sec-k_i-construction}},
 - `fixedInfo` is some protocol-specific KDF binding,
 - `counter` parameter is instantiation-specific and is discussed in {{sec-instantiation}}.
-- `outputBits` determines the length of the key,
+- `outputBits` determines the length of the key to output,
 - `||` represents concatenation.
 
-In section {{sec-instantiation}} are listed several possible practical instantiations, in compliance with NIST SP-800 56Cr2 {{SP800-56C}}.
-The shared secret `ss` MAY be used as a Key Encryption Key (KEK) for key encapsulation.
+In {{sec-instantiation}} are listed several possible practical instantiations, in compliance with NIST SP-800 56Cr2 {{SP800-56C}}.
+The shared secret `ss` MAY be used directly as a symmetric key, for example as a MAC key or as a Key Encryption Key (KEK) for key encapsulation.
 
-Each `k_i` MUST be constant in length, therefore the secret shares `ss_i` can be used directly only if they are guaranteed to be constant length. For all other cases, it is REQUIRED to hash them first:
+## k_i construction {#sec-k_i-construction}
+
+Following the guidance of Giacon et al. [Giacon2018], we wish for a KEM combiner that is (CCA) secure as long as at least one of the ingredient KEMs is. Ir order to protect against chosen ciphertext attacks, it is necessary to include both the shared secret `ss_i` and its corresponding ciphertext `ct_i`. In addition, each `k_i` MUST be constant in length to prevent abuse of the underlying hash function, therefore the secret shares `ss_i || ct_i` MUST be hashed prior to inclusion in the overall construction described in {{tab-kemCombiner}}:
 
 ~~~
-k_i = H(ss_i)
+k_i = H(ss_i || ct_i)
 ~~~
 
-Any protocols making use of this construction MUST either hash all inputs `ss_i`, or justify that any un-hashed inputs will always be fixed length.
+
+BEGIN EDNOTE
+
+There is currently debate among the authors about whether the hash MAY be omitted for KEMs where `ss_i` is guaranteed to be constant length. The overall `ss_i || ct_i` will not be guaranteed to be constant length since `ct_i` is fully under the control of the attacker, but maybe it sufficient that most KEMs will only decapsulate successfully on ciphertexts of fixed length?
+
+~~~
+k_i = ss_i || ct_i
+~~~
+
+Any protocols making use of this construction MUST either hash all inputs `ss_i || ct_i`, or justify that any un-hashed inputs will always be fixed length.
+
+END EDNOTE
 
 ## Protocol binding
 The `fixedInfo` string is a fixed-length string containing some context-specific information.
 It MUST NOT depend on the secret shares. The intention is to prevent cross-protocol attacks by making this key derivation unique to its protocol context.
 
 The `fixedInfo` string MUST have a definite structure depending on the protocol where all parts are fixed length. This prevents a variable length structure from creating collisions between two different instances.
-In cases some variable length input is necessary, such as the representation of a public key or an OID, then hashing or padding can be used.
+In cases some variable length input is necessary, such as the representation of a user ID, a public key or an OID, then hashing or padding SHOULD be used.
 
 The parameter fixedInfo MAY contain any of the following information:
 
@@ -280,13 +314,16 @@ This is a non-comprehensive list, further information can be found in paragraph 
 
 # Practical instantiations {#sec-instantiation}
 
-The KDF MUST be instantiated with one of the following Keccak-based option.
-Each instance defines a function to be used as `KDF`, a hash `H` function to optionally derive the `k_i`, and a `counter`.
+The KDF must be instantiated with cryptographically-secure choices for `KDF` and `H`. The following are RECOMMENDED Keccak-based instatiations, but other choices MAY be made depending on availability of cryptographic primitives, protocol design needs, and especially to allow for future cryptographic agility.
+
+Each instance defines a function to be used as `KDF`, a hash `H` function to derive the `k_i`, and optionally a `counter`.
 
 1. `KDF = SHA3-256` and `H = SHA3-256`, with `hashSize = 256 bit`.
-2. `KDF = SHA3-512` and `H = SHA3-512`, with `hashSize = 512 bit`.
-3. `KDF = KMAC128` and `H = SHA3-256`, with `hashSize = 128 bit`.
-4. `KDF = KMAC256` and `H = SHA3-512`, with `hashSize = 256 bit`.
+1. `KDF = SHA3-512` and `H = SHA3-512`, with `hashSize = 512 bit`.
+1. `KDF = SHAKE128` and `H = SHA3-256`, with `hashSize` at least 128 bit.
+1. `KDF = SHAKE256` and `H = SHA3-512`, with `hashSize` at least 256 bit.
+1. `KDF = KMAC128` and `H = SHA3-256`, with `hashSize = 128 bit`.
+1. `KDF = KMAC256` and `H = SHA3-512`, with `hashSize = 256 bit`.
 
 ## Hash-and-counter based construction
 Options 1 and 2 instantiate the KDF using SHA3, specified in NIST FIPS 202 {{FIPS202}}.
@@ -299,8 +336,17 @@ To generate an `outputBits` long secret share `ss`:
 
 An implementation MUST NOT overflow and reuse the `counter` and an error MUST be returned when producing more than 2^32 consecutive hashes.
 
+## XOF based constructions
+Options 3 and 4 are SHAKE-based, as specified in NIST SP FIPS 202 {{FIPS202}}.
+
+To generate an `outputBits` long secret share `ss`:
+
+* the `counter` MUST be set with the value `0x00000001`.
+* A single iteration of the chosen SHAKE primitive is performed with an output length `d = outputBits`.
+* The output is directly returned as `ss`.
+
 ## KMAC based construction
-Options 3 and 4 are KMAC-based, as specified in NIST SP 800-185 {{SP800-185}}.
+Options 5 and 6 are KMAC-based, as specified in NIST SP 800-185 {{SP800-185}}.
 To instantiate the function:
 
 * The context `S` MUST be the utf-8 string "KDF".

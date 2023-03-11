@@ -5,12 +5,14 @@
 CFRG                                                        M. Ounsworth
 Internet-Draft                                                   Entrust
 Intended status: Informational                                A. Wussler
-Expires: 9 September 2023                                         Proton
-                                                            8 March 2023
+Expires: 11 September 2023                                        Proton
+                                                             S. Kousidis
+                                                                     BSI
+                                                           10 March 2023
 
 
 Combiner function for hybrid key encapsulation mechanisms (Hybrid KEMs)
-                 draft-ounsworth-cfrg-kem-combiners-00
+                 draft-ounsworth-cfrg-kem-combiners-01
 
 Abstract
 
@@ -20,7 +22,8 @@ Abstract
 
    This document defines a flexible multi-share KEM combiner to join an
    arbitrary number of key shares, that is a multi-PRF compatible with
-   NIST SP 800-56Cr2 [SP800-56C].
+   NIST SP 800-56Cr2 [SP800-56C].  The combiner defined here is (CCA)
+   secure as long as at least one of the ingredient KEMs is.
 
 About This Document
 
@@ -44,26 +47,28 @@ Status of This Memo
    This Internet-Draft is submitted in full conformance with the
    provisions of BCP 78 and BCP 79.
 
+
+
+
+
+
+
+Ounsworth, et al.       Expires 11 September 2023               [Page 1]
+
+Internet-Draft                KEM Combiner                    March 2023
+
+
    Internet-Drafts are working documents of the Internet Engineering
    Task Force (IETF).  Note that other groups may also distribute
    working documents as Internet-Drafts.  The list of current Internet-
    Drafts is at https://datatracker.ietf.org/drafts/current/.
-
-
-
-
-
-Ounsworth & Wussler     Expires 9 September 2023                [Page 1]
-
-Internet-Draft                KEM Combiner                    March 2023
-
 
    Internet-Drafts are draft documents valid for a maximum of six months
    and may be updated, replaced, or obsoleted by other documents at any
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 9 September 2023.
+   This Internet-Draft will expire on 11 September 2023.
 
 Copyright Notice
 
@@ -78,24 +83,36 @@ Copyright Notice
 
 Table of Contents
 
-   1.  Terminology . . . . . . . . . . . . . . . . . . . . . . . . .   2
+   1.  Terminology . . . . . . . . . . . . . . . . . . . . . . . . .   3
      1.1.  Key Encapsulation Mechanisms  . . . . . . . . . . . . . .   3
    2.  Introduction  . . . . . . . . . . . . . . . . . . . . . . . .   3
-     2.1.  KEM/PSK hybrids . . . . . . . . . . . . . . . . . . . . .   3
+     2.1.  KEM/PSK hybrids . . . . . . . . . . . . . . . . . . . . .   4
      2.2.  PQ/Traditional hybrid KEMs  . . . . . . . . . . . . . . .   4
      2.3.  KEM-based AKE . . . . . . . . . . . . . . . . . . . . . .   4
    3.  KEM Combiner construction . . . . . . . . . . . . . . . . . .   4
-     3.1.  Protocol binding  . . . . . . . . . . . . . . . . . . . .   5
-   4.  Practical instantiations  . . . . . . . . . . . . . . . . . .   6
+     3.1.  k_i construction  . . . . . . . . . . . . . . . . . . . .   5
+     3.2.  Protocol binding  . . . . . . . . . . . . . . . . . . . .   6
+   4.  Practical instantiations  . . . . . . . . . . . . . . . . . .   7
      4.1.  Hash-and-counter based construction . . . . . . . . . . .   7
-     4.2.  KMAC based construction . . . . . . . . . . . . . . . . .   7
-   5.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .   7
-   6.  Security Considerations . . . . . . . . . . . . . . . . . . .   8
-   7.  References  . . . . . . . . . . . . . . . . . . . . . . . . .   8
-     7.1.  Normative References  . . . . . . . . . . . . . . . . . .   8
-     7.2.  Informative References  . . . . . . . . . . . . . . . . .   8
-   Acknowledgements  . . . . . . . . . . . . . . . . . . . . . . . .  10
-   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  11
+     4.2.  XOF based constructions . . . . . . . . . . . . . . . . .   8
+     4.3.  KMAC based construction . . . . . . . . . . . . . . . . .   8
+   5.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .   9
+   6.  Security Considerations . . . . . . . . . . . . . . . . . . .   9
+   7.  References  . . . . . . . . . . . . . . . . . . . . . . . . .   9
+     7.1.  Normative References  . . . . . . . . . . . . . . . . . .   9
+     7.2.  Informative References  . . . . . . . . . . . . . . . . .   9
+   Acknowledgements  . . . . . . . . . . . . . . . . . . . . . . . .  11
+   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  12
+
+
+
+
+
+
+Ounsworth, et al.       Expires 11 September 2023               [Page 2]
+
+Internet-Draft                KEM Combiner                    March 2023
+
 
 1.  Terminology
 
@@ -104,15 +121,6 @@ Table of Contents
    "OPTIONAL" in this document are to be interpreted as described in BCP
    14 [RFC2119] [RFC8174] when, and only when, they appear in all
    capitals, as shown here.
-
-
-
-
-
-Ounsworth & Wussler     Expires 9 September 2023                [Page 2]
-
-Internet-Draft                KEM Combiner                    March 2023
-
 
    This document is consistent with all terminology defined in
    [I-D.driscoll-pqt-hybrid-terminology].
@@ -154,21 +162,20 @@ Internet-Draft                KEM Combiner                    March 2023
    This document normalizes a mechanism for combining the output of two
    or more KEMs.
 
+
+
+
+Ounsworth, et al.       Expires 11 September 2023               [Page 3]
+
+Internet-Draft                KEM Combiner                    March 2023
+
+
 2.1.  KEM/PSK hybrids
 
    As a post-quantum stop-gap, several IETF protocols have added
    extensions to allow for mixing a pre-shared key (PSK) into an (EC)DH
    based key exchange.  Examples include CMS [RFC8696] and IKEv2
    [RFC8784].
-
-
-
-
-
-Ounsworth & Wussler     Expires 9 September 2023                [Page 3]
-
-Internet-Draft                KEM Combiner                    March 2023
-
 
 2.2.  PQ/Traditional hybrid KEMs
 
@@ -189,6 +196,12 @@ Internet-Draft                KEM Combiner                    March 2023
    [I-D.ounsworth-pq-composite-kem], OpenPGP [I-D.wussler-openpgp-pqc],
    JOSE / COSE (CITE once Orie's drafts are up).
 
+   The traditional algorithm may in fact be a key transport or key
+   agreement scheme, but since simple transformations exist to turn both
+   of those schemes into KEMs, this document assumes that all
+   cryptograhpic algorithms satisfy the KEM interface described in
+   Section 1.1.
+
 2.3.  KEM-based AKE
 
    The need for a KEM-based authenticated key establishment arises, for
@@ -206,6 +219,13 @@ Internet-Draft                KEM Combiner                    March 2023
    ss_i and returns a combined shared secret ss, where all values are
    byte arrays.
 
+
+
+Ounsworth, et al.       Expires 11 September 2023               [Page 4]
+
+Internet-Draft                KEM Combiner                    March 2023
+
+
    ss = kemCombiner(ss_1, ss_2, ..., ss_n)
 
    This document assumes that shared secrets are the output of a KEM,
@@ -215,16 +235,10 @@ Internet-Draft                KEM Combiner                    March 2023
    some protocols, see for example IKEv2 in [RFC8784].
 
    In general it is desirable to use a multi-PRF as a KEM combiner,
-   meaning a PRF when keyed by any of its single inputs.  The following
-   simple yet generic construction can be used in all IETF protocols
-   that need to combine the output of two or more KEMs:
-
-
-
-Ounsworth & Wussler     Expires 9 September 2023                [Page 4]
-
-Internet-Draft                KEM Combiner                    March 2023
-
+   meaning that the combiner has the properties of a PRF when keyed by
+   any of its single inputs.  The following simple yet generic
+   construction can be used in all IETF protocols that need to combine
+   the output of two or more KEMs:
 
    KDF(counter || k_1 || ... || k_n || fixedInfo, outputBits)
 
@@ -235,33 +249,62 @@ Internet-Draft                KEM Combiner                    March 2023
    *  KDF represents a suitable choice of cryptographic key derivation
       function,
 
-   *  k_i represent the constant-length input keys,
+   *  k_i represent the constant-length input keys and is discussed in
+      Section 3.1,
 
    *  fixedInfo is some protocol-specific KDF binding,
 
    *  counter parameter is instantiation-specific and is discussed in
       Section 4.
 
-   *  outputBits determines the length of the key,
+   *  outputBits determines the length of the key to output,
 
    *  || represents concatenation.
 
-   In section Section 4 are listed several possible practical
-   instantiations, in compliance with NIST SP-800 56Cr2 [SP800-56C].
-   The shared secret ss MAY be used as a Key Encryption Key (KEK) for
-   key encapsulation.
+   In Section 4 are listed several possible practical instantiations, in
+   compliance with NIST SP-800 56Cr2 [SP800-56C].  The shared secret ss
+   MAY be used directly as a symmetric key, for example as a MAC key or
+   as a Key Encryption Key (KEK) for key encapsulation.
 
-   Each k_i MUST be constant in length, therefore the secret shares ss_i
-   can be used directly only if they are guaranteed to be constant
-   length.  For all other cases, it is REQUIRED to hash them first:
+3.1.  k_i construction
 
-   k_i = H(ss_i)
+   Following the guidance of Giacon et al.  [Giacon2018], we wish for a
+   KEM combiner that is (CCA) secure as long as at least one of the
+   ingredient KEMs is.  Ir order to protect against chosen ciphertext
+   attacks, it is necessary to include both the shared secret ss_i and
+   its corresponding ciphertext ct_i.  In addition, each k_i MUST be
+   constant in length to prevent abuse of the underlying hash function,
+
+
+
+Ounsworth, et al.       Expires 11 September 2023               [Page 5]
+
+Internet-Draft                KEM Combiner                    March 2023
+
+
+   therefore the secret shares ss_i || ct_i MUST be hashed prior to
+   inclusion in the overall construction described in Figure 1:
+
+   k_i = H(ss_i || ct_i)
+
+   BEGIN EDNOTE
+
+   There is currently debate among the authors about whether the hash
+   MAY be omitted for KEMs where ss_i is guaranteed to be constant
+   length.  The overall ss_i || ct_i will not be guaranteed to be
+   constant length since ct_i is fully under the control of the
+   attacker, but maybe it sufficient that most KEMs will only
+   decapsulate successfully on ciphertexts of fixed length?
+
+   k_i = ss_i || ct_i
 
    Any protocols making use of this construction MUST either hash all
-   inputs ss_i, or justify that any un-hashed inputs will always be
-   fixed length.
+   inputs ss_i || ct_i, or justify that any un-hashed inputs will always
+   be fixed length.
 
-3.1.  Protocol binding
+   END EDNOTE
+
+3.2.  Protocol binding
 
    The fixedInfo string is a fixed-length string containing some
    context-specific information.  It MUST NOT depend on the secret
@@ -272,15 +315,8 @@ Internet-Draft                KEM Combiner                    March 2023
    protocol where all parts are fixed length.  This prevents a variable
    length structure from creating collisions between two different
    instances.  In cases some variable length input is necessary, such as
-   the representation of a public key or an OID, then hashing or padding
-   can be used.
-
-
-
-Ounsworth & Wussler     Expires 9 September 2023                [Page 5]
-
-Internet-Draft                KEM Combiner                    March 2023
-
+   the representation of a user ID, a public key or an OID, then hashing
+   or padding SHOULD be used.
 
    The parameter fixedInfo MAY contain any of the following information:
 
@@ -294,6 +330,13 @@ Internet-Draft                KEM Combiner                    March 2023
 
    *  Other public information shared between communication parties
       before or during the transaction, such as nonces.
+
+
+
+Ounsworth, et al.       Expires 11 September 2023               [Page 6]
+
+Internet-Draft                KEM Combiner                    March 2023
+
 
    *  An indication of the protocol or application employing the key-
       derivation method.
@@ -318,30 +361,38 @@ Internet-Draft                KEM Combiner                    March 2023
 
 4.  Practical instantiations
 
-   The KDF MUST be instantiated with one of the following Keccak-based
-   option.  Each instance defines a function to be used as KDF, a hash H
-   function to optionally derive the k_i, and a counter.
+   The KDF must be instantiated with cryptographically-secure choices
+   for KDF and H.  The following are RECOMMENDED Keccak-based
+   instatiations, but other choices MAY be made depending on
+   availability of cryptographic primitives, protocol design needs, and
+   especially to allow for future cryptographic agility.
+
+   Each instance defines a function to be used as KDF, a hash H function
+   to derive the k_i, and optionally a counter.
 
    1.  KDF = SHA3-256 and H = SHA3-256, with hashSize = 256 bit.
 
    2.  KDF = SHA3-512 and H = SHA3-512, with hashSize = 512 bit.
 
-   3.  KDF = KMAC128 and H = SHA3-256, with hashSize = 128 bit.
+   3.  KDF = SHAKE128 and H = SHA3-256, with hashSize at least 128 bit.
 
-   4.  KDF = KMAC256 and H = SHA3-512, with hashSize = 256 bit.
+   4.  KDF = SHAKE256 and H = SHA3-512, with hashSize at least 256 bit.
 
+   5.  KDF = KMAC128 and H = SHA3-256, with hashSize = 128 bit.
 
-
-
-Ounsworth & Wussler     Expires 9 September 2023                [Page 6]
-
-Internet-Draft                KEM Combiner                    March 2023
-
+   6.  KDF = KMAC256 and H = SHA3-512, with hashSize = 256 bit.
 
 4.1.  Hash-and-counter based construction
 
    Options 1 and 2 instantiate the KDF using SHA3, specified in NIST
    FIPS 202 [FIPS202].  To generate an outputBits long secret share ss:
+
+
+
+Ounsworth, et al.       Expires 11 September 2023               [Page 7]
+
+Internet-Draft                KEM Combiner                    March 2023
+
 
    *  the counter MUST be initialized with the value 0x00000001.
 
@@ -357,9 +408,23 @@ Internet-Draft                KEM Combiner                    March 2023
    error MUST be returned when producing more than 2^32 consecutive
    hashes.
 
-4.2.  KMAC based construction
+4.2.  XOF based constructions
 
-   Options 3 and 4 are KMAC-based, as specified in NIST SP 800-185
+   Options 3 and 4 are SHAKE-based, as specified in NIST SP FIPS 202
+   [FIPS202].
+
+   To generate an outputBits long secret share ss:
+
+   *  the counter MUST be set with the value 0x00000001.
+
+   *  A single iteration of the chosen SHAKE primitive is performed with
+      an output length d = outputBits.
+
+   *  The output is directly returned as ss.
+
+4.3.  KMAC based construction
+
+   Options 5 and 6 are KMAC-based, as specified in NIST SP 800-185
    [SP800-185].  To instantiate the function:
 
    *  The context S MUST be the utf-8 string "KDF".
@@ -376,23 +441,18 @@ Internet-Draft                KEM Combiner                    March 2023
    being outputBits.  This is compatible with the one-step KDF
    definition given in NIST SP800-56Cr2 [SP800-56C], Section 4.
 
-5.  IANA Considerations
-
-   None.
 
 
 
 
-
-
-
-
-
-
-Ounsworth & Wussler     Expires 9 September 2023                [Page 7]
+Ounsworth, et al.       Expires 11 September 2023               [Page 8]
 
 Internet-Draft                KEM Combiner                    March 2023
 
+
+5.  IANA Considerations
+
+   None.
 
 6.  Security Considerations
 
@@ -425,12 +485,26 @@ Internet-Draft                KEM Combiner                    March 2023
               Standards Publication (FIPS) 202 , 2015,
               <https://doi.org/10.6028/NIST.FIPS.202>.
 
+   [Giacon2018]
+              Giacon, F., Heuer, F., and B. Poettering, "KEM Combiners",
+              2018, <https://eprint.iacr.org/2018/024>.
+
    [I-D.driscoll-pqt-hybrid-terminology]
               D, F., "Terminology for Post-Quantum Traditional Hybrid
               Schemes", Work in Progress, Internet-Draft, draft-
               driscoll-pqt-hybrid-terminology-01, 20 October 2022,
               <https://datatracker.ietf.org/doc/html/draft-driscoll-pqt-
               hybrid-terminology-01>.
+
+
+
+
+
+
+Ounsworth, et al.       Expires 11 September 2023               [Page 9]
+
+Internet-Draft                KEM Combiner                    March 2023
+
 
    [I-D.ietf-ipsecme-ikev2-multiple-ke]
               Tjhai, C., Tomlinson, M., Bartlett, G., Fluhrer, S., Van
@@ -439,16 +513,6 @@ Internet-Draft                KEM Combiner                    March 2023
               draft-ietf-ipsecme-ikev2-multiple-ke-12, 1 December 2022,
               <https://datatracker.ietf.org/doc/html/draft-ietf-ipsecme-
               ikev2-multiple-ke-12>.
-
-
-
-
-
-
-Ounsworth & Wussler     Expires 9 September 2023                [Page 8]
-
-Internet-Draft                KEM Combiner                    March 2023
-
 
    [I-D.ietf-lamps-cmp-updates]
               Brockhaus, H., von Oheimb, D., and J. Gray, "Certificate
@@ -491,20 +555,17 @@ Internet-Draft                KEM Combiner                    March 2023
               RFC 8411, DOI 10.17487/RFC8411, August 2018,
               <https://www.rfc-editor.org/info/rfc8411>.
 
+
+
+Ounsworth, et al.       Expires 11 September 2023              [Page 10]
+
+Internet-Draft                KEM Combiner                    March 2023
+
+
    [RFC8696]  Housley, R., "Using Pre-Shared Key (PSK) in the
               Cryptographic Message Syntax (CMS)", RFC 8696,
               DOI 10.17487/RFC8696, December 2019,
               <https://www.rfc-editor.org/info/rfc8696>.
-
-
-
-
-
-
-Ounsworth & Wussler     Expires 9 September 2023                [Page 9]
-
-Internet-Draft                KEM Combiner                    March 2023
-
 
    [RFC8784]  Fluhrer, S., Kampanakis, P., McGrew, D., and V. Smyslov,
               "Mixing Preshared Keys in the Internet Key Exchange
@@ -550,17 +611,17 @@ Acknowledgements
    We are grateful to all, including any contributors who may have been
    inadvertently omitted from this list.
 
+
+
+Ounsworth, et al.       Expires 11 September 2023              [Page 11]
+
+Internet-Draft                KEM Combiner                    March 2023
+
+
    This document borrows text from similar documents, including those
    referenced below.  Thanks go to the authors of those documents.
    "Copying always makes things easier and less error prone" -
    [RFC8411].
-
-
-
-Ounsworth & Wussler     Expires 9 September 2023               [Page 10]
-
-Internet-Draft                KEM Combiner                    March 2023
-
 
 Authors' Addresses
 
@@ -578,6 +639,10 @@ Authors' Addresses
    Email: aron@wussler.it
 
 
+   Stavros Kousidis
+   BSI
+   Germany
+   Email: stavros.kousidis@bsi.bund.de
 
 
 
@@ -604,13 +669,4 @@ Authors' Addresses
 
 
 
-
-
-
-
-
-
-
-
-
-Ounsworth & Wussler     Expires 9 September 2023               [Page 11]
+Ounsworth, et al.       Expires 11 September 2023              [Page 12]
