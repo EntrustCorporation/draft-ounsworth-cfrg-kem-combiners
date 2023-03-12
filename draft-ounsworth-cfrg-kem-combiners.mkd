@@ -171,6 +171,29 @@ informative:
     date: 2020-12
     seriesinfo:
       ETSI TS 103 744 V1.1.1
+  Aviram2022:
+    title: "Practical (Post-Quantum) Key Combiners from One-Wayness and Applications to TLS."
+    target: "https://eprint.iacr.org/2022/065"
+    author:
+      -
+        ins: N. Aviram
+        name: Nimrod Aviram
+      - 
+        ins: B. Dowling
+        name: Benjamin Dowling
+      - 
+        ins: I. Komargodski
+        name: Ilan Komargodski
+      - 
+        ins: K.G. Paterson
+        name: Kenneth G Paterson
+      - 
+        ins: E. Ronen
+        name: Eyal Ronen
+      -
+        ins: E. Yogev
+        name: Eylon Yogev
+        ins: 
 
 --- abstract
 
