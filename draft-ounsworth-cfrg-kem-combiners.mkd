@@ -243,7 +243,7 @@ https://www.etsi.org/deliver/etsi_ts/103700_103799/103744/01.01.01_60/ts_103744v
 TODO: as per https://www.enisa.europa.eu/publications/post-quantum-cryptography-integration-study section 4.2, might need to specify behaviour in light of KEMs with a non-zero failure probability.
 
 
-A KEM combiner is a function that takes in two or more shared secrets `ss_i` and returns a combined shared secret `ss`, where all values are byte arrays.
+A KEM combiner is a function that takes in two or more shared secrets `ss_i` and returns a combined shared secret `ss`.
 
 ~~~
 ss = kemCombiner(ss_1, ss_2, ..., ss_n)
