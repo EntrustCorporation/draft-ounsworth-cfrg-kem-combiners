@@ -151,7 +151,7 @@ informative:
         ins: G. Assche
         name: Gilles van Assche
     date: 2008
-  KEMCombiners:
+  KEMC:
     target: https://doi.org/10.1007/978-3-319-76578-5_7
     title: KEM Combiners
     date: 2018
