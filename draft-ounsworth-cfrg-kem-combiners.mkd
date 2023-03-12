@@ -269,7 +269,7 @@ where:
 - `||` represents concatenation.
 
 In {{sec-instantiation}} are listed several possible practical instantiations, in compliance with NIST SP-800 56Cr2 {{SP800-56C}}.
-The shared secret `ss` MAY be used directly as a symmetric key, for example as a MAC key or as a Key Encryption Key (KEK) for key encapsulation.
+The shared secret `ss` MAY be used directly as a symmetric key, for example as a MAC key or as a Key Encryption Key (KEK).
 
 ## k_i construction {#sec-k_i-construction}
 
