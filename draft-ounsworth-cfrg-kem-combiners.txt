@@ -22,7 +22,7 @@ Abstract
 
    This document defines a flexible multi-share KEM combiner to join an
    arbitrary number of key shares, that is a multi-PRF compatible with
-   NIST SP 800-56Cr2 [SP800-56C].  The combiner defined here is (CCA)
+   NIST SP 800-56Cr2 [SP800-56C].  The combiner defined here is CCA-
    secure as long as at least one of the ingredient KEMs is.
 
 About This Document
@@ -285,7 +285,7 @@ Internet-Draft                KEM Combiner                    March 2023
 3.1.  k_i construction
 
    Following the guidance of Giacon et al.  [KEMCombiners], we wish for
-   a KEM combiner that is (CCA) secure as long as at least one of the
+   a KEM combiner that is CCA-secure as long as at least one of the
    ingredient KEMs is.  Ir order to protect against chosen ciphertext
    attacks, it is necessary to include both the shared secret ss_i and
    its corresponding ciphertext ct_i.  In addition, each k_i MUST be

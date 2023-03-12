@@ -10,7 +10,7 @@
 <meta content="Stavros Kousidis" name="author">
 <meta content="
        The migration to post-quantum cryptography often calls for performing multiple key encapsulations in parallel and then combining their outputs to derive a single shared secret. 
-       This document defines a flexible multi-share KEM combiner to join an arbitrary number of key shares, that is a multi-PRF compatible with NIST SP 800-56Cr2  . The combiner defined here is (CCA) secure as long as at least one of the ingredient
+       This document defines a flexible multi-share KEM combiner to join an arbitrary number of key shares, that is a multi-PRF compatible with NIST SP 800-56Cr2  . The combiner defined here is CCA-secure as long as at least one of the ingredient
 KEMs is. 
        
 
@@ -1224,7 +1224,7 @@ li > p:last-of-type {
 <section id="section-abstract">
       <h2 id="abstract"><a href="#abstract" class="selfRef">Abstract</a></h2>
 <p id="section-abstract-1">The migration to post-quantum cryptography often calls for performing multiple key encapsulations in parallel and then combining their outputs to derive a single shared secret.<a href="#section-abstract-1" class="pilcrow">¶</a></p>
-<p id="section-abstract-2">This document defines a flexible multi-share KEM combiner to join an arbitrary number of key shares, that is a multi-PRF compatible with NIST SP 800-56Cr2 <span>[<a href="#SP800-56C" class="xref">SP800-56C</a>]</span>. The combiner defined here is (CCA) secure as long as at least one of the ingredient
+<p id="section-abstract-2">This document defines a flexible multi-share KEM combiner to join an arbitrary number of key shares, that is a multi-PRF compatible with NIST SP 800-56Cr2 <span>[<a href="#SP800-56C" class="xref">SP800-56C</a>]</span>. The combiner defined here is CCA-secure as long as at least one of the ingredient
 KEMs is.<a href="#section-abstract-2" class="pilcrow">¶</a></p>
 </section>
 <section class="note rfcEditorRemove" id="section-note.1">
@@ -1493,7 +1493,7 @@ The shared secret <code>ss</code> MAY be used directly as a symmetric key, for e
         <h3 id="name-k_i-construction-2">
 <a href="#section-3.1" class="section-number selfRef">3.1. </a><a href="#name-k_i-construction-2" class="section-name selfRef">k_i construction</a>
         </h3>
-<p id="section-3.1-1">Following the guidance of Giacon et al. <span>[<a href="#KEMCombiners" class="xref">KEMCombiners</a>]</span>, we wish for a KEM combiner that is (CCA) secure as long as at least one of the ingredient KEMs is. Ir order to protect against chosen ciphertext attacks, it is necessary to include both the shared secret <code>ss_i</code> and its corresponding ciphertext <code>ct_i</code>. In addition, each <code>k_i</code> MUST be constant in length to prevent abuse of the underlying hash function, therefore the secret shares <code>ss_i || ct_i</code> MUST be hashed prior to inclusion in the overall construction described in <a href="#tab-kemCombiner" class="xref">Figure 1</a>:<a href="#section-3.1-1" class="pilcrow">¶</a></p>
+<p id="section-3.1-1">Following the guidance of Giacon et al. <span>[<a href="#KEMCombiners" class="xref">KEMCombiners</a>]</span>, we wish for a KEM combiner that is CCA-secure as long as at least one of the ingredient KEMs is. Ir order to protect against chosen ciphertext attacks, it is necessary to include both the shared secret <code>ss_i</code> and its corresponding ciphertext <code>ct_i</code>. In addition, each <code>k_i</code> MUST be constant in length to prevent abuse of the underlying hash function, therefore the secret shares <code>ss_i || ct_i</code> MUST be hashed prior to inclusion in the overall construction described in <a href="#tab-kemCombiner" class="xref">Figure 1</a>:<a href="#section-3.1-1" class="pilcrow">¶</a></p>
 <div class="alignLeft art-text artwork" id="section-3.1-2">
 <pre>
 k_i = H(ss_i || ct_i)
