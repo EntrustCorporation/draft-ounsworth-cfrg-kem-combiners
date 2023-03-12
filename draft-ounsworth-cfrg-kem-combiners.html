@@ -1445,7 +1445,7 @@ def kemDecaps(ct, sk) -&gt; ss
 <p id="section-3-1">TODO: read and cite the ETSI doc "Quantum-safe Hybrid Key Exchanges"
 https://www.etsi.org/deliver/etsi_ts/103700_103799/103744/01.01.01_60/ts_103744v010101p.pdf<a href="#section-3-1" class="pilcrow">¶</a></p>
 <p id="section-3-2">TODO: as per https://www.enisa.europa.eu/publications/post-quantum-cryptography-integration-study section 4.2, might need to specify behaviour in light of KEMs with a non-zero failure probability.<a href="#section-3-2" class="pilcrow">¶</a></p>
-<p id="section-3-3">A KEM combiner is a function that takes in two or more shared secrets <code>ss_i</code> and returns a combined shared secret <code>ss</code>, where all values are byte arrays.<a href="#section-3-3" class="pilcrow">¶</a></p>
+<p id="section-3-3">A KEM combiner is a function that takes in two or more shared secrets <code>ss_i</code> and returns a combined shared secret <code>ss</code>.<a href="#section-3-3" class="pilcrow">¶</a></p>
 <div class="alignLeft art-text artwork" id="section-3-4">
 <pre>
 ss = kemCombiner(ss_1, ss_2, ..., ss_n)
@@ -1480,20 +1480,20 @@ KDF(counter || k_1 || ... || k_n || fixedInfo, outputBits)
           <code>counter</code> parameter is instantiation-specific and is discussed in <a href="#sec-instantiation" class="xref">Section 4</a>.<a href="#section-3-9.4" class="pilcrow">¶</a>
 </li>
         <li class="normal" id="section-3-9.5">
-          <code>outputBits</code> determines the length of the key to output,<a href="#section-3-9.5" class="pilcrow">¶</a>
+          <code>outputBits</code> determines the length of the output keying material,<a href="#section-3-9.5" class="pilcrow">¶</a>
 </li>
         <li class="normal" id="section-3-9.6">
           <code>||</code> represents concatenation.<a href="#section-3-9.6" class="pilcrow">¶</a>
 </li>
       </ul>
-<p id="section-3-10">In <a href="#sec-instantiation" class="xref">Section 4</a> are listed several possible practical instantiations, in compliance with NIST SP-800 56Cr2 <span>[<a href="#SP800-56C" class="xref">SP800-56C</a>]</span>.
-The shared secret <code>ss</code> MAY be used directly as a symmetric key, for example as a MAC key or as a Key Encryption Key (KEK) for key encapsulation.<a href="#section-3-10" class="pilcrow">¶</a></p>
+<p id="section-3-10">In <a href="#sec-instantiation" class="xref">Section 4</a> several possible practical instantiations are listed that are in compliance with NIST SP-800 56Cr2 <span>[<a href="#SP800-56C" class="xref">SP800-56C</a>]</span>.
+The shared secret <code>ss</code> MAY be used directly as a symmetric key, for example as a MAC key or as a Key Encryption Key (KEK).<a href="#section-3-10" class="pilcrow">¶</a></p>
 <div id="sec-k_i-construction">
 <section id="section-3.1">
         <h3 id="name-k_i-construction-2">
 <a href="#section-3.1" class="section-number selfRef">3.1. </a><a href="#name-k_i-construction-2" class="section-name selfRef">k_i construction</a>
         </h3>
-<p id="section-3.1-1">Following the guidance of Giacon et al. <span>[<a href="#KEMCombiners" class="xref">KEMCombiners</a>]</span>, we wish for a KEM combiner that is CCA-secure as long as at least one of the ingredient KEMs is. Ir order to protect against chosen ciphertext attacks, it is necessary to include both the shared secret <code>ss_i</code> and its corresponding ciphertext <code>ct_i</code>. In addition, each <code>k_i</code> MUST be constant in length to prevent abuse of the underlying hash function, therefore the secret shares <code>ss_i || ct_i</code> MUST be hashed prior to inclusion in the overall construction described in <a href="#tab-kemCombiner" class="xref">Figure 1</a>:<a href="#section-3.1-1" class="pilcrow">¶</a></p>
+<p id="section-3.1-1">Following the guidance of Giacon et al. <span>[<a href="#KEMC" class="xref">KEMC</a>]</span>, we wish for a KEM combiner that is CCA-secure as long as at least one of the ingredient KEMs is. Ir order to protect against chosen ciphertext attacks, it is necessary to include both the shared secret <code>ss_i</code> and its corresponding ciphertext <code>ct_i</code>. In addition, each <code>k_i</code> MUST be constant in length to prevent abuse of the underlying hash function, therefore the secret shares <code>ss_i || ct_i</code> MUST be hashed prior to inclusion in the overall construction described in <a href="#tab-kemCombiner" class="xref">Figure 1</a>:<a href="#section-3.1-1" class="pilcrow">¶</a></p>
 <div class="alignLeft art-text artwork" id="section-3.1-2">
 <pre>
 k_i = H(ss_i || ct_i)
@@ -1655,10 +1655,10 @@ Hence, to be able to distinguish a key <code>k</code>, derived from shared keys 
 the newly formed combined KEM is IND-CCA2 secure as long as at least one of the
 ingredient KEMs is. Indeed, the above stated indifferentiability from a random
 oracle qualifies Keccak as a split-key pseudorandom function as defined in
-<span>[<a href="#KEMCombiners" class="xref">KEMCombiners</a>]</span>. That is, Keccak behaves like a random function if at least
+<span>[<a href="#KEMC" class="xref">KEMC</a>]</span>. That is, Keccak behaves like a random function if at least
 one input shared secret <code>ss_i</code> is picked uniformly at random. Our construction
 can thus be seen as an instantiation of the IND-CCA2 preserving Example 3 in
-Figure 1 of <span>[<a href="#KEMCombiners" class="xref">KEMCombiners</a>]</span>, up to some reordering of input shared secrets and
+Figure 1 of <span>[<a href="#KEMC" class="xref">KEMC</a>]</span>, up to some reordering of input shared secrets and
 ciphertexts and their potential compression by a cryptographic hash function.<a href="#section-6-2" class="pilcrow">¶</a></p>
 </section>
 </div>
@@ -1682,7 +1682,7 @@ ciphertexts and their potential compression by a cryptographic hash function.<a 
 <a href="#section-7.2" class="section-number selfRef">7.2. </a><a href="#name-informative-references-2" class="section-name selfRef">Informative References</a>
         </h3>
 <dl class="references">
-<dt id="ETSI-hybridKEM">[ETSI-hybridKEM]</dt>
+<dt id="ETSI-QHKE">[ETSI-QHKE]</dt>
         <dd>
 <span class="refTitle">"Quantum-safe Hybrid Key Exchanges"</span>, <span class="seriesInfo">ETSI TS 103 744 V1.1.1 </span>, <time datetime="2020-12" class="refDate">December 2020</time>, <span>&lt;<a href="https://www.etsi.org/deliver/etsi_ts/103700_103799/103744/01.01.01_60/ts_103744v010101p.pdf">https://www.etsi.org/deliver/etsi_ts/103700_103799/103744/01.01.01_60/ts_103744v010101p.pdf</a>&gt;</span>. </dd>
 <dd class="break"></dd>
@@ -1714,7 +1714,7 @@ ciphertexts and their potential compression by a cryptographic hash function.<a 
         <dd>
 <span class="refAuthor">Kousidis, S.</span>, <span class="refAuthor">Strenzke, F.</span>, and <span class="refAuthor">A. Wussler</span>, <span class="refTitle">"Post-Quantum Cryptography in OpenPGP"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-wussler-openpgp-pqc-00</span>, <time datetime="2022-12-21" class="refDate">21 December 2022</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-wussler-openpgp-pqc-00">https://datatracker.ietf.org/doc/html/draft-wussler-openpgp-pqc-00</a>&gt;</span>. </dd>
 <dd class="break"></dd>
-<dt id="KEMCombiners">[KEMCombiners]</dt>
+<dt id="KEMC">[KEMC]</dt>
         <dd>
 <span class="refAuthor">Giacon, F.</span>, <span class="refAuthor">Heuer, F.</span>, and <span class="refAuthor">B. Poettering</span>, <span class="refTitle">"KEM Combiners"</span>, <time datetime="2018" class="refDate">2018</time>, <span>&lt;<a href="https://doi.org/10.1007/978-3-319-76578-5_7">https://doi.org/10.1007/978-3-319-76578-5_7</a>&gt;</span>. </dd>
 <dd class="break"></dd>

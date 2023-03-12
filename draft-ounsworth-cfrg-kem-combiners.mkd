@@ -268,12 +268,12 @@ where:
 - `outputBits` determines the length of the output keying material,
 - `||` represents concatenation.
 
-In {{sec-instantiation}} are listed several possible practical instantiations, in compliance with NIST SP-800 56Cr2 {{SP800-56C}}.
+In {{sec-instantiation}} several possible practical instantiations are listed that are in compliance with NIST SP-800 56Cr2 {{SP800-56C}}.
 The shared secret `ss` MAY be used directly as a symmetric key, for example as a MAC key or as a Key Encryption Key (KEK).
 
 ## k_i construction {#sec-k_i-construction}
 
-Following the guidance of Giacon et al. [KEMCombiners], we wish for a KEM combiner that is CCA-secure as long as at least one of the ingredient KEMs is. Ir order to protect against chosen ciphertext attacks, it is necessary to include both the shared secret `ss_i` and its corresponding ciphertext `ct_i`. In addition, each `k_i` MUST be constant in length to prevent abuse of the underlying hash function, therefore the secret shares `ss_i || ct_i` MUST be hashed prior to inclusion in the overall construction described in {{tab-kemCombiner}}:
+Following the guidance of Giacon et al. [KEMC], we wish for a KEM combiner that is CCA-secure as long as at least one of the ingredient KEMs is. Ir order to protect against chosen ciphertext attacks, it is necessary to include both the shared secret `ss_i` and its corresponding ciphertext `ct_i`. In addition, each `k_i` MUST be constant in length to prevent abuse of the underlying hash function, therefore the secret shares `ss_i || ct_i` MUST be hashed prior to inclusion in the overall construction described in {{tab-kemCombiner}}:
 
 ~~~
 k_i = H(ss_i || ct_i)
@@ -376,10 +376,10 @@ The proposed construction in {{sec-kem-combiner}} with the instantiations in
 the newly formed combined KEM is IND-CCA2 secure as long as at least one of the
 ingredient KEMs is. Indeed, the above stated indifferentiability from a random
 oracle qualifies Keccak as a split-key pseudorandom function as defined in
-{{KEMCombiners}}. That is, Keccak behaves like a random function if at least
+{{KEMC}}. That is, Keccak behaves like a random function if at least
 one input shared secret `ss_i` is picked uniformly at random. Our construction
 can thus be seen as an instantiation of the IND-CCA2 preserving Example 3 in
-Figure 1 of {{KEMCombiners}}, up to some reordering of input shared secrets and
+Figure 1 of {{KEMC}}, up to some reordering of input shared secrets and
 ciphertexts and their potential compression by a cryptographic hash function. 
 
 <!-- Start of Appendices -->

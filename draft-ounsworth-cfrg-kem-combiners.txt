@@ -231,8 +231,7 @@ Internet-Draft                KEM Combiner                    March 2023
    behaviour in light of KEMs with a non-zero failure probability.
 
    A KEM combiner is a function that takes in two or more shared secrets
-   ss_i and returns a combined shared secret ss, where all values are
-   byte arrays.
+   ss_i and returns a combined shared secret ss.
 
    ss = kemCombiner(ss_1, ss_2, ..., ss_n)
 
@@ -265,14 +264,15 @@ Internet-Draft                KEM Combiner                    March 2023
    *  counter parameter is instantiation-specific and is discussed in
       Section 4.
 
-   *  outputBits determines the length of the key to output,
+   *  outputBits determines the length of the output keying material,
 
    *  || represents concatenation.
 
-   In Section 4 are listed several possible practical instantiations, in
-   compliance with NIST SP-800 56Cr2 [SP800-56C].  The shared secret ss
-   MAY be used directly as a symmetric key, for example as a MAC key or
-   as a Key Encryption Key (KEK) for key encapsulation.
+   In Section 4 several possible practical instantiations are listed
+   that are in compliance with NIST SP-800 56Cr2 [SP800-56C].  The
+   shared secret ss MAY be used directly as a symmetric key, for example
+   as a MAC key or as a Key Encryption Key (KEK).
+
 
 
 
@@ -284,11 +284,11 @@ Internet-Draft                KEM Combiner                    March 2023
 
 3.1.  k_i construction
 
-   Following the guidance of Giacon et al.  [KEMCombiners], we wish for
-   a KEM combiner that is CCA-secure as long as at least one of the
-   ingredient KEMs is.  Ir order to protect against chosen ciphertext
-   attacks, it is necessary to include both the shared secret ss_i and
-   its corresponding ciphertext ct_i.  In addition, each k_i MUST be
+   Following the guidance of Giacon et al.  [KEMC], we wish for a KEM
+   combiner that is CCA-secure as long as at least one of the ingredient
+   KEMs is.  Ir order to protect against chosen ciphertext attacks, it
+   is necessary to include both the shared secret ss_i and its
+   corresponding ciphertext ct_i.  In addition, each k_i MUST be
    constant in length to prevent abuse of the underlying hash function,
    therefore the secret shares ss_i || ct_i MUST be hashed prior to
    inclusion in the overall construction described in Figure 1:
@@ -486,13 +486,13 @@ Internet-Draft                KEM Combiner                    March 2023
    newly formed combined KEM is IND-CCA2 secure as long as at least one
    of the ingredient KEMs is.  Indeed, the above stated
    indifferentiability from a random oracle qualifies Keccak as a split-
-   key pseudorandom function as defined in [KEMCombiners].  That is,
-   Keccak behaves like a random function if at least one input shared
-   secret ss_i is picked uniformly at random.  Our construction can thus
-   be seen as an instantiation of the IND-CCA2 preserving Example 3 in
-   Figure 1 of [KEMCombiners], up to some reordering of input shared
-   secrets and ciphertexts and their potential compression by a
-   cryptographic hash function.
+   key pseudorandom function as defined in [KEMC].  That is, Keccak
+   behaves like a random function if at least one input shared secret
+   ss_i is picked uniformly at random.  Our construction can thus be
+   seen as an instantiation of the IND-CCA2 preserving Example 3 in
+   Figure 1 of [KEMC], up to some reordering of input shared secrets and
+   ciphertexts and their potential compression by a cryptographic hash
+   function.
 
 7.  References
 
@@ -513,7 +513,7 @@ Internet-Draft                KEM Combiner                    March 2023
 
 7.2.  Informative References
 
-   [ETSI-hybridKEM]
+   [ETSI-QHKE]
               "Quantum-safe Hybrid Key Exchanges", ETSI TS 103 744
               V1.1.1 , December 2020, <https://www.etsi.org/deliver/
               etsi_ts/103700_103799/103744/01.01.01_60/
@@ -576,8 +576,7 @@ Internet-Draft                KEM Combiner                    March 2023
               <https://datatracker.ietf.org/doc/html/draft-wussler-
               openpgp-pqc-00>.
 
-   [KEMCombiners]
-              Giacon, F., Heuer, F., and B. Poettering, "KEM Combiners",
+   [KEMC]     Giacon, F., Heuer, F., and B. Poettering, "KEM Combiners",
               2018, <https://doi.org/10.1007/978-3-319-76578-5_7>.
 
    [PQCAPI]   Project, N. P.-Q. C., "PQC - API notes", November 2022,
@@ -609,6 +608,7 @@ Internet-Draft                KEM Combiner                    March 2023
               Functions: cSHAKE, KMAC, TupleHash, and ParallelHash",
               NIST Special Publication 800-185 , 2016,
               <https://doi.org/10.6028/NIST.SP.800-185>.
+
 
 
 
