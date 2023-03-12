@@ -347,8 +347,6 @@ Each instance defines a function to be used as `KDF`, a hash `H` function to der
 
 1. `KDF = SHA3-256` and `H = SHA3-256`, with `hashSize = 256 bit`.
 1. `KDF = SHA3-512` and `H = SHA3-512`, with `hashSize = 512 bit`.
-1. `KDF = SHAKE128` and `H = SHA3-256`, with `hashSize` at least 128 bit.
-1. `KDF = SHAKE256` and `H = SHA3-512`, with `hashSize` at least 256 bit.
 1. `KDF = KMAC128` and `H = SHA3-256`, with `hashSize = 128 bit`.
 1. `KDF = KMAC256` and `H = SHA3-512`, with `hashSize = 256 bit`.
 
@@ -363,17 +361,8 @@ To generate an `outputBits` long secret share `ss`:
 
 An implementation MUST NOT overflow and reuse the `counter` and an error MUST be returned when producing more than 2^32 consecutive hashes.
 
-## XOF based constructions
-Options 3 and 4 are SHAKE-based, as specified in NIST SP FIPS 202 {{FIPS202}}.
-
-To generate an `outputBits` long secret share `ss`:
-
-* the `counter` MUST be set with the value `0x00000001`.
-* A single iteration of the chosen SHAKE primitive is performed with an output length `d = outputBits`.
-* The output is directly returned as `ss`.
-
 ## KMAC based construction
-Options 5 and 6 are KMAC-based, as specified in NIST SP 800-185 {{SP800-185}}.
+Options 3 and 4 are KMAC-based, as specified in NIST SP 800-185 {{SP800-185}}.
 To instantiate the function:
 
 * The context `S` MUST be the utf-8 string "KDF".

@@ -94,15 +94,15 @@ Table of Contents
      3.2.  Protocol binding  . . . . . . . . . . . . . . . . . . . .   6
    4.  Practical instantiations  . . . . . . . . . . . . . . . . . .   7
      4.1.  Hash-and-counter based construction . . . . . . . . . . .   8
-     4.2.  XOF based constructions . . . . . . . . . . . . . . . . .   8
-     4.3.  KMAC based construction . . . . . . . . . . . . . . . . .   8
-   5.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .   9
+     4.2.  KMAC based construction . . . . . . . . . . . . . . . . .   8
+   5.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .   8
    6.  Security Considerations . . . . . . . . . . . . . . . . . . .   9
    7.  References  . . . . . . . . . . . . . . . . . . . . . . . . .   9
      7.1.  Normative References  . . . . . . . . . . . . . . . . . .   9
-     7.2.  Informative References  . . . . . . . . . . . . . . . . .  10
+     7.2.  Informative References  . . . . . . . . . . . . . . . . .   9
    Acknowledgements  . . . . . . . . . . . . . . . . . . . . . . . .  12
    Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  12
+
 
 
 
@@ -385,7 +385,7 @@ Internet-Draft                KEM Combiner                    March 2023
 
    2.  KDF = SHA3-512 and H = SHA3-512, with hashSize = 512 bit.
 
-   3.  KDF = SHAKE128 and H = SHA3-256, with hashSize at least 128 bit.
+   3.  KDF = KMAC128 and H = SHA3-256, with hashSize = 128 bit.
 
 
 
@@ -394,11 +394,7 @@ Ounsworth, et al.       Expires 13 September 2023               [Page 7]
 Internet-Draft                KEM Combiner                    March 2023
 
 
-   4.  KDF = SHAKE256 and H = SHA3-512, with hashSize at least 256 bit.
-
-   5.  KDF = KMAC128 and H = SHA3-256, with hashSize = 128 bit.
-
-   6.  KDF = KMAC256 and H = SHA3-512, with hashSize = 256 bit.
+   4.  KDF = KMAC256 and H = SHA3-512, with hashSize = 256 bit.
 
 4.1.  Hash-and-counter based construction
 
@@ -419,36 +415,12 @@ Internet-Draft                KEM Combiner                    March 2023
    error MUST be returned when producing more than 2^32 consecutive
    hashes.
 
-4.2.  XOF based constructions
+4.2.  KMAC based construction
 
-   Options 3 and 4 are SHAKE-based, as specified in NIST SP FIPS 202
-   [FIPS202].
-
-   To generate an outputBits long secret share ss:
-
-   *  the counter MUST be set with the value 0x00000001.
-
-   *  A single iteration of the chosen SHAKE primitive is performed with
-      an output length d = outputBits.
-
-   *  The output is directly returned as ss.
-
-4.3.  KMAC based construction
-
-   Options 5 and 6 are KMAC-based, as specified in NIST SP 800-185
+   Options 3 and 4 are KMAC-based, as specified in NIST SP 800-185
    [SP800-185].  To instantiate the function:
 
    *  The context S MUST be the utf-8 string "KDF".
-
-
-
-
-
-
-Ounsworth, et al.       Expires 13 September 2023               [Page 8]
-
-Internet-Draft                KEM Combiner                    March 2023
-
 
    *  The key K MUST be a context-specific string of at least hashSize
       bits, and it MAY be used as an additional option to perform
@@ -465,6 +437,18 @@ Internet-Draft                KEM Combiner                    March 2023
 5.  IANA Considerations
 
    None.
+
+
+
+
+
+
+
+
+Ounsworth, et al.       Expires 13 September 2023               [Page 8]
+
+Internet-Draft                KEM Combiner                    March 2023
+
 
 6.  Security Considerations
 
@@ -498,14 +482,6 @@ Internet-Draft                KEM Combiner                    March 2023
 
 7.1.  Normative References
 
-
-
-
-Ounsworth, et al.       Expires 13 September 2023               [Page 9]
-
-Internet-Draft                KEM Combiner                    March 2023
-
-
    [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
               Requirement Levels", BCP 14, RFC 2119,
               DOI 10.17487/RFC2119, March 1997,
@@ -518,6 +494,17 @@ Internet-Draft                KEM Combiner                    March 2023
               Ronen, E., and E. Yogev, "Practical (Post-Quantum) Key
               Combiners from One-Wayness and Applications to TLS.",
               n.d., <https://eprint.iacr.org/2022/065>.
+
+
+
+
+
+
+
+Ounsworth, et al.       Expires 13 September 2023               [Page 9]
+
+Internet-Draft                KEM Combiner                    March 2023
+
 
    [ETSI-QHKE]
               "Quantum-safe Hybrid Key Exchanges", ETSI TS 103 744
@@ -552,16 +539,6 @@ Internet-Draft                KEM Combiner                    March 2023
               2022, <https://datatracker.ietf.org/doc/html/draft-ietf-
               lamps-cmp-updates-23>.
 
-
-
-
-
-
-Ounsworth, et al.       Expires 13 September 2023              [Page 10]
-
-Internet-Draft                KEM Combiner                    March 2023
-
-
    [I-D.ietf-tls-hybrid-design]
               Stebila, D., Fluhrer, S., and S. Gueron, "Hybrid key
               exchange in TLS 1.3", Work in Progress, Internet-Draft,
@@ -575,6 +552,15 @@ Internet-Draft                KEM Combiner                    March 2023
               ounsworth-pq-composite-kem-00, 11 July 2022,
               <https://datatracker.ietf.org/doc/html/draft-ounsworth-pq-
               composite-kem-00>.
+
+
+
+
+
+Ounsworth, et al.       Expires 13 September 2023              [Page 10]
+
+Internet-Draft                KEM Combiner                    March 2023
+
 
    [I-D.wussler-openpgp-pqc]
               Kousidis, S., Strenzke, F., and A. Wussler, "Post-Quantum
@@ -610,14 +596,6 @@ Internet-Draft                KEM Combiner                    March 2023
               RFC 8784, DOI 10.17487/RFC8784, June 2020,
               <https://www.rfc-editor.org/info/rfc8784>.
 
-
-
-
-Ounsworth, et al.       Expires 13 September 2023              [Page 11]
-
-Internet-Draft                KEM Combiner                    March 2023
-
-
    [SP800-185]
               Kelsey, J., Chan, S., and R. Perln, "SHA-3 Derived
               Functions: cSHAKE, KMAC, TupleHash, and ParallelHash",
@@ -630,6 +608,15 @@ Internet-Draft                KEM Combiner                    March 2023
               Schemes Using Discrete Logarithm Cryptography", NIST
               Special Publication 800-56A , April 2018,
               <https://doi.org/10.6028/NIST.SP.800-56Ar3>.
+
+
+
+
+
+Ounsworth, et al.       Expires 13 September 2023              [Page 11]
+
+Internet-Draft                KEM Combiner                    March 2023
+
 
    [SP800-56C]
               Barker, E., Chen, L., and R. Davis, "Recommendation for
@@ -663,17 +650,6 @@ Acknowledgements
 
 Authors' Addresses
 
-
-
-
-
-
-
-Ounsworth, et al.       Expires 13 September 2023              [Page 12]
-
-Internet-Draft                KEM Combiner                    March 2023
-
-
    Mike Ounsworth
    Entrust Limited
    2500 Solandt Road – Suite 100
@@ -688,10 +664,34 @@ Internet-Draft                KEM Combiner                    March 2023
    Email: aron@wussler.it
 
 
+
+
+
+
+
+Ounsworth, et al.       Expires 13 September 2023              [Page 12]
+
+Internet-Draft                KEM Combiner                    March 2023
+
+
    Stavros Kousidis
    BSI
    Germany
    Email: stavros.kousidis@bsi.bund.de
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
