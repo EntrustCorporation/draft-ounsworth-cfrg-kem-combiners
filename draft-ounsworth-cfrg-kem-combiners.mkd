@@ -265,7 +265,7 @@ where:
 - `k_i` represent the constant-length input keys and is discussed in {{sec-k_i-construction}},
 - `fixedInfo` is some protocol-specific KDF binding,
 - `counter` parameter is instantiation-specific and is discussed in {{sec-instantiation}}.
-- `outputBits` determines the length of the key to output,
+- `outputBits` determines the length of the output keying material,
 - `||` represents concatenation.
 
 In {{sec-instantiation}} are listed several possible practical instantiations, in compliance with NIST SP-800 56Cr2 {{SP800-56C}}.
