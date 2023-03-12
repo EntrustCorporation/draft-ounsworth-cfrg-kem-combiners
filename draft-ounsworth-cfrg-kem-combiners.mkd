@@ -165,7 +165,7 @@ informative:
       -
         ins: B. Poettering
         name: Bertram Poettering
-  ETSI-hybridKEM:
+  ETSI-QHKE:
     target: https://www.etsi.org/deliver/etsi_ts/103700_103799/103744/01.01.01_60/ts_103744v010101p.pdf
     title: Quantum-safe Hybrid Key Exchanges
     date: 2020-12
