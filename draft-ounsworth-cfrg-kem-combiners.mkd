@@ -151,7 +151,7 @@ informative:
         ins: G. Assche
         name: Gilles van Assche
     date: 2008
-  KEMCombiners:
+  KEMC:
     target: https://doi.org/10.1007/978-3-319-76578-5_7
     title: KEM Combiners
     date: 2018
@@ -165,7 +165,7 @@ informative:
       -
         ins: B. Poettering
         name: Bertram Poettering
-  ETSI-hybridKEM:
+  ETSI-QHKE:
     target: https://www.etsi.org/deliver/etsi_ts/103700_103799/103744/01.01.01_60/ts_103744v010101p.pdf
     title: Quantum-safe Hybrid Key Exchanges
     date: 2020-12
@@ -243,7 +243,7 @@ https://www.etsi.org/deliver/etsi_ts/103700_103799/103744/01.01.01_60/ts_103744v
 TODO: as per https://www.enisa.europa.eu/publications/post-quantum-cryptography-integration-study section 4.2, might need to specify behaviour in light of KEMs with a non-zero failure probability.
 
 
-A KEM combiner is a function that takes in two or more shared secrets `ss_i` and returns a combined shared secret `ss`, where all values are byte arrays.
+A KEM combiner is a function that takes in two or more shared secrets `ss_i` and returns a combined shared secret `ss`.
 
 ~~~
 ss = kemCombiner(ss_1, ss_2, ..., ss_n)
@@ -265,11 +265,11 @@ where:
 - `k_i` represent the constant-length input keys and is discussed in {{sec-k_i-construction}},
 - `fixedInfo` is some protocol-specific KDF binding,
 - `counter` parameter is instantiation-specific and is discussed in {{sec-instantiation}}.
-- `outputBits` determines the length of the key to output,
+- `outputBits` determines the length of the output keying material,
 - `||` represents concatenation.
 
 In {{sec-instantiation}} are listed several possible practical instantiations, in compliance with NIST SP-800 56Cr2 {{SP800-56C}}.
-The shared secret `ss` MAY be used directly as a symmetric key, for example as a MAC key or as a Key Encryption Key (KEK) for key encapsulation.
+The shared secret `ss` MAY be used directly as a symmetric key, for example as a MAC key or as a Key Encryption Key (KEK).
 
 ## k_i construction {#sec-k_i-construction}
 
