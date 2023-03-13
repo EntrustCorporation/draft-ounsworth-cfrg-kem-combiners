@@ -1512,8 +1512,8 @@ k_i = ss_i || ct_i
         </h3>
 <p id="section-3.2-1">The <code>fixedInfo</code> string is a fixed-length string containing some context-specific information.
 It MUST NOT depend on the secret shares. The intention is to prevent cross-protocol attacks by making this key derivation unique to its protocol context.<a href="#section-3.2-1" class="pilcrow">¶</a></p>
-<p id="section-3.2-2">The <code>fixedInfo</code> string MUST have a definite structure depending on the protocol where all parts are fixed length  . This prevents a variable length structure from creating collisions between two different instances.
-In cases some variable length input is necessary, such as the representation of a user ID, a public key or an OID, then hashing or padding SHOULD be used.<a href="#section-3.2-2" class="pilcrow">¶</a></p>
+<p id="section-3.2-2">The <code>fixedInfo</code> string MUST have a definite structure depending on the protocol where all parts are fixed length. This prevents a variable length structure from creating collisions between two different instances.
+In cases some variable length input is necessary, such as the representation of a user ID, a public key, or an OID, then hashing or padding MAY be used.<a href="#section-3.2-2" class="pilcrow">¶</a></p>
 <p id="section-3.2-3">The parameter fixedInfo MAY contain any of the following information:<a href="#section-3.2-3" class="pilcrow">¶</a></p>
 <ul class="normal">
 <li class="normal" id="section-3.2-4.1">Public information about the communication parties, such as their identifiers.<a href="#section-3.2-4.1" class="pilcrow">¶</a>
