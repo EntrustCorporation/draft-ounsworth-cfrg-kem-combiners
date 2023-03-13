@@ -322,7 +322,7 @@ The `fixedInfo` string is a fixed-length string containing some context-specific
 It MUST NOT depend on the secret shares. The intention is to prevent cross-protocol attacks by making this key derivation unique to its protocol context.
 
 The `fixedInfo` string MUST have a definite structure depending on the protocol where all parts are fixed length. This prevents a variable length structure from creating collisions between two different instances.
-In cases some variable length input is necessary, such as the representation of a user ID, a public key or an OID, then hashing or padding SHOULD be used.
+In cases some variable length input is necessary, such as the representation of a user ID, a public key, or an OID, then hashing or padding MAY be used.
 
 The parameter fixedInfo MAY contain any of the following information:
 
