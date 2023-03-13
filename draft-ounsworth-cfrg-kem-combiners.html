@@ -10,8 +10,7 @@
 <meta content="Stavros Kousidis" name="author">
 <meta content="
        The migration to post-quantum cryptography often calls for performing multiple key encapsulations in parallel and then combining their outputs to derive a single shared secret. 
-       This document defines a comprehensible and easy to implement Keccak-based KEM combiner to join an arbitrary number of key shares, that is compatible with NIST SP 800-56Cr2   when viewed as a key derivation function. The combiner defined here is a multi-PRF and CCA-secure as long as at least one of the ingredient
-KEMs is. 
+       This document defines a comprehensible and easy to implement Keccak-based KEM combiner to join an arbitrary number of key shares, that is compatible with NIST SP 800-56Cr2   when viewed as a key derivation function. The combiners defined here are practical multi-PRFs and are CCA-secure as long as at least one of the ingredient KEMs is. 
        
 
 
@@ -19,7 +18,7 @@ KEMs is.
     " name="description">
 <meta content="xml2rfc 3.12.2" name="generator">
 <meta content="Internet-Draft" name="keyword">
-<meta content="draft-ounsworth-cfrg-kem-combiners-02" name="ietf.draft">
+<meta content="draft-ounsworth-cfrg-kem-combiners-03" name="ietf.draft">
 <!-- Generator version information:
   xml2rfc 3.12.2
     Python 3.10.6
@@ -1194,7 +1193,7 @@ li > p:last-of-type {
 <dt class="label-workgroup">Workgroup:</dt>
 <dd class="workgroup">CFRG</dd>
 <dt class="label-internet-draft">Internet-Draft:</dt>
-<dd class="internet-draft">draft-ounsworth-cfrg-kem-combiners-02</dd>
+<dd class="internet-draft">draft-ounsworth-cfrg-kem-combiners-03</dd>
 <dt class="label-published">Published:</dt>
 <dd class="published">
 <time datetime="2023-03-13" class="published">13 March 2023</time>
@@ -1224,8 +1223,7 @@ li > p:last-of-type {
 <section id="section-abstract">
       <h2 id="abstract"><a href="#abstract" class="selfRef">Abstract</a></h2>
 <p id="section-abstract-1">The migration to post-quantum cryptography often calls for performing multiple key encapsulations in parallel and then combining their outputs to derive a single shared secret.<a href="#section-abstract-1" class="pilcrow">¶</a></p>
-<p id="section-abstract-2">This document defines a comprehensible and easy to implement Keccak-based KEM combiner to join an arbitrary number of key shares, that is compatible with NIST SP 800-56Cr2 <span>[<a href="#SP800-56C" class="xref">SP800-56C</a>]</span> when viewed as a key derivation function. The combiner defined here is a multi-PRF and CCA-secure as long as at least one of the ingredient
-KEMs is.<a href="#section-abstract-2" class="pilcrow">¶</a></p>
+<p id="section-abstract-2">This document defines a comprehensible and easy to implement Keccak-based KEM combiner to join an arbitrary number of key shares, that is compatible with NIST SP 800-56Cr2 <span>[<a href="#SP800-56C" class="xref">SP800-56C</a>]</span> when viewed as a key derivation function. The combiners defined here are practical multi-PRFs and are CCA-secure as long as at least one of the ingredient KEMs is.<a href="#section-abstract-2" class="pilcrow">¶</a></p>
 </section>
 <section class="note rfcEditorRemove" id="section-note.1">
       <h2 id="name-about-this-document-2">
@@ -1682,7 +1680,7 @@ hash function.<a href="#section-6-2" class="pilcrow">¶</a></p>
 <dd class="break"></dd>
 <dt id="I-D.driscoll-pqt-hybrid-terminology">[I-D.driscoll-pqt-hybrid-terminology]</dt>
         <dd>
-<span class="refAuthor">Driscoll, F.</span>, <span class="refTitle">"Terminology for Post-Quantum Traditional Hybrid Schemes"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-driscoll-pqt-hybrid-terminology-02</span>, <time datetime="2023-03-07" class="refDate">7 March 2023</time>, <span>&lt;<a href="https://datatracker.ietf.org/api/v1/doc/document/draft-driscoll-pqt-hybrid-terminology/">https://datatracker.ietf.org/api/v1/doc/document/draft-driscoll-pqt-hybrid-terminology/</a>&gt;</span>. </dd>
+<span class="refAuthor">D, F.</span>, <span class="refTitle">"Terminology for Post-Quantum Traditional Hybrid Schemes"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-driscoll-pqt-hybrid-terminology-01</span>, <time datetime="2022-10-20" class="refDate">20 October 2022</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-driscoll-pqt-hybrid-terminology-01">https://datatracker.ietf.org/doc/html/draft-driscoll-pqt-hybrid-terminology-01</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="I-D.ietf-ipsecme-ikev2-multiple-ke">[I-D.ietf-ipsecme-ikev2-multiple-ke]</dt>
         <dd>

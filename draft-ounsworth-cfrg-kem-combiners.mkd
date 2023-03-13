@@ -1,7 +1,7 @@
 ---
 title: Combiner function for hybrid key encapsulation mechanisms (Hybrid KEMs)
 abbrev: KEM Combiner
-docname: draft-ounsworth-cfrg-kem-combiners-02
+docname: draft-ounsworth-cfrg-kem-combiners-03
 
 # <!-- stand_alone: true -->
 ipr: trust200902
@@ -196,8 +196,8 @@ informative:
 
 The migration to post-quantum cryptography often calls for performing multiple key encapsulations in parallel and then combining their outputs to derive a single shared secret.
 
-This document defines a comprehensible and easy to implement Keccak-based KEM combiner to join an arbitrary number of key shares, that is compatible with NIST SP 800-56Cr2 [SP800-56C] when viewed as a key derivation function. The combiner defined here is a multi-PRF and CCA-secure as long as at least one of the ingredient
-KEMs is.
+This document defines a comprehensible and easy to implement Keccak-based KEM combiner to join an arbitrary number of key shares, that is compatible with NIST SP 800-56Cr2 [SP800-56C] when viewed as a key derivation function. The combiners defined here are practical multi-PRFs and are CCA-secure as long as at least one of the ingredient KEMs is.
+
 
 <!-- End of Abstract -->
 

@@ -12,7 +12,7 @@ Expires: 14 September 2023                                        Proton
 
 
 Combiner function for hybrid key encapsulation mechanisms (Hybrid KEMs)
-                 draft-ounsworth-cfrg-kem-combiners-02
+                 draft-ounsworth-cfrg-kem-combiners-03
 
 Abstract
 
@@ -23,8 +23,9 @@ Abstract
    This document defines a comprehensible and easy to implement Keccak-
    based KEM combiner to join an arbitrary number of key shares, that is
    compatible with NIST SP 800-56Cr2 [SP800-56C] when viewed as a key
-   derivation function.  The combiner defined here is a multi-PRF and
-   CCA-secure as long as at least one of the ingredient KEMs is.
+   derivation function.  The combiners defined here are practical multi-
+   PRFs and are CCA-secure as long as at least one of the ingredient
+   KEMs is.
 
 About This Document
 
@@ -47,7 +48,6 @@ Status of This Memo
 
    This Internet-Draft is submitted in full conformance with the
    provisions of BCP 78 and BCP 79.
-
 
 
 
@@ -521,11 +521,11 @@ Internet-Draft                KEM Combiner                    March 2023
               2018, <https://doi.org/10.1007/978-3-319-76578-5_7>.
 
    [I-D.driscoll-pqt-hybrid-terminology]
-              Driscoll, F., "Terminology for Post-Quantum Traditional
-              Hybrid Schemes", Work in Progress, Internet-Draft, draft-
-              driscoll-pqt-hybrid-terminology-02, 7 March 2023,
-              <https://datatracker.ietf.org/api/v1/doc/document/draft-
-              driscoll-pqt-hybrid-terminology/>.
+              D, F., "Terminology for Post-Quantum Traditional Hybrid
+              Schemes", Work in Progress, Internet-Draft, draft-
+              driscoll-pqt-hybrid-terminology-01, 20 October 2022,
+              <https://datatracker.ietf.org/doc/html/draft-driscoll-pqt-
+              hybrid-terminology-01>.
 
    [I-D.ietf-ipsecme-ikev2-multiple-ke]
               Tjhai, C., Tomlinson, M., Bartlett, G., Fluhrer, S., Van
