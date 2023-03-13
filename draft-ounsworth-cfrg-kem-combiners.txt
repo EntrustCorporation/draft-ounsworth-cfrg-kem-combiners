@@ -295,7 +295,7 @@ Internet-Draft                KEM Combiner                    March 2023
    MAY be omitted for KEMs where ss_i is guaranteed to be constant
    length.  The overall ss_i || ct_i will not be guaranteed to be
    constant length since ct_i is fully under the control of the
-   attacker, but maybe it sufficient that most KEMs will only
+   attacker, but maybe it sufficient if the chosen KEMs will only
    decapsulate successfully on ciphertexts of fixed length?
 
    k_i = ss_i || ct_i
