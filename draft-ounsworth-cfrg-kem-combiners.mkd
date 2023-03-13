@@ -1,8 +1,7 @@
 ---
 title: Combiner function for hybrid key encapsulation mechanisms (Hybrid KEMs)
 abbrev: KEM Combiner
-# <!-- EDNOTE: Edits the draft name -->
-docname: draft-ounsworth-cfrg-kem-combiners-01
+docname: draft-ounsworth-cfrg-kem-combiners-02
 
 # <!-- stand_alone: true -->
 ipr: trust200902

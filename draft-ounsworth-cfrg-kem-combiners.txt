@@ -12,7 +12,7 @@ Expires: 13 September 2023                                        Proton
 
 
 Combiner function for hybrid key encapsulation mechanisms (Hybrid KEMs)
-                 draft-ounsworth-cfrg-kem-combiners-01
+                 draft-ounsworth-cfrg-kem-combiners-02
 
 Abstract
 
