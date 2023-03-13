@@ -41,7 +41,6 @@ author:
       abbrev: Proton
       country: Switzerland
       email: aron@wussler.it
-
     -
       ins: S. Kousidis
       name: Stavros Kousidis
@@ -133,7 +132,7 @@ informative:
     date: 2015
     seriesinfo:
       Federal information Processing Standards Publication (FIPS) 202
-  SPONGE:
+  BDPA08:
     target: "https://doi.org/10.1007/978-3-540-78967-3_11"
     title: On the Indifferentiability of the Sponge Construction
     author:
@@ -150,7 +149,7 @@ informative:
         ins: G. Assche
         name: Gilles van Assche
     date: 2008
-  KEMC:
+  GHP18:
     target: https://doi.org/10.1007/978-3-319-76578-5_7
     title: KEM Combiners
     date: 2018
@@ -170,7 +169,7 @@ informative:
     date: 2020-12
     seriesinfo:
       ETSI TS 103 744 V1.1.1
-  Aviram2022:
+  ADKPRY22:
     title: "Practical (Post-Quantum) Key Combiners from One-Wayness and Applications to TLS."
     target: "https://eprint.iacr.org/2022/065"
     author:
@@ -192,13 +191,12 @@ informative:
       -
         ins: E. Yogev
         name: Eylon Yogev
-        ins: 
 
 --- abstract
 
 The migration to post-quantum cryptography often calls for performing multiple key encapsulations in parallel and then combining their outputs to derive a single shared secret.
 
-This document defines a flexible multi-share KEM combiner to join an arbitrary number of key shares, that is a multi-PRF compatible with NIST SP 800-56Cr2 [SP800-56C]. The combiner defined here is CCA-secure as long as at least one of the ingredient
+This document defines a comprehensible and easy to implement Keccak-based KEM combiner to join an arbitrary number of key shares, that is compatible with NIST SP 800-56Cr2 [SP800-56C] when viewed as a key derivation function. The combiner defined here is a multi-PRF and CCA-secure as long as at least one of the ingredient
 KEMs is.
 
 <!-- End of Abstract -->
@@ -284,7 +282,7 @@ KDF(counter || k_1 || ... || k_n || fixedInfo, outputBits)
 
 where:
 
-- `KDF` represents a suitable choice of cryptographic key derivation function,
+- `KDF` represents a suitable choice of a cryptographic key derivation function,
 - `k_i` represent the constant-length input keys and is discussed in {{sec-k_i-construction}},
 - `fixedInfo` is some protocol-specific KDF binding,
 - `counter` parameter is instantiation-specific and is discussed in {{sec-instantiation}}.
@@ -296,7 +294,7 @@ The shared secret `ss` MAY be used directly as a symmetric key, for example as a
 
 ## k_i construction {#sec-k_i-construction}
 
-Following the guidance of Giacon et al. [KEMC], we wish for a KEM combiner that is CCA-secure as long as at least one of the ingredient KEMs is. Ir order to protect against chosen ciphertext attacks, it is necessary to include both the shared secret `ss_i` and its corresponding ciphertext `ct_i`. In addition, each `k_i` MUST be constant in length to prevent abuse of the underlying hash function, therefore the secret shares `ss_i || ct_i` MUST be hashed prior to inclusion in the overall construction described in {{tab-kemCombiner}}:
+Following the guidance of Giacon et al. [GHP18], we wish for a KEM combiner that is CCA-secure as long as at least one of the ingredient KEMs is. In order to protect against chosen ciphertext attacks, it is necessary to include both the shared secret `ss_i` and its corresponding ciphertext `ct_i`. In addition, each `k_i` MUST be constant in length to prevent abuse of the underlying hash function, therefore the secret shares `ss_i || ct_i` MUST be hashed prior to inclusion in the overall construction described in {{tab-kemCombiner}}:
 
 ~~~
 k_i = H(ss_i || ct_i)
@@ -319,7 +317,7 @@ For all other cases, it is REQUIRED to concatenate and hash them first:
 k_i = H(ss_i || ct_i)
 ~~~
 
-Including the ciphertext guarantees that the combined kem is IND-CCA secure as long as one of the ingredient KEMs is, as stated by [KEMC].
+Including the ciphertext guarantees that the combined kem is IND-CCA secure as long as one of the ingredient KEMs is, as stated by [GHP18].
 
 Any protocols making use of this construction MUST either hash all inputs `ss_i || ct_i`, or justify that any un-hashed inputs will always be fixed length.
 
@@ -387,7 +385,7 @@ None.
 
 # Security Considerations
 
-The proposed instantiations in {{sec-instantiation}} are practical multi-PRFs and this specification limits to the use of Keccak-based constructions. The sponge construction was proven to be indifferentiable from a random oracle {{SPONGE}}.
+The proposed instantiations in {{sec-instantiation}} are practical multi-PRFs since this specification limits to the use of Keccak-based constructions. The sponge construction was proven to be indifferentiable from a random oracle {{BDPA08}}.
 More precisely, for a given capacity `c` the indifferentiability proof shows that assuming there are no weaknesses found in the Keccak permutation, an attacker has to make an expected number of `2^(c/2)` calls to the permutation to tell Keccak from a random oracle.
 For a random oracle, a difference in only a single bit gives an unrelated, uniformly random output.
 Hence, to be able to distinguish a key `k`, derived from shared keys `k_i` from a random bit string, an adversary has to correctly guess all key shares `k_i` entirely.
@@ -397,19 +395,15 @@ The proposed construction in {{sec-kem-combiner}} with the instantiations in
 the newly formed combined KEM is IND-CCA2 secure as long as at least one of the
 ingredient KEMs is. Indeed, the above stated indifferentiability from a random
 oracle qualifies Keccak as a split-key pseudorandom function as defined in
-{{KEMC}}. That is, Keccak behaves like a random function if at least
-one input shared secret `ss_i` is picked uniformly at random. Our construction
-can thus be seen as an instantiation of the IND-CCA2 preserving Example 3 in
-Figure 1 of {{KEMC}}, up to some reordering of input shared secrets and
-ciphertexts and their potential compression by a cryptographic hash function. 
+{{GHP18}}. That is, Keccak behaves like a random function if at least one input
+shared secret `ss_i` is picked uniformly at random. Our construction can thus
+be seen as an instantiation of the IND-CCA2 preserving Example 3 in Figure 1 of
+{{GHP18}}, up to some reordering of input shared secrets `ss_i` and ciphertexts
+`ct_i` and their potential compression `H(ss_i || ct_i)` by a cryptographic
+hash function. 
 
 <!-- Start of Appendices -->
 --- back
-
-# Contributors
-{:numbered="false"}
-
-Stavros Kousidis (BSI)
 
 # Acknowledgements
 {:numbered="false"}
