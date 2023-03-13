@@ -1183,13 +1183,8 @@ li > p:last-of-type {
 <td class="right">March 2023</td>
 </tr></thead>
 <tfoot><tr>
-<<<<<<< HEAD
 <td class="left">Ounsworth, et al.</td>
 <td class="center">Expires 13 September 2023</td>
-=======
-<td class="left">Ounsworth &amp; Wussler</td>
-<td class="center">Expires 10 September 2023</td>
->>>>>>> 189c875e71b01db76300cfb1972627fba5d5c446
 <td class="right">[Page]</td>
 </tr></tfoot>
 </table>
@@ -1202,20 +1197,12 @@ li > p:last-of-type {
 <dd class="internet-draft">draft-ounsworth-cfrg-kem-combiners-01</dd>
 <dt class="label-published">Published:</dt>
 <dd class="published">
-<<<<<<< HEAD
 <time datetime="2023-03-12" class="published">12 March 2023</time>
-=======
-<time datetime="2023-03-09" class="published">9 March 2023</time>
->>>>>>> 189c875e71b01db76300cfb1972627fba5d5c446
     </dd>
 <dt class="label-intended-status">Intended Status:</dt>
 <dd class="intended-status">Informational</dd>
 <dt class="label-expires">Expires:</dt>
-<<<<<<< HEAD
 <dd class="expires"><time datetime="2023-09-13">13 September 2023</time></dd>
-=======
-<dd class="expires"><time datetime="2023-09-10">10 September 2023</time></dd>
->>>>>>> 189c875e71b01db76300cfb1972627fba5d5c446
 <dt class="label-authors">Authors:</dt>
 <dd class="authors">
 <div class="author">
@@ -1274,11 +1261,7 @@ KEMs is.<a href="#section-abstract-2" class="pilcrow">¶</a></p>
         time. It is inappropriate to use Internet-Drafts as reference
         material or to cite them other than as "work in progress."<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
 <p id="section-boilerplate.1-4">
-<<<<<<< HEAD
         This Internet-Draft will expire on 13 September 2023.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
-=======
-        This Internet-Draft will expire on 10 September 2023.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
->>>>>>> 189c875e71b01db76300cfb1972627fba5d5c446
 </section>
 </div>
 <div id="copyright">
@@ -1485,11 +1468,7 @@ KDF(counter || k_1 || ... || k_n || fixedInfo, outputBits)
           <code>KDF</code> represents a suitable choice of cryptographic key derivation function,<a href="#section-3-7.1" class="pilcrow">¶</a>
 </li>
         <li class="normal" id="section-3-7.2">
-<<<<<<< HEAD
           <code>k_i</code> represent the constant-length input keys and is discussed in <a href="#sec-k_i-construction" class="xref">Section 3.1</a>,<a href="#section-3-7.2" class="pilcrow">¶</a>
-=======
-          <code>k_i</code> represent the i-th constant-length input key,<a href="#section-3-7.2" class="pilcrow">¶</a>
->>>>>>> 189c875e71b01db76300cfb1972627fba5d5c446
 </li>
         <li class="normal" id="section-3-7.3">
           <code>fixedInfo</code> is some protocol-specific KDF binding,<a href="#section-3-7.3" class="pilcrow">¶</a>
@@ -1504,34 +1483,13 @@ KDF(counter || k_1 || ... || k_n || fixedInfo, outputBits)
           <code>||</code> represents concatenation.<a href="#section-3-7.6" class="pilcrow">¶</a>
 </li>
       </ul>
-<<<<<<< HEAD
 <p id="section-3-8">In <a href="#sec-instantiation" class="xref">Section 4</a> several possible practical instantiations are listed that are in compliance with NIST SP-800 56Cr2 <span>[<a href="#SP800-56C" class="xref">SP800-56C</a>]</span>.
 The shared secret <code>ss</code> MAY be used directly as a symmetric key, for example as a MAC key or as a Key Encryption Key (KEK).<a href="#section-3-8" class="pilcrow">¶</a></p>
 <div id="sec-k_i-construction">
-=======
-<p id="section-3-8">In section <a href="#sec-instantiation" class="xref">Section 4</a> are listed several possible practical instantiations, in compliance with NIST SP-800 56Cr2 <span>[<a href="#SP800-56C" class="xref">SP800-56C</a>]</span>.
-The shared secret <code>ss</code> MAY be used as a Key Encryption Key (KEK) for key encapsulation.<a href="#section-3-8" class="pilcrow">¶</a></p>
-<p id="section-3-9">Each <code>k_i</code> MUST be constant in length, therefore it is the concatenation of the secret share <code>ss_i</code> and ciphertext <code>ct_i</code> only if they are guaranteed to be constant length:<a href="#section-3-9" class="pilcrow">¶</a></p>
-<div class="alignLeft art-text artwork" id="section-3-10">
-<pre>
-k_i = ss_i || ct_i
-</pre><a href="#section-3-10" class="pilcrow">¶</a>
-</div>
-<p id="section-3-11">For all other cases, it is REQUIRED to concatenate and hash them first:<a href="#section-3-11" class="pilcrow">¶</a></p>
-<div class="alignLeft art-text artwork" id="section-3-12">
-<pre>
-k_i = H(ss_i || ct_i)
-</pre><a href="#section-3-12" class="pilcrow">¶</a>
-</div>
-<p id="section-3-13">Any protocols making use of this construction MUST either hash all inputs <code>ss_i || ct_i</code>, or justify that any un-hashed inputs will always be fixed length.<a href="#section-3-13" class="pilcrow">¶</a></p>
-<p id="section-3-14">Including the ciphertext guarantees that the combined kem is IND-CCA secure as long as one of the ingredient KEMs is, as stated by <span>[<a href="#KEMCombiners" class="xref">KEMCombiners</a>]</span>.<a href="#section-3-14" class="pilcrow">¶</a></p>
-<div id="protocol-binding">
->>>>>>> 189c875e71b01db76300cfb1972627fba5d5c446
 <section id="section-3.1">
         <h3 id="name-k_i-construction-2">
 <a href="#section-3.1" class="section-number selfRef">3.1. </a><a href="#name-k_i-construction-2" class="section-name selfRef">k_i construction</a>
         </h3>
-<<<<<<< HEAD
 <p id="section-3.1-1">Following the guidance of Giacon et al. <span>[<a href="#KEMC" class="xref">KEMC</a>]</span>, we wish for a KEM combiner that is CCA-secure as long as at least one of the ingredient KEMs is. Ir order to protect against chosen ciphertext attacks, it is necessary to include both the shared secret <code>ss_i</code> and its corresponding ciphertext <code>ct_i</code>. In addition, each <code>k_i</code> MUST be constant in length to prevent abuse of the underlying hash function, therefore the secret shares <code>ss_i || ct_i</code> MUST be hashed prior to inclusion in the overall construction described in <a href="#tab-kemCombiner" class="xref">Figure 1</a>:<a href="#section-3.1-1" class="pilcrow">¶</a></p>
 <div class="alignLeft art-text artwork" id="section-3.1-2">
 <pre>
@@ -1540,14 +1498,21 @@ k_i = H(ss_i || ct_i)
 </div>
 <p id="section-3.1-3">In the case of a PSK there is no associated ciphertext present.<a href="#section-3.1-3" class="pilcrow">¶</a></p>
 <p id="section-3.1-4">~~~ BEGIN EDNOTE ~~~<a href="#section-3.1-4" class="pilcrow">¶</a></p>
-<p id="section-3.1-5">There is currently debate among the authors about whether the hash MAY be omitted for KEMs where <code>ss_i</code> is guaranteed to be constant length. The overall <code>ss_i || ct_i</code> will not be guaranteed to be constant length since <code>ct_i</code> is fully under the control of the attacker, but maybe it sufficient if the chosen KEMs will only decapsulate successfully on ciphertexts of fixed length?<a href="#section-3.1-5" class="pilcrow">¶</a></p>
+<p id="section-3.1-5">Each <code>k_i</code> MUST be constant in length, therefore it MAY be the concatenation of the secret share <code>ss_i</code> and ciphertext <code>ct_i</code> only if they are guaranteed to be constant length:<a href="#section-3.1-5" class="pilcrow">¶</a></p>
 <div class="alignLeft art-text artwork" id="section-3.1-6">
 <pre>
 k_i = ss_i || ct_i
 </pre><a href="#section-3.1-6" class="pilcrow">¶</a>
 </div>
-<p id="section-3.1-7">Any protocols making use of this construction MUST either hash all inputs <code>ss_i || ct_i</code>, or justify that any un-hashed inputs will always be fixed length.<a href="#section-3.1-7" class="pilcrow">¶</a></p>
-<p id="section-3.1-8">~~~ END EDNOTE ~~~<a href="#section-3.1-8" class="pilcrow">¶</a></p>
+<p id="section-3.1-7">For all other cases, it is REQUIRED to concatenate and hash them first:<a href="#section-3.1-7" class="pilcrow">¶</a></p>
+<div class="alignLeft art-text artwork" id="section-3.1-8">
+<pre>
+k_i = H(ss_i || ct_i)
+</pre><a href="#section-3.1-8" class="pilcrow">¶</a>
+</div>
+<p id="section-3.1-9">Including the ciphertext guarantees that the combined kem is IND-CCA secure as long as one of the ingredient KEMs is, as stated by <span>[<a href="#KEMC" class="xref">KEMC</a>]</span>.<a href="#section-3.1-9" class="pilcrow">¶</a></p>
+<p id="section-3.1-10">Any protocols making use of this construction MUST either hash all inputs <code>ss_i || ct_i</code>, or justify that any un-hashed inputs will always be fixed length.<a href="#section-3.1-10" class="pilcrow">¶</a></p>
+<p id="section-3.1-11">~~~ END EDNOTE ~~~<a href="#section-3.1-11" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="protocol-binding">
@@ -1556,57 +1521,32 @@ k_i = ss_i || ct_i
 <a href="#section-3.2" class="section-number selfRef">3.2. </a><a href="#name-protocol-binding-2" class="section-name selfRef">Protocol binding</a>
         </h3>
 <p id="section-3.2-1">The <code>fixedInfo</code> string is a fixed-length string containing some context-specific information.
-It MUST NOT depend on the secret shares. The intention is to prevent cross-protocol attacks by making this key derivation unique to its protocol context.<a href="#section-3.2-1" class="pilcrow">¶</a></p>
+The intention is to prevent cross-context attacks by making this key derivation unique to its protocol context.<a href="#section-3.2-1" class="pilcrow">¶</a></p>
 <p id="section-3.2-2">The <code>fixedInfo</code> string MUST have a definite structure depending on the protocol where all parts are fixed length. This prevents a variable length structure from creating collisions between two different instances.
 In cases some variable length input is necessary, such as the representation of a user ID, a public key, or an OID, then hashing or padding MAY be used.<a href="#section-3.2-2" class="pilcrow">¶</a></p>
-<p id="section-3.2-3">The parameter fixedInfo MAY contain any of the following information:<a href="#section-3.2-3" class="pilcrow">¶</a></p>
-=======
-<p id="section-3.1-1">The <code>fixedInfo</code> string is a fixed-length string containing some context-specific information.
-The intention is to prevent cross-context attacks by making this key derivation unique to its protocol context.<a href="#section-3.1-1" class="pilcrow">¶</a></p>
-<p id="section-3.1-2">The <code>fixedInfo</code> string MUST have a definite structure depending on the protocol where all parts are fixed length. This prevents a variable length structure from creating collisions between two different instances.
-In cases some variable length input is necessary, such as the representation of a public key or an OID, then hashing or padding can be used.
-<code>fixedInfo</code> MUST NOT include the shared secrets and ciphertexts, as they are already represented in the KDF input.<a href="#section-3.1-2" class="pilcrow">¶</a></p>
-<p id="section-3.1-3">The parameter fixedInfo MAY contain any of the following information:<a href="#section-3.1-3" class="pilcrow">¶</a></p>
->>>>>>> 189c875e71b01db76300cfb1972627fba5d5c446
+<p id="section-3.2-3"><code>fixedInfo</code> MUST NOT include the shared secrets and ciphertexts, as they are already represented in the KDF input.<a href="#section-3.2-3" class="pilcrow">¶</a></p>
+<p id="section-3.2-4">The parameter fixedInfo MAY contain any of the following information:<a href="#section-3.2-4" class="pilcrow">¶</a></p>
 <ul class="normal">
-<li class="normal" id="section-3.2-4.1">Public information about the communication parties, such as their identifiers.<a href="#section-3.2-4.1" class="pilcrow">¶</a>
+<li class="normal" id="section-3.2-5.1">Public information about the communication parties, such as their identifiers.<a href="#section-3.2-5.1" class="pilcrow">¶</a>
 </li>
-          <li class="normal" id="section-3.2-4.2">The public keys or certificates contributed by each party to the key-agreement transaction.<a href="#section-3.2-4.2" class="pilcrow">¶</a>
+          <li class="normal" id="section-3.2-5.2">The public keys or certificates contributed by each party to the key-agreement transaction.<a href="#section-3.2-5.2" class="pilcrow">¶</a>
 </li>
-<<<<<<< HEAD
-          <li class="normal" id="section-3.2-4.3">The ciphertext of each Key Encapsulation Mechanism.<a href="#section-3.2-4.3" class="pilcrow">¶</a>
+          <li class="normal" id="section-3.2-5.3">Other public information shared between communication parties before or during the transaction, such as nonces.<a href="#section-3.2-5.3" class="pilcrow">¶</a>
 </li>
-          <li class="normal" id="section-3.2-4.4">Other public information shared between communication parties before or during the transaction, such as nonces.<a href="#section-3.2-4.4" class="pilcrow">¶</a>
+          <li class="normal" id="section-3.2-5.4">An indication of the protocol or application employing the key-derivation method.<a href="#section-3.2-5.4" class="pilcrow">¶</a>
 </li>
-          <li class="normal" id="section-3.2-4.5">An indication of the protocol or application employing the key-derivation method.<a href="#section-3.2-4.5" class="pilcrow">¶</a>
+          <li class="normal" id="section-3.2-5.5">Protocol-related information, such as a label or session identifier.<a href="#section-3.2-5.5" class="pilcrow">¶</a>
 </li>
-          <li class="normal" id="section-3.2-4.6">Protocol-related information, such as a label or session identifier.<a href="#section-3.2-4.6" class="pilcrow">¶</a>
+          <li class="normal" id="section-3.2-5.6">An indication of the key-agreement scheme and/or key-derivation method used.<a href="#section-3.2-5.6" class="pilcrow">¶</a>
 </li>
-          <li class="normal" id="section-3.2-4.7">An indication of the key-agreement scheme and/or key-derivation method used.<a href="#section-3.2-4.7" class="pilcrow">¶</a>
+          <li class="normal" id="section-3.2-5.7">An indication of the domain parameters associated with the asymmetric key pairs employed for key establishment.<a href="#section-3.2-5.7" class="pilcrow">¶</a>
 </li>
-          <li class="normal" id="section-3.2-4.8">An indication of the domain parameters associated with the asymmetric key pairs employed for key establishment.<a href="#section-3.2-4.8" class="pilcrow">¶</a>
+          <li class="normal" id="section-3.2-5.8">An indication of other parameter or primitive choices.<a href="#section-3.2-5.8" class="pilcrow">¶</a>
 </li>
-          <li class="normal" id="section-3.2-4.9">An indication of other parameter or primitive choices.<a href="#section-3.2-4.9" class="pilcrow">¶</a>
-</li>
-          <li class="normal" id="section-3.2-4.10">An indication of how the derived keying material should be parsed, including an indication of which algorithm(s) will use the (parsed) keying material.<a href="#section-3.2-4.10" class="pilcrow">¶</a>
-=======
-          <li class="normal" id="section-3.1-4.3">Other public information shared between communication parties before or during the transaction, such as nonces.<a href="#section-3.1-4.3" class="pilcrow">¶</a>
-</li>
-          <li class="normal" id="section-3.1-4.4">An indication of the protocol or application employing the key-derivation method.<a href="#section-3.1-4.4" class="pilcrow">¶</a>
-</li>
-          <li class="normal" id="section-3.1-4.5">Protocol-related information, such as a label or session identifier.<a href="#section-3.1-4.5" class="pilcrow">¶</a>
-</li>
-          <li class="normal" id="section-3.1-4.6">An indication of the key-agreement scheme and/or key-derivation method used.<a href="#section-3.1-4.6" class="pilcrow">¶</a>
-</li>
-          <li class="normal" id="section-3.1-4.7">An indication of the domain parameters associated with the asymmetric key pairs employed for key establishment.<a href="#section-3.1-4.7" class="pilcrow">¶</a>
-</li>
-          <li class="normal" id="section-3.1-4.8">An indication of other parameter or primitive choices.<a href="#section-3.1-4.8" class="pilcrow">¶</a>
-</li>
-          <li class="normal" id="section-3.1-4.9">An indication of how the derived keying material should be parsed, including an indication of which algorithm(s) will use the (parsed) keying material.<a href="#section-3.1-4.9" class="pilcrow">¶</a>
->>>>>>> 189c875e71b01db76300cfb1972627fba5d5c446
+          <li class="normal" id="section-3.2-5.9">An indication of how the derived keying material should be parsed, including an indication of which algorithm(s) will use the (parsed) keying material.<a href="#section-3.2-5.9" class="pilcrow">¶</a>
 </li>
         </ul>
-<p id="section-3.2-5">This is a non-comprehensive list, further information can be found in paragraph 5.8.2 of NIST SP800-56Ar3 <span>[<a href="#SP800-56A" class="xref">SP800-56A</a>]</span>.<a href="#section-3.2-5" class="pilcrow">¶</a></p>
+<p id="section-3.2-6">This is a non-comprehensive list, further information can be found in paragraph 5.8.2 of NIST SP800-56Ar3 <span>[<a href="#SP800-56A" class="xref">SP800-56A</a>]</span>.<a href="#section-3.2-6" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
@@ -1758,15 +1698,9 @@ ciphertexts and their potential compression by a cryptographic hash function.<a 
         <dd>
 <span class="refAuthor">Kousidis, S.</span>, <span class="refAuthor">Strenzke, F.</span>, and <span class="refAuthor">A. Wussler</span>, <span class="refTitle">"Post-Quantum Cryptography in OpenPGP"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-wussler-openpgp-pqc-00</span>, <time datetime="2022-12-21" class="refDate">21 December 2022</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-wussler-openpgp-pqc-00">https://datatracker.ietf.org/doc/html/draft-wussler-openpgp-pqc-00</a>&gt;</span>. </dd>
 <dd class="break"></dd>
-<<<<<<< HEAD
 <dt id="KEMC">[KEMC]</dt>
         <dd>
 <span class="refAuthor">Giacon, F.</span>, <span class="refAuthor">Heuer, F.</span>, and <span class="refAuthor">B. Poettering</span>, <span class="refTitle">"KEM Combiners"</span>, <time datetime="2018" class="refDate">2018</time>, <span>&lt;<a href="https://doi.org/10.1007/978-3-319-76578-5_7">https://doi.org/10.1007/978-3-319-76578-5_7</a>&gt;</span>. </dd>
-=======
-<dt id="KEMCombiners">[KEMCombiners]</dt>
-        <dd>
-<span class="refAuthor">Giacon, F.</span>, <span class="refAuthor">Heuer, F.</span>, and <span class="refAuthor">B. Poettering</span>, <span class="refTitle">"KEM Combiners"</span>, <time datetime="2018" class="refDate">2018</time>, <span>&lt;<a href="https://eprint.iacr.org/2018/024">https://eprint.iacr.org/2018/024</a>&gt;</span>. </dd>
->>>>>>> 189c875e71b01db76300cfb1972627fba5d5c446
 <dd class="break"></dd>
 <dt id="PQCAPI">[PQCAPI]</dt>
         <dd>

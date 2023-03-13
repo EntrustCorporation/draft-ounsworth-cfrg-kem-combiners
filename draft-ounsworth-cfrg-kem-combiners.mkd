@@ -320,7 +320,7 @@ For all other cases, it is REQUIRED to concatenate and hash them first:
 k_i = H(ss_i || ct_i)
 ~~~
 
-Including the ciphertext guarantees that the combined kem is IND-CCA secure as long as one of the ingredient KEMs is, as stated by {{KEMCombiners}}.
+Including the ciphertext guarantees that the combined kem is IND-CCA secure as long as one of the ingredient KEMs is, as stated by [KEMC].
 
 Any protocols making use of this construction MUST either hash all inputs `ss_i || ct_i`, or justify that any un-hashed inputs will always be fixed length.
 
