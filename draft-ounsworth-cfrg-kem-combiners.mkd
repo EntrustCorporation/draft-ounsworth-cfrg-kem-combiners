@@ -260,10 +260,11 @@ The need for a KEM-based authenticated key establishment arises, for example, wh
 
 # KEM Combiner construction {#sec-kem-combiner}
 
-TODO: read and cite the ETSI doc "Quantum-safe Hybrid Key Exchanges"
+<!-- TODO: read and cite the ETSI doc "Quantum-safe Hybrid Key Exchanges"
 https://www.etsi.org/deliver/etsi_ts/103700_103799/103744/01.01.01_60/ts_103744v010101p.pdf
 
 TODO: as per https://www.enisa.europa.eu/publications/post-quantum-cryptography-integration-study section 4.2, might need to specify behaviour in light of KEMs with a non-zero failure probability.
+-->
 
 
 A KEM combiner is a function that takes in two or more shared secrets `ss_i` and returns a combined shared secret `ss`.
@@ -305,7 +306,7 @@ k_i = H(ss_i || ct_i)
 In the case of a PSK there is no associated ciphertext present.
 
 
-BEGIN EDNOTE
+~~~ BEGIN EDNOTE ~~~
 
 There is currently debate among the authors about whether the hash MAY be omitted for KEMs where `ss_i` is guaranteed to be constant length. The overall `ss_i || ct_i` will not be guaranteed to be constant length since `ct_i` is fully under the control of the attacker, but maybe it sufficient that most KEMs will only decapsulate successfully on ciphertexts of fixed length?
 
@@ -315,13 +316,13 @@ k_i = ss_i || ct_i
 
 Any protocols making use of this construction MUST either hash all inputs `ss_i || ct_i`, or justify that any un-hashed inputs will always be fixed length.
 
-END EDNOTE
+~~~ END EDNOTE ~~~
 
 ## Protocol binding
 The `fixedInfo` string is a fixed-length string containing some context-specific information.
 It MUST NOT depend on the secret shares. The intention is to prevent cross-protocol attacks by making this key derivation unique to its protocol context.
 
-The `fixedInfo` string MUST have a definite structure depending on the protocol where all parts are fixed length. This prevents a variable length structure from creating collisions between two different instances.
+The `fixedInfo` string MUST have a definite structure depending on the protocol where all parts are fixed length  . This prevents a variable length structure from creating collisions between two different instances.
 In cases some variable length input is necessary, such as the representation of a user ID, a public key or an OID, then hashing or padding SHOULD be used.
 
 The parameter fixedInfo MAY contain any of the following information:
@@ -341,7 +342,7 @@ This is a non-comprehensive list, further information can be found in paragraph 
 
 # Practical instantiations {#sec-instantiation}
 
-The KDF must be instantiated with cryptographically-secure choices for `KDF` and `H`. The following are RECOMMENDED Keccak-based instatiations, but other choices MAY be made depending on availability of cryptographic primitives, protocol design needs, and especially to allow for future cryptographic agility.
+The KDF must be instantiated with cryptographically-secure choices for `KDF` and `H`. The following are RECOMMENDED Keccak-based instatiations, but other choices MAY be made for example to allow for future cryptographic agility. A protocol using a different instantiation MUST justify that it will behave as a multi-PRF given fixed length inputs.
 
 Each instance defines a function to be used as `KDF`, a hash `H` function to derive the `k_i`, and optionally a `counter`.
 

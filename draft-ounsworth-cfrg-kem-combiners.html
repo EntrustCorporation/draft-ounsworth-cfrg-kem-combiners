@@ -1439,21 +1439,18 @@ def kemDecaps(ct, sk) -&gt; ss
       <h2 id="name-kem-combiner-construction-2">
 <a href="#section-3" class="section-number selfRef">3. </a><a href="#name-kem-combiner-construction-2" class="section-name selfRef">KEM Combiner construction</a>
       </h2>
-<p id="section-3-1">TODO: read and cite the ETSI doc "Quantum-safe Hybrid Key Exchanges"
-https://www.etsi.org/deliver/etsi_ts/103700_103799/103744/01.01.01_60/ts_103744v010101p.pdf<a href="#section-3-1" class="pilcrow">¶</a></p>
-<p id="section-3-2">TODO: as per https://www.enisa.europa.eu/publications/post-quantum-cryptography-integration-study section 4.2, might need to specify behaviour in light of KEMs with a non-zero failure probability.<a href="#section-3-2" class="pilcrow">¶</a></p>
-<p id="section-3-3">A KEM combiner is a function that takes in two or more shared secrets <code>ss_i</code> and returns a combined shared secret <code>ss</code>.<a href="#section-3-3" class="pilcrow">¶</a></p>
-<div class="alignLeft art-text artwork" id="section-3-4">
+<p id="section-3-1">A KEM combiner is a function that takes in two or more shared secrets <code>ss_i</code> and returns a combined shared secret <code>ss</code>.<a href="#section-3-1" class="pilcrow">¶</a></p>
+<div class="alignLeft art-text artwork" id="section-3-2">
 <pre>
 ss = kemCombiner(ss_1, ss_2, ..., ss_n)
-</pre><a href="#section-3-4" class="pilcrow">¶</a>
+</pre><a href="#section-3-2" class="pilcrow">¶</a>
 </div>
-<p id="section-3-5">This document assumes that shared secrets are the output of a KEM, but without loss of generality they MAY also be any other source of cryptographic key material, such as pre-shared keys (PSKs), with PQ/PSK being a quantum-safe migration strategy being made available by some protocols, see for example IKEv2 in <span>[<a href="#RFC8784" class="xref">RFC8784</a>]</span>.<a href="#section-3-5" class="pilcrow">¶</a></p>
-<p id="section-3-6">In general it is desirable to use a multi-PRF as a KEM combiner, meaning that the combiner has the properties of a PRF when keyed by any of its single inputs.
-The following simple yet generic construction can be used in all IETF protocols that need to combine the output of two or more KEMs:<a href="#section-3-6" class="pilcrow">¶</a></p>
+<p id="section-3-3">This document assumes that shared secrets are the output of a KEM, but without loss of generality they MAY also be any other source of cryptographic key material, such as pre-shared keys (PSKs), with PQ/PSK being a quantum-safe migration strategy being made available by some protocols, see for example IKEv2 in <span>[<a href="#RFC8784" class="xref">RFC8784</a>]</span>.<a href="#section-3-3" class="pilcrow">¶</a></p>
+<p id="section-3-4">In general it is desirable to use a multi-PRF as a KEM combiner, meaning that the combiner has the properties of a PRF when keyed by any of its single inputs.
+The following simple yet generic construction can be used in all IETF protocols that need to combine the output of two or more KEMs:<a href="#section-3-4" class="pilcrow">¶</a></p>
 <span id="name-general-kem-combiner-constru"></span><div id="tab-kemCombiner">
 <figure id="figure-1">
-        <div class="alignLeft art-text artwork" id="section-3-7.1">
+        <div class="alignLeft art-text artwork" id="section-3-5.1">
 <pre>
 KDF(counter || k_1 || ... || k_n || fixedInfo, outputBits)
 </pre>
@@ -1462,29 +1459,29 @@ KDF(counter || k_1 || ... || k_n || fixedInfo, outputBits)
 <a href="#name-general-kem-combiner-constru" class="selfRef">general KEM combiner construction</a>
         </figcaption></figure>
 </div>
-<p id="section-3-8">where:<a href="#section-3-8" class="pilcrow">¶</a></p>
+<p id="section-3-6">where:<a href="#section-3-6" class="pilcrow">¶</a></p>
 <ul class="normal">
-<li class="normal" id="section-3-9.1">
-          <code>KDF</code> represents a suitable choice of cryptographic key derivation function,<a href="#section-3-9.1" class="pilcrow">¶</a>
+<li class="normal" id="section-3-7.1">
+          <code>KDF</code> represents a suitable choice of cryptographic key derivation function,<a href="#section-3-7.1" class="pilcrow">¶</a>
 </li>
-        <li class="normal" id="section-3-9.2">
-          <code>k_i</code> represent the constant-length input keys and is discussed in <a href="#sec-k_i-construction" class="xref">Section 3.1</a>,<a href="#section-3-9.2" class="pilcrow">¶</a>
+        <li class="normal" id="section-3-7.2">
+          <code>k_i</code> represent the constant-length input keys and is discussed in <a href="#sec-k_i-construction" class="xref">Section 3.1</a>,<a href="#section-3-7.2" class="pilcrow">¶</a>
 </li>
-        <li class="normal" id="section-3-9.3">
-          <code>fixedInfo</code> is some protocol-specific KDF binding,<a href="#section-3-9.3" class="pilcrow">¶</a>
+        <li class="normal" id="section-3-7.3">
+          <code>fixedInfo</code> is some protocol-specific KDF binding,<a href="#section-3-7.3" class="pilcrow">¶</a>
 </li>
-        <li class="normal" id="section-3-9.4">
-          <code>counter</code> parameter is instantiation-specific and is discussed in <a href="#sec-instantiation" class="xref">Section 4</a>.<a href="#section-3-9.4" class="pilcrow">¶</a>
+        <li class="normal" id="section-3-7.4">
+          <code>counter</code> parameter is instantiation-specific and is discussed in <a href="#sec-instantiation" class="xref">Section 4</a>.<a href="#section-3-7.4" class="pilcrow">¶</a>
 </li>
-        <li class="normal" id="section-3-9.5">
-          <code>outputBits</code> determines the length of the output keying material,<a href="#section-3-9.5" class="pilcrow">¶</a>
+        <li class="normal" id="section-3-7.5">
+          <code>outputBits</code> determines the length of the output keying material,<a href="#section-3-7.5" class="pilcrow">¶</a>
 </li>
-        <li class="normal" id="section-3-9.6">
-          <code>||</code> represents concatenation.<a href="#section-3-9.6" class="pilcrow">¶</a>
+        <li class="normal" id="section-3-7.6">
+          <code>||</code> represents concatenation.<a href="#section-3-7.6" class="pilcrow">¶</a>
 </li>
       </ul>
-<p id="section-3-10">In <a href="#sec-instantiation" class="xref">Section 4</a> several possible practical instantiations are listed that are in compliance with NIST SP-800 56Cr2 <span>[<a href="#SP800-56C" class="xref">SP800-56C</a>]</span>.
-The shared secret <code>ss</code> MAY be used directly as a symmetric key, for example as a MAC key or as a Key Encryption Key (KEK).<a href="#section-3-10" class="pilcrow">¶</a></p>
+<p id="section-3-8">In <a href="#sec-instantiation" class="xref">Section 4</a> several possible practical instantiations are listed that are in compliance with NIST SP-800 56Cr2 <span>[<a href="#SP800-56C" class="xref">SP800-56C</a>]</span>.
+The shared secret <code>ss</code> MAY be used directly as a symmetric key, for example as a MAC key or as a Key Encryption Key (KEK).<a href="#section-3-8" class="pilcrow">¶</a></p>
 <div id="sec-k_i-construction">
 <section id="section-3.1">
         <h3 id="name-k_i-construction-2">
@@ -1497,7 +1494,7 @@ k_i = H(ss_i || ct_i)
 </pre><a href="#section-3.1-2" class="pilcrow">¶</a>
 </div>
 <p id="section-3.1-3">In the case of a PSK there is no associated ciphertext present.<a href="#section-3.1-3" class="pilcrow">¶</a></p>
-<p id="section-3.1-4">BEGIN EDNOTE<a href="#section-3.1-4" class="pilcrow">¶</a></p>
+<p id="section-3.1-4">~~~ BEGIN EDNOTE ~~~<a href="#section-3.1-4" class="pilcrow">¶</a></p>
 <p id="section-3.1-5">There is currently debate among the authors about whether the hash MAY be omitted for KEMs where <code>ss_i</code> is guaranteed to be constant length. The overall <code>ss_i || ct_i</code> will not be guaranteed to be constant length since <code>ct_i</code> is fully under the control of the attacker, but maybe it sufficient that most KEMs will only decapsulate successfully on ciphertexts of fixed length?<a href="#section-3.1-5" class="pilcrow">¶</a></p>
 <div class="alignLeft art-text artwork" id="section-3.1-6">
 <pre>
@@ -1505,7 +1502,7 @@ k_i = ss_i || ct_i
 </pre><a href="#section-3.1-6" class="pilcrow">¶</a>
 </div>
 <p id="section-3.1-7">Any protocols making use of this construction MUST either hash all inputs <code>ss_i || ct_i</code>, or justify that any un-hashed inputs will always be fixed length.<a href="#section-3.1-7" class="pilcrow">¶</a></p>
-<p id="section-3.1-8">END EDNOTE<a href="#section-3.1-8" class="pilcrow">¶</a></p>
+<p id="section-3.1-8">~~~ END EDNOTE ~~~<a href="#section-3.1-8" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="protocol-binding">
@@ -1515,7 +1512,7 @@ k_i = ss_i || ct_i
         </h3>
 <p id="section-3.2-1">The <code>fixedInfo</code> string is a fixed-length string containing some context-specific information.
 It MUST NOT depend on the secret shares. The intention is to prevent cross-protocol attacks by making this key derivation unique to its protocol context.<a href="#section-3.2-1" class="pilcrow">¶</a></p>
-<p id="section-3.2-2">The <code>fixedInfo</code> string MUST have a definite structure depending on the protocol where all parts are fixed length. This prevents a variable length structure from creating collisions between two different instances.
+<p id="section-3.2-2">The <code>fixedInfo</code> string MUST have a definite structure depending on the protocol where all parts are fixed length  . This prevents a variable length structure from creating collisions between two different instances.
 In cases some variable length input is necessary, such as the representation of a user ID, a public key or an OID, then hashing or padding SHOULD be used.<a href="#section-3.2-2" class="pilcrow">¶</a></p>
 <p id="section-3.2-3">The parameter fixedInfo MAY contain any of the following information:<a href="#section-3.2-3" class="pilcrow">¶</a></p>
 <ul class="normal">
@@ -1550,7 +1547,7 @@ In cases some variable length input is necessary, such as the representation of 
       <h2 id="name-practical-instantiations-2">
 <a href="#section-4" class="section-number selfRef">4. </a><a href="#name-practical-instantiations-2" class="section-name selfRef">Practical instantiations</a>
       </h2>
-<p id="section-4-1">The KDF must be instantiated with cryptographically-secure choices for <code>KDF</code> and <code>H</code>. The following are RECOMMENDED Keccak-based instatiations, but other choices MAY be made depending on availability of cryptographic primitives, protocol design needs, and especially to allow for future cryptographic agility.<a href="#section-4-1" class="pilcrow">¶</a></p>
+<p id="section-4-1">The KDF must be instantiated with cryptographically-secure choices for <code>KDF</code> and <code>H</code>. The following are RECOMMENDED Keccak-based instatiations, but other choices MAY be made for example to allow for future cryptographic agility. A protocol using a different instantiation MUST justify that it will behave as a multi-PRF given fixed length inputs.<a href="#section-4-1" class="pilcrow">¶</a></p>
 <p id="section-4-2">Each instance defines a function to be used as <code>KDF</code>, a hash <code>H</code> function to derive the <code>k_i</code>, and optionally a <code>counter</code>.<a href="#section-4-2" class="pilcrow">¶</a></p>
 <ol start="1" type="1" class="normal type-1" id="section-4-3">
 <li id="section-4-3.1">
