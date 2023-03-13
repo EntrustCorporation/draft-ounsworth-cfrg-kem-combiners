@@ -308,11 +308,19 @@ In the case of a PSK there is no associated ciphertext present.
 
 ~~~ BEGIN EDNOTE ~~~
 
-There is currently debate among the authors about whether the hash MAY be omitted for KEMs where `ss_i` is guaranteed to be constant length. The overall `ss_i || ct_i` will not be guaranteed to be constant length since `ct_i` is fully under the control of the attacker, but maybe it sufficient if the chosen KEMs will only decapsulate successfully on ciphertexts of fixed length?
+Each `k_i` MUST be constant in length, therefore it MAY be the concatenation of the secret share `ss_i` and ciphertext `ct_i` only if they are guaranteed to be constant length:
 
 ~~~
 k_i = ss_i || ct_i
 ~~~
+
+For all other cases, it is REQUIRED to concatenate and hash them first:
+
+~~~
+k_i = H(ss_i || ct_i)
+~~~
+
+Including the ciphertext guarantees that the combined kem is IND-CCA secure as long as one of the ingredient KEMs is, as stated by {{KEMCombiners}}.
 
 Any protocols making use of this construction MUST either hash all inputs `ss_i || ct_i`, or justify that any un-hashed inputs will always be fixed length.
 
@@ -320,16 +328,17 @@ Any protocols making use of this construction MUST either hash all inputs `ss_i 
 
 ## Protocol binding
 The `fixedInfo` string is a fixed-length string containing some context-specific information.
-It MUST NOT depend on the secret shares. The intention is to prevent cross-protocol attacks by making this key derivation unique to its protocol context.
+The intention is to prevent cross-context attacks by making this key derivation unique to its protocol context.
 
 The `fixedInfo` string MUST have a definite structure depending on the protocol where all parts are fixed length. This prevents a variable length structure from creating collisions between two different instances.
 In cases some variable length input is necessary, such as the representation of a user ID, a public key, or an OID, then hashing or padding MAY be used.
+
+`fixedInfo` MUST NOT include the shared secrets and ciphertexts, as they are already represented in the KDF input.
 
 The parameter fixedInfo MAY contain any of the following information:
 
 * Public information about the communication parties, such as their identifiers.
 * The public keys or certificates contributed by each party to the key-agreement transaction.
-* The ciphertext of each Key Encapsulation Mechanism.
 * Other public information shared between communication parties before or during the transaction, such as nonces.
 * An indication of the protocol or application employing the key-derivation method.
 * Protocol-related information, such as a label or session identifier.
@@ -398,12 +407,17 @@ ciphertexts and their potential compression by a cryptographic hash function.
 <!-- Start of Appendices -->
 --- back
 
+# Contributors
+{:numbered="false"}
+
+Stavros Kousidis (BSI)
+
 # Acknowledgements
 {:numbered="false"}
 
 This document incorporates contributions and comments from a large group of experts. The authors would especially like to acknowledge the expertise and tireless dedication of the following people, who attended many long meetings and generated millions of bytes of electronic mail and VOIP traffic over the past years in pursuit of this document:
 
-Douglas Stebila, Nimrod Aviram, Andreas Huelsing, and Stavros Kousidis.
+Douglas Stebila, Nimrod Aviram, and Andreas Huelsing.
 
 We are grateful to all, including any contributors who may have
 been inadvertently omitted from this list.
