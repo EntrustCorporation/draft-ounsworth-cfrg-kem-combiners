@@ -5,10 +5,10 @@
 CFRG                                                        M. Ounsworth
 Internet-Draft                                                   Entrust
 Intended status: Informational                                A. Wussler
-Expires: 14 September 2023                                        Proton
+Expires: 25 September 2023                                        Proton
                                                              S. Kousidis
                                                                      BSI
-                                                           13 March 2023
+                                                           24 March 2023
 
 
 Combiner function for hybrid key encapsulation mechanisms (Hybrid KEMs)
@@ -53,7 +53,7 @@ Status of This Memo
 
 
 
-Ounsworth, et al.       Expires 14 September 2023               [Page 1]
+Ounsworth, et al.       Expires 25 September 2023               [Page 1]
 
 Internet-Draft                KEM Combiner                    March 2023
 
@@ -68,7 +68,7 @@ Internet-Draft                KEM Combiner                    March 2023
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 14 September 2023.
+   This Internet-Draft will expire on 25 September 2023.
 
 Copyright Notice
 
@@ -93,14 +93,14 @@ Table of Contents
      3.1.  k_i construction  . . . . . . . . . . . . . . . . . . . .   5
      3.2.  Protocol binding  . . . . . . . . . . . . . . . . . . . .   6
    4.  Practical instantiations  . . . . . . . . . . . . . . . . . .   7
-     4.1.  Hash-and-counter based construction . . . . . . . . . . .   8
+     4.1.  Hash-and-counter based construction . . . . . . . . . . .   7
      4.2.  KMAC based construction . . . . . . . . . . . . . . . . .   8
    5.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .   8
-   6.  Security Considerations . . . . . . . . . . . . . . . . . . .   9
+   6.  Security Considerations . . . . . . . . . . . . . . . . . . .   8
    7.  References  . . . . . . . . . . . . . . . . . . . . . . . . .   9
      7.1.  Normative References  . . . . . . . . . . . . . . . . . .   9
      7.2.  Informative References  . . . . . . . . . . . . . . . . .   9
-   Acknowledgements  . . . . . . . . . . . . . . . . . . . . . . . .  12
+   Acknowledgements  . . . . . . . . . . . . . . . . . . . . . . . .  11
    Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  12
 
 
@@ -109,7 +109,7 @@ Table of Contents
 
 
 
-Ounsworth, et al.       Expires 14 September 2023               [Page 2]
+Ounsworth, et al.       Expires 25 September 2023               [Page 2]
 
 Internet-Draft                KEM Combiner                    March 2023
 
@@ -165,7 +165,7 @@ Internet-Draft                KEM Combiner                    March 2023
 
 
 
-Ounsworth, et al.       Expires 14 September 2023               [Page 3]
+Ounsworth, et al.       Expires 25 September 2023               [Page 3]
 
 Internet-Draft                KEM Combiner                    March 2023
 
@@ -221,7 +221,7 @@ Internet-Draft                KEM Combiner                    March 2023
 
 
 
-Ounsworth, et al.       Expires 14 September 2023               [Page 4]
+Ounsworth, et al.       Expires 25 September 2023               [Page 4]
 
 Internet-Draft                KEM Combiner                    March 2023
 
@@ -272,45 +272,31 @@ Internet-Draft                KEM Combiner                    March 2023
    combiner that is CCA-secure as long as at least one of the ingredient
    KEMs is.  In order to protect against chosen ciphertext attacks, it
    is necessary to include both the shared secret ss_i and its
-   corresponding ciphertext ct_i.  In addition, each k_i MUST be
-   constant in length to prevent abuse of the underlying hash function,
+   corresponding ciphertext ct_i.  If both the secret share ss_i and the
+   ciphertext ct_i are constant length, then k_i MAY be constructed
 
 
 
-Ounsworth, et al.       Expires 14 September 2023               [Page 5]
+Ounsworth, et al.       Expires 25 September 2023               [Page 5]
 
 Internet-Draft                KEM Combiner                    March 2023
 
 
-   therefore the secret shares ss_i || ct_i MUST be hashed prior to
-   inclusion in the overall construction described in Figure 1:
-
-   k_i = H(ss_i || ct_i)
-
-   In the case of a PSK there is no associated ciphertext present.
-
-   ~~~ BEGIN EDNOTE ~~~
-
-   Each k_i MUST be constant in length, therefore it MAY be the
-   concatenation of the secret share ss_i and ciphertext ct_i only if
-   they are guaranteed to be constant length:
+   concatenating the two values:
 
    k_i = ss_i || ct_i
 
-   For all other cases, it is REQUIRED to concatenate and hash them
-   first:
+   If ss_i or ct_i are not guaranteed to have constant length, it is
+   REQUIRED to concatenate and hash the resulting string prior to
+   inclusion in the overall construction described in Figure 1:
 
    k_i = H(ss_i || ct_i)
-
-   Including the ciphertext guarantees that the combined kem is IND-CCA
-   secure as long as one of the ingredient KEMs is, as stated by
-   [GHP18].
 
    Any protocols making use of this construction MUST either hash all
    inputs ss_i || ct_i, or justify that any un-hashed inputs will always
    be fixed length.
 
-   ~~~ END EDNOTE ~~~
+   In the case of a PSK the associated ciphertext is the empty string.
 
 3.2.  Protocol binding
 
@@ -331,13 +317,6 @@ Internet-Draft                KEM Combiner                    March 2023
 
    The parameter fixedInfo MAY contain any of the following information:
 
-
-
-Ounsworth, et al.       Expires 14 September 2023               [Page 6]
-
-Internet-Draft                KEM Combiner                    March 2023
-
-
    *  Public information about the communication parties, such as their
       identifiers.
 
@@ -349,6 +328,15 @@ Internet-Draft                KEM Combiner                    March 2023
 
    *  An indication of the protocol or application employing the key-
       derivation method.
+
+
+
+
+
+Ounsworth, et al.       Expires 25 September 2023               [Page 6]
+
+Internet-Draft                KEM Combiner                    March 2023
+
 
    *  Protocol-related information, such as a label or session
       identifier.
@@ -386,14 +374,6 @@ Internet-Draft                KEM Combiner                    March 2023
 
    3.  KDF = KMAC128 and H = SHA3-256, with hashSize = 128 bit.
 
-
-
-
-Ounsworth, et al.       Expires 14 September 2023               [Page 7]
-
-Internet-Draft                KEM Combiner                    March 2023
-
-
    4.  KDF = KMAC256 and H = SHA3-512, with hashSize = 256 bit.
 
 4.1.  Hash-and-counter based construction
@@ -406,6 +386,13 @@ Internet-Draft                KEM Combiner                    March 2023
    *  The hash is performed over the string defined in Section 3, and
       repeated ceil(outputBits/hashSize) times.  For each iteration the
       counter MUST be increased by 0x01.
+
+
+
+Ounsworth, et al.       Expires 25 September 2023               [Page 7]
+
+Internet-Draft                KEM Combiner                    March 2023
+
 
    *  The strings are concatenated ordered by counter.
 
@@ -438,18 +425,6 @@ Internet-Draft                KEM Combiner                    March 2023
 
    None.
 
-
-
-
-
-
-
-
-Ounsworth, et al.       Expires 14 September 2023               [Page 8]
-
-Internet-Draft                KEM Combiner                    March 2023
-
-
 6.  Security Considerations
 
    The proposed instantiations in Section 4 are practical multi-PRFs
@@ -464,6 +439,16 @@ Internet-Draft                KEM Combiner                    March 2023
    Hence, to be able to distinguish a key k, derived from shared keys
    k_i from a random bit string, an adversary has to correctly guess all
    key shares k_i entirely.
+
+
+
+
+
+
+Ounsworth, et al.       Expires 25 September 2023               [Page 8]
+
+Internet-Draft                KEM Combiner                    March 2023
+
 
    The proposed construction in Section 3 with the instantiations in
    Section 4 preserves IND-CCA2 of any of its ingredient KEMs, i.e. the
@@ -498,14 +483,6 @@ Internet-Draft                KEM Combiner                    March 2023
               the Indifferentiability of the Sponge Construction", 2008,
               <https://doi.org/10.1007/978-3-540-78967-3_11>.
 
-
-
-
-Ounsworth, et al.       Expires 14 September 2023               [Page 9]
-
-Internet-Draft                KEM Combiner                    March 2023
-
-
    [ETSI-QHKE]
               "Quantum-safe Hybrid Key Exchanges", ETSI TS 103 744
               V1.1.1 , December 2020, <https://www.etsi.org/deliver/
@@ -520,12 +497,21 @@ Internet-Draft                KEM Combiner                    March 2023
    [GHP18]    Giacon, F., Heuer, F., and B. Poettering, "KEM Combiners",
               2018, <https://doi.org/10.1007/978-3-319-76578-5_7>.
 
+
+
+
+
+Ounsworth, et al.       Expires 25 September 2023               [Page 9]
+
+Internet-Draft                KEM Combiner                    March 2023
+
+
    [I-D.driscoll-pqt-hybrid-terminology]
               D, F., "Terminology for Post-Quantum Traditional Hybrid
               Schemes", Work in Progress, Internet-Draft, draft-
-              driscoll-pqt-hybrid-terminology-01, 20 October 2022,
+              driscoll-pqt-hybrid-terminology-02, 7 March 2023,
               <https://datatracker.ietf.org/doc/html/draft-driscoll-pqt-
-              hybrid-terminology-01>.
+              hybrid-terminology-02>.
 
    [I-D.ietf-ipsecme-ikev2-multiple-ke]
               Tjhai, C., Tomlinson, M., Bartlett, G., Fluhrer, S., Van
@@ -549,25 +535,12 @@ Internet-Draft                KEM Combiner                    March 2023
               <https://datatracker.ietf.org/doc/html/draft-ietf-tls-
               hybrid-design-06>.
 
-
-
-
-
-
-
-
-
-Ounsworth, et al.       Expires 14 September 2023              [Page 10]
-
-Internet-Draft                KEM Combiner                    March 2023
-
-
    [I-D.ounsworth-pq-composite-kem]
               Ounsworth, M. and J. Gray, "Composite KEM For Use In
               Internet PKI", Work in Progress, Internet-Draft, draft-
-              ounsworth-pq-composite-kem-00, 11 July 2022,
+              ounsworth-pq-composite-kem-01, 13 March 2023,
               <https://datatracker.ietf.org/doc/html/draft-ounsworth-pq-
-              composite-kem-00>.
+              composite-kem-01>.
 
    [I-D.wussler-openpgp-pqc]
               Kousidis, S., Strenzke, F., and A. Wussler, "Post-Quantum
@@ -579,6 +552,15 @@ Internet-Draft                KEM Combiner                    March 2023
    [PQCAPI]   Project, N. P.-Q. C., "PQC - API notes", November 2022,
               <https://csrc.nist.gov/CSRC/media/Projects/Post-Quantum-
               Cryptography/documents/example-files/api-notes.pdf>.
+
+
+
+
+
+Ounsworth, et al.       Expires 25 September 2023              [Page 10]
+
+Internet-Draft                KEM Combiner                    March 2023
+
 
    [RFC8174]  Leiba, B., "Ambiguity of Uppercase vs Lowercase in RFC
               2119 Key Words", BCP 14, RFC 8174, DOI 10.17487/RFC8174,
@@ -606,18 +588,6 @@ Internet-Draft                KEM Combiner                    March 2023
               NIST Special Publication 800-185 , 2016,
               <https://doi.org/10.6028/NIST.SP.800-185>.
 
-
-
-
-
-
-
-
-Ounsworth, et al.       Expires 14 September 2023              [Page 11]
-
-Internet-Draft                KEM Combiner                    March 2023
-
-
    [SP800-56A]
               Barker, E., Chen, L., Roginsky, A., Vassilev, A., and R.
               Davis, "Recommendation for Pair-Wise Key-Establishment
@@ -639,6 +609,14 @@ Acknowledgements
    attended many long meetings and generated millions of bytes of
    electronic mail and VOIP traffic over the past years in pursuit of
    this document:
+
+
+
+
+Ounsworth, et al.       Expires 25 September 2023              [Page 11]
+
+Internet-Draft                KEM Combiner                    March 2023
+
 
    Douglas Stebila, Nimrod Aviram, and Andreas Huelsing.
 
@@ -666,14 +644,6 @@ Authors' Addresses
    Email: aron@wussler.it
 
 
-
-
-
-Ounsworth, et al.       Expires 14 September 2023              [Page 12]
-
-Internet-Draft                KEM Combiner                    March 2023
-
-
    Stavros Kousidis
    BSI
    Germany
@@ -699,30 +669,4 @@ Internet-Draft                KEM Combiner                    March 2023
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-Ounsworth, et al.       Expires 14 September 2023              [Page 13]
+Ounsworth, et al.       Expires 25 September 2023              [Page 12]

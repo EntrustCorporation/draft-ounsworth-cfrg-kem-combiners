@@ -154,7 +154,7 @@ informative:
     title: KEM Combiners
     date: 2018
     author:
-      - 
+      -
         ins: F. Giacon
         name: Federico Giacon
       -
@@ -176,16 +176,16 @@ informative:
       -
         ins: N. Aviram
         name: Nimrod Aviram
-      - 
+      -
         ins: B. Dowling
         name: Benjamin Dowling
-      - 
+      -
         ins: I. Komargodski
         name: Ilan Komargodski
-      - 
+      -
         ins: K.G. Paterson
         name: Kenneth G Paterson
-      - 
+      -
         ins: E. Ronen
         name: Eyal Ronen
       -
@@ -294,34 +294,22 @@ The shared secret `ss` MAY be used directly as a symmetric key, for example as a
 
 ## k_i construction {#sec-k_i-construction}
 
-Following the guidance of Giacon et al. [GHP18], we wish for a KEM combiner that is CCA-secure as long as at least one of the ingredient KEMs is. In order to protect against chosen ciphertext attacks, it is necessary to include both the shared secret `ss_i` and its corresponding ciphertext `ct_i`. In addition, each `k_i` MUST be constant in length to prevent abuse of the underlying hash function, therefore the secret shares `ss_i || ct_i` MUST be hashed prior to inclusion in the overall construction described in {{tab-kemCombiner}}:
-
-~~~
-k_i = H(ss_i || ct_i)
-~~~
-
-In the case of a PSK there is no associated ciphertext present.
-
-
-~~~ BEGIN EDNOTE ~~~
-
-Each `k_i` MUST be constant in length, therefore it MAY be the concatenation of the secret share `ss_i` and ciphertext `ct_i` only if they are guaranteed to be constant length:
+Following the guidance of Giacon et al. [GHP18], we wish for a KEM combiner that is CCA-secure as long as at least one of the ingredient KEMs is. In order to protect against chosen ciphertext attacks, it is necessary to include both the shared secret `ss_i` and its corresponding ciphertext `ct_i`.
+If both the secret share `ss_i` and the ciphertext `ct_i` are constant length, then `k_i` MAY be constructed concatenating the two values:
 
 ~~~
 k_i = ss_i || ct_i
 ~~~
 
-For all other cases, it is REQUIRED to concatenate and hash them first:
+If `ss_i` or `ct_i` are not guaranteed to have constant length, it is REQUIRED to concatenate and hash the resulting string prior to inclusion in the overall construction described in {{tab-kemCombiner}}:
 
 ~~~
 k_i = H(ss_i || ct_i)
 ~~~
 
-Including the ciphertext guarantees that the combined kem is IND-CCA secure as long as one of the ingredient KEMs is, as stated by [GHP18].
-
 Any protocols making use of this construction MUST either hash all inputs `ss_i || ct_i`, or justify that any un-hashed inputs will always be fixed length.
 
-~~~ END EDNOTE ~~~
+In the case of a PSK the associated ciphertext is the empty string.
 
 ## Protocol binding
 The `fixedInfo` string is a fixed-length string containing some context-specific information.
@@ -400,7 +388,7 @@ shared secret `ss_i` is picked uniformly at random. Our construction can thus
 be seen as an instantiation of the IND-CCA2 preserving Example 3 in Figure 1 of
 {{GHP18}}, up to some reordering of input shared secrets `ss_i` and ciphertexts
 `ct_i` and their potential compression `H(ss_i || ct_i)` by a cryptographic
-hash function. 
+hash function.
 
 <!-- Start of Appendices -->
 --- back
