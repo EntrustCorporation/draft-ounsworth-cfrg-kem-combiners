@@ -331,6 +331,8 @@ k_i = ct_i || rlen(ct_i) || ss_i || rlen(ss_i)
 Any protocols making use of this construction MUST either right-encode the length of all inputs `ss_i` and `ct_i`, or justify that any inputs will always be fixed length.
 In the case of a PSK the associated ciphertext is the empty string.
 
+Including the ciphertext guarantees that the combined kem is IND-CCA2 secure as long as one of the ingredient KEMs is, as stated by [GHP18].
+
 The ciphertext precedes the secret share, as memory-constrained devices can write `c_i` into the hash state and no further caching is required when streaming.
 
 ## Protocol binding
