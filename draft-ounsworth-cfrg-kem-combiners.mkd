@@ -373,28 +373,22 @@ This is a non-comprehensive list, further information can be found in paragraph 
 
 # Practical instantiations {#sec-instantiation}
 
-The KDF must be instantiated with cryptographically-secure choices for `KDF` and `H`. The following are RECOMMENDED Keccak-based instatiations, but other choices MAY be made for example to allow for future cryptographic agility. A protocol using a different instantiation MUST justify that it will behave as a multi-PRF given fixed length inputs.
+The KDF must be instantiated with cryptographically-secure choices for `KDF`. The following are RECOMMENDED Keccak-based instatiations, but other choices MAY be made for example to allow for future cryptographic agility. A protocol using a different instantiation MUST justify that it will behave as a multi-PRF.
 
-Each instance defines a function to be used as `KDF`, a hash `H` function to derive the `k_i`, and optionally a `counter`.
+Each instance defines a function to be used as `KDF`, a `hashSize` to determine parameter size, and optionally a `counter`:
 
-1. `KDF = SHA3-256` and `H = SHA3-256`, with `hashSize = 256 bit`.
-1. `KDF = SHA3-512` and `H = SHA3-512`, with `hashSize = 512 bit`.
-1. `KDF = KMAC128` and `H = SHA3-256`, with `hashSize = 128 bit`.
-1. `KDF = KMAC256` and `H = SHA3-512`, with `hashSize = 256 bit`.
+1. `KDF = KMAC128`, with `hashSize = 128 bit`.
+1. `KDF = KMAC256`, with `hashSize = 256 bit`.
+1. `KDF = SHA3-256`, with `hashSize = 256 bit`.
+1. `KDF = SHA3-512`, with `hashSize = 512 bit`.
 
-## Hash-and-counter based construction
-Options 1 and 2 instantiate the KDF using SHA3, specified in NIST FIPS 202 {{FIPS202}}.
-To generate an `outputBits` long secret share `ss`:
+As justified in the security considerations, we recommend only Keccak-based instantiations because assuming there are no weaknesses found in the Keccak permutation, it behaves as a multi-PRF that can be keyed by any input `k_i`.
+SHAKE is also not included in the list as it is not allowed by {{SP800-56A}} section 7, and does not provide any implementation advantage over KMAC.
 
-* the `counter` MUST be initialized with the value `0x00000001`.
-* The hash is performed over the string defined in {{sec-kem-combiner}}, and repeated `ceil(outputBits/hashSize)` times. For each iteration the `counter` MUST be increased by `0x01`.
-* The strings are concatenated ordered by `counter`.
-* The leftmost `outputBits` are returned as `ss`.
-
-An implementation MUST NOT overflow and reuse the `counter` and an error MUST be returned when producing more than 2^32 consecutive hashes.
+KMAC constructions are RECOMMENDED over SHA-3, as KMAC offers a simple cSHAKE-based construction, with the advantage of returning an unrelated output when requesting a different `outputBits` KEK length.
 
 ## KMAC based construction
-Options 3 and 4 are KMAC-based, as specified in NIST SP 800-185 {{SP800-185}}.
+Options 1 and 2 are KMAC-based, as specified in NIST SP 800-185 {{SP800-185}}.
 To instantiate the function:
 
 * The context `S` MUST be the utf-8 string "KDF".
@@ -403,6 +397,17 @@ To instantiate the function:
 
 To derive a shared secret `ss` of desired length, KMAC is called a single time with the input string `X` defined in {{sec-kem-combiner}} and length `L` being `outputBits`.
 This is compatible with the one-step KDF definition given in NIST SP800-56Cr2 {{SP800-56C}}, Section 4.
+
+## Hash-and-counter based construction
+Options 3 and 4 instantiate the KDF using SHA3, specified in NIST FIPS 202 {{FIPS202}}.
+To generate an `outputBits` long secret share `ss`:
+
+* the `counter` MUST be initialized with the value `0x00000001`.
+* The hash is performed over the string defined in {{sec-kem-combiner}}, and repeated `ceil(outputBits/hashSize)` times. For each iteration the `counter` MUST be increased by `0x01`.
+* The strings are concatenated ordered by `counter`.
+* The leftmost `outputBits` are returned as `ss`.
+
+An implementation MUST NOT overflow and reuse the `counter` and an error MUST be returned when producing more than 2^32 consecutive hashes.
 
 # IANA Considerations {#sec-iana}
 

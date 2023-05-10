@@ -94,8 +94,8 @@ Table of Contents
      3.2.  k_i construction  . . . . . . . . . . . . . . . . . . . .   6
      3.3.  Protocol binding  . . . . . . . . . . . . . . . . . . . .   7
    4.  Practical instantiations  . . . . . . . . . . . . . . . . . .   8
-     4.1.  Hash-and-counter based construction . . . . . . . . . . .   8
-     4.2.  KMAC based construction . . . . . . . . . . . . . . . . .   9
+     4.1.  KMAC based construction . . . . . . . . . . . . . . . . .   8
+     4.2.  Hash-and-counter based construction . . . . . . . . . . .   9
    5.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .   9
    6.  Security Considerations . . . . . . . . . . . . . . . . . . .   9
    7.  References  . . . . . . . . . . . . . . . . . . . . . . . . .  10
@@ -409,39 +409,39 @@ Internet-Draft                KEM Combiner                      May 2023
 4.  Practical instantiations
 
    The KDF must be instantiated with cryptographically-secure choices
-   for KDF and H.  The following are RECOMMENDED Keccak-based
-   instatiations, but other choices MAY be made for example to allow for
-   future cryptographic agility.  A protocol using a different
-   instantiation MUST justify that it will behave as a multi-PRF given
-   fixed length inputs.
+   for KDF.  The following are RECOMMENDED Keccak-based instatiations,
+   but other choices MAY be made for example to allow for future
+   cryptographic agility.  A protocol using a different instantiation
+   MUST justify that it will behave as a multi-PRF.
 
-   Each instance defines a function to be used as KDF, a hash H function
-   to derive the k_i, and optionally a counter.
+   Each instance defines a function to be used as KDF, a hashSize to
+   determine parameter size, and optionally a counter:
 
-   1.  KDF = SHA3-256 and H = SHA3-256, with hashSize = 256 bit.
+   1.  KDF = KMAC128, with hashSize = 128 bit.
 
-   2.  KDF = SHA3-512 and H = SHA3-512, with hashSize = 512 bit.
+   2.  KDF = KMAC256, with hashSize = 256 bit.
 
-   3.  KDF = KMAC128 and H = SHA3-256, with hashSize = 128 bit.
+   3.  KDF = SHA3-256, with hashSize = 256 bit.
 
-   4.  KDF = KMAC256 and H = SHA3-512, with hashSize = 256 bit.
+   4.  KDF = SHA3-512, with hashSize = 512 bit.
 
-4.1.  Hash-and-counter based construction
+   As justified in the security considerations, we recommend only
+   Keccak-based instantiations because assuming there are no weaknesses
+   found in the Keccak permutation, it behaves as a multi-PRF that can
+   be keyed by any input k_i.  SHAKE is also not included in the list as
+   it is not allowed by [SP800-56A] section 7, and does not provide any
+   implementation advantage over KMAC.
 
-   Options 1 and 2 instantiate the KDF using SHA3, specified in NIST
-   FIPS 202 [FIPS202].  To generate an outputBits long secret share ss:
+   KMAC constructions are RECOMMENDED over SHA-3, as KMAC offers a
+   simple cSHAKE-based construction, with the advantage of returning an
+   unrelated output when requesting a different outputBits KEK length.
 
-   *  the counter MUST be initialized with the value 0x00000001.
+4.1.  KMAC based construction
 
-   *  The hash is performed over the string defined in Section 3, and
-      repeated ceil(outputBits/hashSize) times.  For each iteration the
-      counter MUST be increased by 0x01.
+   Options 1 and 2 are KMAC-based, as specified in NIST SP 800-185
+   [SP800-185].  To instantiate the function:
 
-   *  The strings are concatenated ordered by counter.
-
-   *  The leftmost outputBits are returned as ss.
-
-
+   *  The context S MUST be the utf-8 string "KDF".
 
 
 
@@ -449,17 +449,6 @@ Ounsworth, et al.       Expires 11 November 2023                [Page 8]
 
 Internet-Draft                KEM Combiner                      May 2023
 
-
-   An implementation MUST NOT overflow and reuse the counter and an
-   error MUST be returned when producing more than 2^32 consecutive
-   hashes.
-
-4.2.  KMAC based construction
-
-   Options 3 and 4 are KMAC-based, as specified in NIST SP 800-185
-   [SP800-185].  To instantiate the function:
-
-   *  The context S MUST be the utf-8 string "KDF".
 
    *  The key K MUST be a context-specific string of at least hashSize
       bits, and it MAY be used as an additional option to perform
@@ -472,6 +461,25 @@ Internet-Draft                KEM Combiner                      May 2023
    single time with the input string X defined in Section 3 and length L
    being outputBits.  This is compatible with the one-step KDF
    definition given in NIST SP800-56Cr2 [SP800-56C], Section 4.
+
+4.2.  Hash-and-counter based construction
+
+   Options 3 and 4 instantiate the KDF using SHA3, specified in NIST
+   FIPS 202 [FIPS202].  To generate an outputBits long secret share ss:
+
+   *  the counter MUST be initialized with the value 0x00000001.
+
+   *  The hash is performed over the string defined in Section 3, and
+      repeated ceil(outputBits/hashSize) times.  For each iteration the
+      counter MUST be increased by 0x01.
+
+   *  The strings are concatenated ordered by counter.
+
+   *  The leftmost outputBits are returned as ss.
+
+   An implementation MUST NOT overflow and reuse the counter and an
+   error MUST be returned when producing more than 2^32 consecutive
+   hashes.
 
 5.  IANA Considerations
 
@@ -490,14 +498,6 @@ Internet-Draft                KEM Combiner                      May 2023
    in only a single bit gives an unrelated, uniformly random output.
    Hence, to be able to distinguish a key k, derived from shared keys
    k_i from a random bit string, an adversary has to correctly guess all
-   key shares k_i entirely.
-
-   The proposed construction in Section 3 with the instantiations in
-   Section 4 preserves IND-CCA2 of any of its ingredient KEMs, i.e. the
-   newly formed combined KEM is IND-CCA2 secure as long as at least one
-   of the ingredient KEMs is.  Indeed, the above stated
-   indifferentiability from a random oracle qualifies Keccak as a split-
-   key pseudorandom function as defined in [GHP18].  That is, Keccak
 
 
 
@@ -506,6 +506,14 @@ Ounsworth, et al.       Expires 11 November 2023                [Page 9]
 Internet-Draft                KEM Combiner                      May 2023
 
 
+   key shares k_i entirely.
+
+   The proposed construction in Section 3 with the instantiations in
+   Section 4 preserves IND-CCA2 of any of its ingredient KEMs, i.e. the
+   newly formed combined KEM is IND-CCA2 secure as long as at least one
+   of the ingredient KEMs is.  Indeed, the above stated
+   indifferentiability from a random oracle qualifies Keccak as a split-
+   key pseudorandom function as defined in [GHP18].  That is, Keccak
    behaves like a random function if at least one input shared secret
    ss_i is picked uniformly at random.  Our construction can thus be
    seen as an instantiation of the IND-CCA2 preserving Example 3 in
@@ -547,20 +555,19 @@ Internet-Draft                KEM Combiner                      May 2023
    [GHP18]    Giacon, F., Heuer, F., and B. Poettering, "KEM Combiners",
               2018, <https://doi.org/10.1007/978-3-319-76578-5_7>.
 
-   [I-D.driscoll-pqt-hybrid-terminology]
-              D, F., "Terminology for Post-Quantum Traditional Hybrid
-              Schemes", Work in Progress, Internet-Draft, draft-
-              driscoll-pqt-hybrid-terminology-02, 7 March 2023,
-              <https://datatracker.ietf.org/doc/html/draft-driscoll-pqt-
-              hybrid-terminology-02>.
-
-
 
 
 Ounsworth, et al.       Expires 11 November 2023               [Page 10]
 
 Internet-Draft                KEM Combiner                      May 2023
 
+
+   [I-D.driscoll-pqt-hybrid-terminology]
+              D, F., "Terminology for Post-Quantum Traditional Hybrid
+              Schemes", Work in Progress, Internet-Draft, draft-
+              driscoll-pqt-hybrid-terminology-02, 7 March 2023,
+              <https://datatracker.ietf.org/doc/html/draft-driscoll-pqt-
+              hybrid-terminology-02>.
 
    [I-D.ietf-ipsecme-ikev2-multiple-ke]
               Tjhai, C., Tomlinson, M., Bartlett, G., Fluhrer, S., Van
@@ -602,6 +609,15 @@ Internet-Draft                KEM Combiner                      May 2023
               <https://csrc.nist.gov/CSRC/media/Projects/Post-Quantum-
               Cryptography/documents/example-files/api-notes.pdf>.
 
+
+
+
+
+Ounsworth, et al.       Expires 11 November 2023               [Page 11]
+
+Internet-Draft                KEM Combiner                      May 2023
+
+
    [RFC8174]  Leiba, B., "Ambiguity of Uppercase vs Lowercase in RFC
               2119 Key Words", BCP 14, RFC 8174, DOI 10.17487/RFC8174,
               May 2017, <https://www.rfc-editor.org/info/rfc8174>.
@@ -610,13 +626,6 @@ Internet-Draft                KEM Combiner                      May 2023
               Cryptographic Algorithm Object Identifier Range",
               RFC 8411, DOI 10.17487/RFC8411, August 2018,
               <https://www.rfc-editor.org/info/rfc8411>.
-
-
-
-Ounsworth, et al.       Expires 11 November 2023               [Page 11]
-
-Internet-Draft                KEM Combiner                      May 2023
-
 
    [RFC8696]  Housley, R., "Using Pre-Shared Key (PSK) in the
               Cryptographic Message Syntax (CMS)", RFC 8696,
@@ -657,6 +666,14 @@ Acknowledgements
    electronic mail and VOIP traffic over the past years in pursuit of
    this document:
 
+
+
+
+Ounsworth, et al.       Expires 11 November 2023               [Page 12]
+
+Internet-Draft                KEM Combiner                      May 2023
+
+
    Douglas Stebila, Nimrod Aviram, and Andreas Huelsing.
 
    We are grateful to all, including any contributors who may have been
@@ -666,13 +683,6 @@ Acknowledgements
    referenced below.  Thanks go to the authors of those documents.
    "Copying always makes things easier and less error prone" -
    [RFC8411].
-
-
-
-Ounsworth, et al.       Expires 11 November 2023               [Page 12]
-
-Internet-Draft                KEM Combiner                      May 2023
-
 
 Authors' Addresses
 
@@ -694,16 +704,6 @@ Authors' Addresses
    BSI
    Germany
    Email: stavros.kousidis@bsi.bund.de
-
-
-
-
-
-
-
-
-
-
 
 
 
