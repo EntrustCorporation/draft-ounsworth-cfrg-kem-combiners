@@ -11,10 +11,10 @@ wg: CFRG
 kw: Internet-Draft
 cat: info
 venue:
-  group: "Limited Additional Mechanisms for PKIX and SMIME (lamps)"
-  type: "Working Group"
-  mail: "spasm@ietf.org"
-  arch: "https://mailarchive.ietf.org/arch/browse/spasm/"
+  group: "Crypto Forum Research Group (CFRG)"
+  type: "Research Group"
+  mail: "cfrg@ietf.org"
+  arch: "https://mailarchive.ietf.org/arch/browse/cfrg/"
   repo: "https://github.com/EntrustCorporation/draft-ounsworth-cfrg-kem-combiners"
 
 coding: utf-8
