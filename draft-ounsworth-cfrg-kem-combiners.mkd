@@ -196,7 +196,7 @@ informative:
 
 The migration to post-quantum cryptography often calls for performing multiple key encapsulations in parallel and then combining their outputs to derive a single shared secret.
 
-This document defines a comprehensible and easy to implement Keccak-based KEM combiner to join an arbitrary number of key shares, that is compatible with NIST SP 800-56Cr2 [SP800-56C] when viewed as a key derivation function. The combiners defined here are practical multi-PRFs and are CCA-secure as long as at least one of the ingredient KEMs is.
+This document defines a comprehensible and easy to implement Keccak-based KEM combiner to join an arbitrary number of key shares, that is compatible with NIST SP 800-56Cr2 [SP800-56C] when viewed as a key derivation function. The combiners defined here are practical split-key PRFs and are CCA-secure as long as at least one of the ingredient KEMs is.
 
 
 <!-- End of Abstract -->
@@ -272,7 +272,7 @@ ss = kemCombiner(ss_1, ss_2, ..., ss_n)
 
 This document assumes that shared secrets are the output of a KEM, but without loss of generality they MAY also be any other source of cryptographic key material, such as pre-shared keys (PSKs), with PQ/PSK being a quantum-safe migration strategy being made available by some protocols, see for example IKEv2 in [RFC8784].
 
-In general it is desirable to use a multi-PRF as a KEM combiner, meaning that the combiner has the properties of a PRF when keyed by any of its single inputs.
+In general it is desirable to use a split-key PRF as a KEM combiner, meaning that the combiner has the properties of a PRF when keyed by any of its single inputs.
 The following simple yet generic construction can be used in all IETF protocols that need to combine the output of two or more KEMs:
 
 ~~~
@@ -396,7 +396,7 @@ This is a non-comprehensive list, further information can be found in paragraph 
 
 # Practical instantiations {#sec-instantiation}
 
-The KDF must be instantiated with cryptographically-secure choices for `KDF`. The following are RECOMMENDED Keccak-based instatiations, but other choices MAY be made for example to allow for future cryptographic agility. A protocol using a different instantiation MUST justify that it will behave as a multi-PRF.
+The KDF must be instantiated with cryptographically-secure choices for `KDF`. The following are RECOMMENDED Keccak-based instatiations, but other choices MAY be made for example to allow for future cryptographic agility. A protocol using a different instantiation MUST justify that it will behave as a split-key PRF, as required in {{GHP18}}.
 
 Each instance defines a function to be used as `KDF`, a `hashSize` to determine parameter size, and optionally a `counter`:
 
@@ -405,7 +405,7 @@ Each instance defines a function to be used as `KDF`, a `hashSize` to determine 
 1. `KDF = SHA3-256`, with `hashSize = 256 bit`.
 1. `KDF = SHA3-512`, with `hashSize = 512 bit`.
 
-As justified in the security considerations, we recommend only Keccak-based instantiations because assuming there are no weaknesses found in the Keccak permutation, it behaves as a multi-PRF that can be keyed by any input `k_i`.
+As justified in the security considerations, we recommend only Keccak-based instantiations because assuming there are no weaknesses found in the Keccak permutation, it behaves as a split-key PRF that can be keyed by any input `k_i`.
 SHAKE is also not included in the list as it is not allowed by {{SP800-56A}} section 7, and does not provide any implementation advantage over KMAC.
 
 KMAC constructions are RECOMMENDED over SHA-3, as KMAC offers a simple cSHAKE-based construction, with the advantage of returning an unrelated output when requesting a different `outputBits` KEK length.
@@ -438,7 +438,7 @@ None.
 
 # Security Considerations
 
-The proposed instantiations in {{sec-instantiation}} are practical multi-PRFs since this specification limits to the use of Keccak-based constructions. The sponge construction was proven to be indifferentiable from a random oracle {{BDPA08}}.
+The proposed instantiations in {{sec-instantiation}} are practical split-key PRFs since this specification limits to the use of Keccak-based constructions. The sponge construction was proven to be indifferentiable from a random oracle {{BDPA08}}.
 More precisely, for a given capacity `c` the indifferentiability proof shows that assuming there are no weaknesses found in the Keccak permutation, an attacker has to make an expected number of `2^(c/2)` calls to the permutation to tell Keccak from a random oracle.
 For a random oracle, a difference in only a single bit gives an unrelated, uniformly random output.
 Hence, to be able to distinguish a key `k`, derived from shared keys `k_i` from a random bit string, an adversary has to correctly guess all key shares `k_i` entirely.
