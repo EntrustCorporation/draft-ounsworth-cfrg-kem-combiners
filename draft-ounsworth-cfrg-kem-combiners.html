@@ -1317,10 +1317,10 @@ li > p:last-of-type {
                 <p id="section-toc.1-1.3.2.2.1"><a href="#section-3.2" class="xref">3.2</a>.  <a href="#name-k_i-construction-2" class="xref">k_i construction</a></p>
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.3">
-                <p id="section-toc.1-1.3.2.3.1"><a href="#section-3.3" class="xref">3.3</a>.  <a href="#name-protocol-binding-2" class="xref">Protocol binding</a></p>
+                <p id="section-toc.1-1.3.2.3.1"><a href="#section-3.3" class="xref">3.3</a>.  <a href="#name-note-on-the-order-of-paramet" class="xref">Note on the order of parameters</a></p>
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.4">
-                <p id="section-toc.1-1.3.2.4.1"><a href="#section-3.4" class="xref">3.4</a>.  <a href="#name-note-on-the-order-of-paramet" class="xref">Note on the order of parameters</a></p>
+                <p id="section-toc.1-1.3.2.4.1"><a href="#section-3.4" class="xref">3.4</a>.  <a href="#name-protocol-binding-2" class="xref">Protocol binding</a></p>
 </li>
             </ul>
 </li>
@@ -1534,74 +1534,74 @@ In the case of a PSK the associated ciphertext is the empty string.<a href="#sec
 <p id="section-3.2-7">The ciphertext precedes the secret share, as memory-constrained devices can write <code>c_i</code> into the hash state and no further caching is required when streaming.<a href="#section-3.2-7" class="pilcrow">¶</a></p>
 </section>
 </div>
-<div id="protocol-binding">
-<section id="section-3.3">
-        <h3 id="name-protocol-binding-2">
-<a href="#section-3.3" class="section-number selfRef">3.3. </a><a href="#name-protocol-binding-2" class="section-name selfRef">Protocol binding</a>
-        </h3>
-<p id="section-3.3-1">The <code>fixedInfo</code> parameter is a fixed-format string containing some context-specific information.
-This serves to prevent cross-context attacks by making this key derivation unique to its protocol context.<a href="#section-3.3-1" class="pilcrow">¶</a></p>
-<p id="section-3.3-2">The <code>fixedInfo</code> string MUST have a definite structure depending on the protocol where all parts strictly defined by the protocol specification.<a href="#section-3.3-2" class="pilcrow">¶</a></p>
-<div class="alignLeft art-text artwork" id="section-3.3-3">
-<pre>
-fixedInfo = fixedInfo || s
-</pre><a href="#section-3.3-3" class="pilcrow">¶</a>
-</div>
-<p id="section-3.3-4">Each fixed-length input string <code>f</code> MAY be directly used as input:<a href="#section-3.3-4" class="pilcrow">¶</a></p>
-<div class="alignLeft art-text artwork" id="section-3.3-5">
-<pre>
-s = f ; f is guaranteed to have fixed length
-</pre><a href="#section-3.3-5" class="pilcrow">¶</a>
-</div>
-<p id="section-3.3-6">Each variable-length input string <code>v</code> MUST be suffixed with a right-encoding of the length:<a href="#section-3.3-6" class="pilcrow">¶</a></p>
-<div class="alignLeft art-text artwork" id="section-3.3-7">
-<pre>
-s = v || rlen(v) ; v may have variable length
-</pre><a href="#section-3.3-7" class="pilcrow">¶</a>
-</div>
-<p id="section-3.3-8"><code>fixedInfo</code> MUST NOT include the shared secrets and ciphertexts, as they are already represented in the KDF input.<a href="#section-3.3-8" class="pilcrow">¶</a></p>
-<p id="section-3.3-9">The parameter fixedInfo MAY contain any of the following information:<a href="#section-3.3-9" class="pilcrow">¶</a></p>
-<ul class="normal">
-<li class="normal" id="section-3.3-10.1">Public information about the communication parties, such as their identifiers.<a href="#section-3.3-10.1" class="pilcrow">¶</a>
-</li>
-          <li class="normal" id="section-3.3-10.2">The public keys or certificates contributed by each party to the key-agreement transaction.<a href="#section-3.3-10.2" class="pilcrow">¶</a>
-</li>
-          <li class="normal" id="section-3.3-10.3">Other public information shared between communication parties before or during the transaction, such as nonces.<a href="#section-3.3-10.3" class="pilcrow">¶</a>
-</li>
-          <li class="normal" id="section-3.3-10.4">An indication of the protocol or application employing the key-derivation method.<a href="#section-3.3-10.4" class="pilcrow">¶</a>
-</li>
-          <li class="normal" id="section-3.3-10.5">Protocol-related information, such as a label or session identifier.<a href="#section-3.3-10.5" class="pilcrow">¶</a>
-</li>
-          <li class="normal" id="section-3.3-10.6">An indication of the key-agreement scheme and/or key-derivation method used.<a href="#section-3.3-10.6" class="pilcrow">¶</a>
-</li>
-          <li class="normal" id="section-3.3-10.7">An indication of the domain parameters associated with the asymmetric key pairs employed for key establishment.<a href="#section-3.3-10.7" class="pilcrow">¶</a>
-</li>
-          <li class="normal" id="section-3.3-10.8">An indication of other parameter or primitive choices.<a href="#section-3.3-10.8" class="pilcrow">¶</a>
-</li>
-          <li class="normal" id="section-3.3-10.9">An indication of how the derived keying material should be parsed, including an indication of which algorithm(s) will use the (parsed) keying material.<a href="#section-3.3-10.9" class="pilcrow">¶</a>
-</li>
-        </ul>
-<p id="section-3.3-11">This is a non-comprehensive list, further information can be found in paragraph 5.8.2 of NIST SP800-56Ar3 <span>[<a href="#SP800-56A" class="xref">SP800-56A</a>]</span>.<a href="#section-3.3-11" class="pilcrow">¶</a></p>
-</section>
-</div>
 <div id="note-on-the-order-of-parameters">
-<section id="section-3.4">
+<section id="section-3.3">
         <h3 id="name-note-on-the-order-of-paramet">
-<a href="#section-3.4" class="section-number selfRef">3.4. </a><a href="#name-note-on-the-order-of-paramet" class="section-name selfRef">Note on the order of parameters</a>
+<a href="#section-3.3" class="section-number selfRef">3.3. </a><a href="#name-note-on-the-order-of-paramet" class="section-name selfRef">Note on the order of parameters</a>
         </h3>
-<p id="section-3.4-1">For a two-KEM instantiation, the construction is<a href="#section-3.4-1" class="pilcrow">¶</a></p>
-<p id="section-3.4-2"><code>
+<p id="section-3.3-1">For a two-KEM instantiation, the construction is<a href="#section-3.3-1" class="pilcrow">¶</a></p>
+<p id="section-3.3-2"><code>
 KDF(counter || ct_1 || rlen(ct_i1 || ss_1 || rlen(ss_1) || 
                ct_2 || rlen(ct_2) || ss_2 || rlen(ss_2) || 
                k_n || fixedInfo, outputBits)
-</code><a href="#section-3.4-2" class="pilcrow">¶</a></p>
-<p id="section-3.4-3">The order of parameters is chosen intentionally to facilitate streaming implementations
-on devices that lack sufficient memory to hold the entirety of <code>ct_1</code> or <code>ct_2</code>.<a href="#section-3.4-3" class="pilcrow">¶</a></p>
-<p id="section-3.4-4">This construction aims to have two streaming-friendly properties. First, 
-<code>ct_i</code> can be fed into <code>KDF</code>'s update interface as it is received and 
+</code><a href="#section-3.3-2" class="pilcrow">¶</a></p>
+<p id="section-3.3-3">The order of parameters is chosen intentionally to facilitate streaming implementations
+on devices that lack sufficient memory to hold the entirety of <code>ct_1</code> or <code>ct_2</code>.<a href="#section-3.3-3" class="pilcrow">¶</a></p>
+<p id="section-3.3-4">This construction aims to have two streaming-friendly properties. First, 
+<code>ct_i</code> can be written to <code>KDF</code>'s update interface as it is received and 
 does not need to be stored, finally adding its corresponding <code>ss_i</code> once 
 it is available. And second, the first KEM can be processed in its entirety and
-fed into <code>KDF</code>'s update interface before beginning to process the second KEM.<a href="#section-3.4-4" class="pilcrow">¶</a></p>
+written to <code>KDF</code>'s update interface before beginning to process the second KEM.<a href="#section-3.3-4" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="protocol-binding">
+<section id="section-3.4">
+        <h3 id="name-protocol-binding-2">
+<a href="#section-3.4" class="section-number selfRef">3.4. </a><a href="#name-protocol-binding-2" class="section-name selfRef">Protocol binding</a>
+        </h3>
+<p id="section-3.4-1">The <code>fixedInfo</code> parameter is a fixed-format string containing some context-specific information.
+This serves to prevent cross-context attacks by making this key derivation unique to its protocol context.<a href="#section-3.4-1" class="pilcrow">¶</a></p>
+<p id="section-3.4-2">The <code>fixedInfo</code> string MUST have a definite structure depending on the protocol where all parts strictly defined by the protocol specification.<a href="#section-3.4-2" class="pilcrow">¶</a></p>
+<div class="alignLeft art-text artwork" id="section-3.4-3">
+<pre>
+fixedInfo = fixedInfo || s
+</pre><a href="#section-3.4-3" class="pilcrow">¶</a>
+</div>
+<p id="section-3.4-4">Each fixed-length input string <code>f</code> MAY be directly used as input:<a href="#section-3.4-4" class="pilcrow">¶</a></p>
+<div class="alignLeft art-text artwork" id="section-3.4-5">
+<pre>
+s = f ; f is guaranteed to have fixed length
+</pre><a href="#section-3.4-5" class="pilcrow">¶</a>
+</div>
+<p id="section-3.4-6">Each variable-length input string <code>v</code> MUST be suffixed with a right-encoding of the length:<a href="#section-3.4-6" class="pilcrow">¶</a></p>
+<div class="alignLeft art-text artwork" id="section-3.4-7">
+<pre>
+s = v || rlen(v) ; v may have variable length
+</pre><a href="#section-3.4-7" class="pilcrow">¶</a>
+</div>
+<p id="section-3.4-8"><code>fixedInfo</code> MUST NOT include the shared secrets and ciphertexts, as they are already represented in the KDF input.<a href="#section-3.4-8" class="pilcrow">¶</a></p>
+<p id="section-3.4-9">The parameter fixedInfo MAY contain any of the following information:<a href="#section-3.4-9" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-3.4-10.1">Public information about the communication parties, such as their identifiers.<a href="#section-3.4-10.1" class="pilcrow">¶</a>
+</li>
+          <li class="normal" id="section-3.4-10.2">The public keys or certificates contributed by each party to the key-agreement transaction.<a href="#section-3.4-10.2" class="pilcrow">¶</a>
+</li>
+          <li class="normal" id="section-3.4-10.3">Other public information shared between communication parties before or during the transaction, such as nonces.<a href="#section-3.4-10.3" class="pilcrow">¶</a>
+</li>
+          <li class="normal" id="section-3.4-10.4">An indication of the protocol or application employing the key-derivation method.<a href="#section-3.4-10.4" class="pilcrow">¶</a>
+</li>
+          <li class="normal" id="section-3.4-10.5">Protocol-related information, such as a label or session identifier.<a href="#section-3.4-10.5" class="pilcrow">¶</a>
+</li>
+          <li class="normal" id="section-3.4-10.6">An indication of the key-agreement scheme and/or key-derivation method used.<a href="#section-3.4-10.6" class="pilcrow">¶</a>
+</li>
+          <li class="normal" id="section-3.4-10.7">An indication of the domain parameters associated with the asymmetric key pairs employed for key establishment.<a href="#section-3.4-10.7" class="pilcrow">¶</a>
+</li>
+          <li class="normal" id="section-3.4-10.8">An indication of other parameter or primitive choices.<a href="#section-3.4-10.8" class="pilcrow">¶</a>
+</li>
+          <li class="normal" id="section-3.4-10.9">An indication of how the derived keying material should be parsed, including an indication of which algorithm(s) will use the (parsed) keying material.<a href="#section-3.4-10.9" class="pilcrow">¶</a>
+</li>
+        </ul>
+<p id="section-3.4-11">This is a non-comprehensive list, further information can be found in paragraph 5.8.2 of NIST SP800-56Ar3 <span>[<a href="#SP800-56A" class="xref">SP800-56A</a>]</span>.<a href="#section-3.4-11" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
