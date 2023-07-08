@@ -154,7 +154,7 @@ informative:
     title: KEM Combiners
     date: 2018
     author:
-      - 
+      -
         ins: F. Giacon
         name: Federico Giacon
       -
@@ -176,16 +176,16 @@ informative:
       -
         ins: N. Aviram
         name: Nimrod Aviram
-      - 
+      -
         ins: B. Dowling
         name: Benjamin Dowling
-      - 
+      -
         ins: I. Komargodski
         name: Ilan Komargodski
-      - 
+      -
         ins: K.G. Paterson
         name: Kenneth G Paterson
-      - 
+      -
         ins: E. Ronen
         name: Eyal Ronen
       -
@@ -219,9 +219,9 @@ def kemEncaps(pk) -> (ct, ss)
 def kemDecaps(ct, sk) -> ss
 ~~~
 
-where `pk` is public key, `sk` is secret key, `ct` is the ciphertext representing an encapsulated key, and `ss` is shared secret.
+where `pk` is public key, `sk` is secret key, `ct` is the ciphertext representing an encapsulated key, and `ss` is the shared secret.
 
-KEMs are typically used in cases where two parties, hereby refereed to as the "encapsulater" and the "decapsulater", wish to establish a shared secret via public key cryptography, where the decapsulater has an asymmetric key pair and has previously shared the public key with the encapsulater.
+KEMs are typically used in cases where two parties, hereby referred to as the "encapsulater" and the "decapsulater", wish to establish a shared secret via public key cryptography, where the decapsulater has an asymmetric key pair and has previously shared the public key with the encapsulater.
 
 
 # Introduction {#sec-intro}
@@ -276,7 +276,7 @@ In general it is desirable to use a multi-PRF as a KEM combiner, meaning that th
 The following simple yet generic construction can be used in all IETF protocols that need to combine the output of two or more KEMs:
 
 ~~~
-KDF(counter || k_1 || ... || k_n || fixedInfo, outputBits)
+ss = KDF(counter || k_1 || ... || k_n || fixedInfo, outputBits)
 ~~~
 {: #tab-kemCombiner title="general KEM combiner construction" }
 
@@ -292,43 +292,70 @@ where:
 In {{sec-instantiation}} several possible practical instantiations are listed that are in compliance with NIST SP-800 56Cr2 {{SP800-56C}}.
 The shared secret `ss` MAY be used directly as a symmetric key, for example as a MAC key or as a Key Encryption Key (KEK).
 
+The values `k_i` can be processed individually, without requiring to store intermediate values except for the hash state and the protocol binding information required for `fixedInfo`.
+
+## Length encoding
+All variable length string inputs `s` MUST be suffixed with the length, right-encoded using the `rlen` function, having the following construction:
+
+~~~
+Validity Conditions: 0 <= len(s) < 2^{2040}
+1. Let x = len(s)
+1. Let n be the smallest positive integer for which 2^{8n} > x
+2. Let x_1, x_2, ..., x_n be the base-256 encoding of x satisfying:
+    x = sum 28(n-i)x i, for i = 1 to n
+3. Let O_i = uint8(x_i), for i = 1 to n
+4. Let O_{n+1} = uint8(n)
+5. rlen(s) = O_1 || O_2 || ... || O_n || O_{n+1}
+~~~
+
+This is compatible with the `right_encode` construction presented in {{SP800-185}}, and encodes the length of the string `s` as a byte string in a way that can be unambiguously parsed from the end.
+
+Right encoding is preferred to left encoding, since it provides the same security guarantees but allows
+encoding ciphertext where length is a priori unknown.
+
 ## k_i construction {#sec-k_i-construction}
 
-Following the guidance of Giacon et al. [GHP18], we wish for a KEM combiner that is CCA-secure as long as at least one of the ingredient KEMs is. In order to protect against chosen ciphertext attacks, it is necessary to include both the shared secret `ss_i` and its corresponding ciphertext `ct_i`. In addition, each `k_i` MUST be constant in length to prevent abuse of the underlying hash function, therefore the secret shares `ss_i || ct_i` MUST be hashed prior to inclusion in the overall construction described in {{tab-kemCombiner}}:
+Following the guidance of Giacon et al. [GHP18], we wish for a KEM combiner that is CCA-secure as long as at least one of the ingredient KEMs is. In order to protect against chosen ciphertext attacks, it is necessary to include both the shared secret `ss_i` and its corresponding ciphertext `ct_i`.
+If both the secret share `ss_i` and the ciphertext `ct_i` are constant length, then `k_i` MAY be constructed concatenating the two values:
 
 ~~~
-k_i = H(ss_i || ct_i)
+k_i = ct_i || ss_i
 ~~~
 
-In the case of a PSK there is no associated ciphertext present.
-
-
-~~~ BEGIN EDNOTE ~~~
-
-Each `k_i` MUST be constant in length, therefore it MAY be the concatenation of the secret share `ss_i` and ciphertext `ct_i` only if they are guaranteed to be constant length:
+If `ss_i` or `ct_i` are not guaranteed to have constant length, it is REQUIRED to append the `rlen` encoded length when concatenating, prior to inclusion in the overall construction described in {{tab-kemCombiner}}:
 
 ~~~
-k_i = ss_i || ct_i
+k_i = ct_i || rlen(ct_i) || ss_i || rlen(ss_i)
 ~~~
 
-For all other cases, it is REQUIRED to concatenate and hash them first:
+Any protocols making use of this construction MUST either right-encode the length of all inputs `ss_i` and `ct_i`, or justify that any inputs will always be fixed length.
+In the case of a PSK the associated ciphertext is the empty string.
 
-~~~
-k_i = H(ss_i || ct_i)
-~~~
+Including the ciphertext guarantees that the combined kem is IND-CCA2 secure as long as one of the ingredient KEMs is, as stated by [GHP18].
 
-Including the ciphertext guarantees that the combined kem is IND-CCA secure as long as one of the ingredient KEMs is, as stated by [GHP18].
-
-Any protocols making use of this construction MUST either hash all inputs `ss_i || ct_i`, or justify that any un-hashed inputs will always be fixed length.
-
-~~~ END EDNOTE ~~~
+The ciphertext precedes the secret share, as memory-constrained devices can write `c_i` into the hash state and no further caching is required when streaming.
 
 ## Protocol binding
-The `fixedInfo` string is a fixed-length string containing some context-specific information.
-The intention is to prevent cross-context attacks by making this key derivation unique to its protocol context.
+The `fixedInfo` parameter is a fixed-format string containing some context-specific information.
+This serves to prevent cross-context attacks by making this key derivation unique to its protocol context.
 
-The `fixedInfo` string MUST have a definite structure depending on the protocol where all parts are fixed length. This prevents a variable length structure from creating collisions between two different instances.
-In cases some variable length input is necessary, such as the representation of a user ID, a public key, or an OID, then hashing or padding MAY be used.
+The `fixedInfo` string MUST have a definite structure depending on the protocol where all parts strictly defined by the protocol specification.
+
+~~~
+fixedInfo = fixedInfo || s
+~~~
+
+Each fixed-length input string `f` MAY be directly used as input:
+
+~~~
+s = f ; f is guaranteed to have fixed length
+~~~
+
+Each variable-length input string `v` MUST be suffixed with a right-encoding of the length:
+
+~~~
+s = v || rlen(v) ; v may have variable length
+~~~
 
 `fixedInfo` MUST NOT include the shared secrets and ciphertexts, as they are already represented in the KDF input.
 
@@ -348,28 +375,22 @@ This is a non-comprehensive list, further information can be found in paragraph 
 
 # Practical instantiations {#sec-instantiation}
 
-The KDF must be instantiated with cryptographically-secure choices for `KDF` and `H`. The following are RECOMMENDED Keccak-based instatiations, but other choices MAY be made for example to allow for future cryptographic agility. A protocol using a different instantiation MUST justify that it will behave as a multi-PRF given fixed length inputs.
+The KDF must be instantiated with cryptographically-secure choices for `KDF`. The following are RECOMMENDED Keccak-based instatiations, but other choices MAY be made for example to allow for future cryptographic agility. A protocol using a different instantiation MUST justify that it will behave as a multi-PRF.
 
-Each instance defines a function to be used as `KDF`, a hash `H` function to derive the `k_i`, and optionally a `counter`.
+Each instance defines a function to be used as `KDF`, a `hashSize` to determine parameter size, and optionally a `counter`:
 
-1. `KDF = SHA3-256` and `H = SHA3-256`, with `hashSize = 256 bit`.
-1. `KDF = SHA3-512` and `H = SHA3-512`, with `hashSize = 512 bit`.
-1. `KDF = KMAC128` and `H = SHA3-256`, with `hashSize = 128 bit`.
-1. `KDF = KMAC256` and `H = SHA3-512`, with `hashSize = 256 bit`.
+1. `KDF = KMAC128`, with `hashSize = 128 bit`.
+1. `KDF = KMAC256`, with `hashSize = 256 bit`.
+1. `KDF = SHA3-256`, with `hashSize = 256 bit`.
+1. `KDF = SHA3-512`, with `hashSize = 512 bit`.
 
-## Hash-and-counter based construction
-Options 1 and 2 instantiate the KDF using SHA3, specified in NIST FIPS 202 {{FIPS202}}.
-To generate an `outputBits` long secret share `ss`:
+As justified in the security considerations, we recommend only Keccak-based instantiations because assuming there are no weaknesses found in the Keccak permutation, it behaves as a multi-PRF that can be keyed by any input `k_i`.
+SHAKE is also not included in the list as it is not allowed by {{SP800-56A}} section 7, and does not provide any implementation advantage over KMAC.
 
-* the `counter` MUST be initialized with the value `0x00000001`.
-* The hash is performed over the string defined in {{sec-kem-combiner}}, and repeated `ceil(outputBits/hashSize)` times. For each iteration the `counter` MUST be increased by `0x01`.
-* The strings are concatenated ordered by `counter`.
-* The leftmost `outputBits` are returned as `ss`.
-
-An implementation MUST NOT overflow and reuse the `counter` and an error MUST be returned when producing more than 2^32 consecutive hashes.
+KMAC constructions are RECOMMENDED over SHA-3, as KMAC offers a simple cSHAKE-based construction, with the advantage of returning an unrelated output when requesting a different `outputBits` KEK length.
 
 ## KMAC based construction
-Options 3 and 4 are KMAC-based, as specified in NIST SP 800-185 {{SP800-185}}.
+Options 1 and 2 are KMAC-based, as specified in NIST SP 800-185 {{SP800-185}}.
 To instantiate the function:
 
 * The context `S` MUST be the utf-8 string "KDF".
@@ -378,6 +399,17 @@ To instantiate the function:
 
 To derive a shared secret `ss` of desired length, KMAC is called a single time with the input string `X` defined in {{sec-kem-combiner}} and length `L` being `outputBits`.
 This is compatible with the one-step KDF definition given in NIST SP800-56Cr2 {{SP800-56C}}, Section 4.
+
+## Hash-and-counter based construction
+Options 3 and 4 instantiate the KDF using SHA3, specified in NIST FIPS 202 {{FIPS202}}.
+To generate an `outputBits` long secret share `ss`:
+
+* the `counter` MUST be initialized with the value `0x00000001`.
+* The hash is performed over the string defined in {{sec-kem-combiner}}, and repeated `ceil(outputBits/hashSize)` times. For each iteration the `counter` MUST be increased by `0x01`.
+* The strings are concatenated ordered by `counter`.
+* The leftmost `outputBits` are returned as `ss`.
+
+An implementation MUST NOT overflow and reuse the `counter` and an error MUST be returned when producing more than 2^32 consecutive hashes.
 
 # IANA Considerations {#sec-iana}
 
@@ -400,7 +432,7 @@ shared secret `ss_i` is picked uniformly at random. Our construction can thus
 be seen as an instantiation of the IND-CCA2 preserving Example 3 in Figure 1 of
 {{GHP18}}, up to some reordering of input shared secrets `ss_i` and ciphertexts
 `ct_i` and their potential compression `H(ss_i || ct_i)` by a cryptographic
-hash function. 
+hash function.
 
 <!-- Start of Appendices -->
 --- back
