@@ -23,8 +23,8 @@ Abstract
    This document defines a comprehensible and easy to implement Keccak-
    based KEM combiner to join an arbitrary number of key shares, that is
    compatible with NIST SP 800-56Cr2 [SP800-56C] when viewed as a key
-   derivation function.  The combiners defined here are practical multi-
-   PRFs and are CCA-secure as long as at least one of the ingredient
+   derivation function.  The combiners defined here are practical split-
+   key PRFs and are CCA-secure as long as at least one of the ingredient
    KEMs is.
 
 About This Document
@@ -234,7 +234,7 @@ Internet-Draft                KEM Combiner                     July 2023
    PSK being a quantum-safe migration strategy being made available by
    some protocols, see for example IKEv2 in [RFC8784].
 
-   In general it is desirable to use a multi-PRF as a KEM combiner,
+   In general it is desirable to use a split-key PRF as a KEM combiner,
    meaning that the combiner has the properties of a PRF when keyed by
    any of its single inputs.  The following simple yet generic
    construction can be used in all IETF protocols that need to combine
@@ -435,13 +435,13 @@ Internet-Draft                KEM Combiner                     July 2023
    for KDF.  The following are RECOMMENDED Keccak-based instatiations,
    but other choices MAY be made for example to allow for future
    cryptographic agility.  A protocol using a different instantiation
-   MUST justify that it will behave as a multi-PRF.
+   MUST justify that it will behave as a split-key PRF, as required in
+   [GHP18].
 
    Each instance defines a function to be used as KDF, a hashSize to
    determine parameter size, and optionally a counter:
 
    1.  KDF = KMAC128, with hashSize = 128 bit.
-
 
 
 
@@ -458,10 +458,10 @@ Internet-Draft                KEM Combiner                     July 2023
 
    As justified in the security considerations, we recommend only
    Keccak-based instantiations because assuming there are no weaknesses
-   found in the Keccak permutation, it behaves as a multi-PRF that can
-   be keyed by any input k_i.  SHAKE is also not included in the list as
-   it is not allowed by [SP800-56A] section 7, and does not provide any
-   implementation advantage over KMAC.
+   found in the Keccak permutation, it behaves as a split-key PRF that
+   can be keyed by any input k_i.  SHAKE is also not included in the
+   list as it is not allowed by [SP800-56A] section 7, and does not
+   provide any implementation advantage over KMAC.
 
    KMAC constructions are RECOMMENDED over SHA-3, as KMAC offers a
    simple cSHAKE-based construction, with the advantage of returning an
@@ -518,7 +518,7 @@ Internet-Draft                KEM Combiner                     July 2023
 
 6.  Security Considerations
 
-   The proposed instantiations in Section 4 are practical multi-PRFs
+   The proposed instantiations in Section 4 are practical split-key PRFs
    since this specification limits to the use of Keccak-based
    constructions.  The sponge construction was proven to be
    indifferentiable from a random oracle [BDPA08].  More precisely, for
