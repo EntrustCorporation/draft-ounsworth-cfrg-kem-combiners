@@ -343,7 +343,7 @@ For a two-KEM instantiation, the construction is
 ```
 KDF(counter || ct_1 || rlen(ct_1) || ss_1 || rlen(ss_1) || 
                ct_2 || rlen(ct_2) || ss_2 || rlen(ss_2) || 
-               k_n || fixedInfo, outputBits)
+               fixedInfo, outputBits)
 ```
 
 The order of parameters is chosen intentionally to facilitate streaming implementations

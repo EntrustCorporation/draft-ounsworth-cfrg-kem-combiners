@@ -1543,7 +1543,7 @@ In the case of a PSK the associated ciphertext is the empty string.<a href="#sec
 <p id="section-3.3-2"><code>
 KDF(counter || ct_1 || rlen(ct_1) || ss_1 || rlen(ss_1) || 
                ct_2 || rlen(ct_2) || ss_2 || rlen(ss_2) || 
-               k_n || fixedInfo, outputBits)
+               fixedInfo, outputBits)
 </code><a href="#section-3.3-2" class="pilcrow">¶</a></p>
 <p id="section-3.3-3">The order of parameters is chosen intentionally to facilitate streaming implementations
 on devices that lack sufficient memory to hold the entirety of <code>ct_1</code> or <code>ct_2</code>.<a href="#section-3.3-3" class="pilcrow">¶</a></p>
