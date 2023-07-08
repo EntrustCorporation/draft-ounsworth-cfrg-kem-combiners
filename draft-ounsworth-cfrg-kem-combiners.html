@@ -22,6 +22,7 @@
 <!-- Generator version information:
   xml2rfc 3.12.2
     Python 3.10.6
+    weasyprint 54.1
 -->
 <link href="draft-ounsworth-cfrg-kem-combiners.xml" rel="alternate" type="application/rfc+xml">
 <link href="#copyright" rel="license">
@@ -1178,11 +1179,11 @@ li > p:last-of-type {
 <thead><tr>
 <td class="left">Internet-Draft</td>
 <td class="center">KEM Combiner</td>
-<td class="right">May 2023</td>
+<td class="right">July 2023</td>
 </tr></thead>
 <tfoot><tr>
 <td class="left">Ounsworth, et al.</td>
-<td class="center">Expires 11 November 2023</td>
+<td class="center">Expires 9 January 2024</td>
 <td class="right">[Page]</td>
 </tr></tfoot>
 </table>
@@ -1195,12 +1196,12 @@ li > p:last-of-type {
 <dd class="internet-draft">draft-ounsworth-cfrg-kem-combiners-03</dd>
 <dt class="label-published">Published:</dt>
 <dd class="published">
-<time datetime="2023-05-10" class="published">10 May 2023</time>
+<time datetime="2023-07-08" class="published">8 July 2023</time>
     </dd>
 <dt class="label-intended-status">Intended Status:</dt>
 <dd class="intended-status">Informational</dd>
 <dt class="label-expires">Expires:</dt>
-<dd class="expires"><time datetime="2023-11-11">11 November 2023</time></dd>
+<dd class="expires"><time datetime="2024-01-09">9 January 2024</time></dd>
 <dt class="label-authors">Authors:</dt>
 <dd class="authors">
 <div class="author">
@@ -1233,9 +1234,9 @@ li > p:last-of-type {
         Status information for this document may be found at <span><a href="https://datatracker.ietf.org/doc/draft-ounsworth-cfrg-kem-combiners/">https://datatracker.ietf.org/doc/draft-ounsworth-cfrg-kem-combiners/</a></span>.<a href="#section-note.1-2" class="pilcrow">¶</a></p>
 <p id="section-note.1-3">
         Discussion of this document takes place on the
-        Limited Additional Mechanisms for PKIX and SMIME (lamps) Working Group mailing list (<span><a href="mailto:spasm@ietf.org">mailto:spasm@ietf.org</a></span>),
-        which is archived at <span><a href="https://mailarchive.ietf.org/arch/browse/spasm/">https://mailarchive.ietf.org/arch/browse/spasm/</a></span>.
-        Subscribe at <span><a href="https://www.ietf.org/mailman/listinfo/spasm/">https://www.ietf.org/mailman/listinfo/spasm/</a></span>.<a href="#section-note.1-3" class="pilcrow">¶</a></p>
+        Crypto Forum Research Group (CFRG) Research Group mailing list (<span><a href="mailto:cfrg@ietf.org">mailto:cfrg@ietf.org</a></span>),
+        which is archived at <span><a href="https://mailarchive.ietf.org/arch/browse/cfrg/">https://mailarchive.ietf.org/arch/browse/cfrg/</a></span>.
+        Subscribe at <span><a href="https://www.ietf.org/mailman/listinfo/cfrg/">https://www.ietf.org/mailman/listinfo/cfrg/</a></span>.<a href="#section-note.1-3" class="pilcrow">¶</a></p>
 <p id="section-note.1-4">Source for this draft and an issue tracker can be found at
         <span><a href="https://github.com/EntrustCorporation/draft-ounsworth-cfrg-kem-combiners">https://github.com/EntrustCorporation/draft-ounsworth-cfrg-kem-combiners</a></span>.<a href="#section-note.1-4" class="pilcrow">¶</a></p>
 </section>
@@ -1258,7 +1259,7 @@ li > p:last-of-type {
         time. It is inappropriate to use Internet-Drafts as reference
         material or to cite them other than as "work in progress."<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
 <p id="section-boilerplate.1-4">
-        This Internet-Draft will expire on 11 November 2023.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
+        This Internet-Draft will expire on 9 January 2024.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="copyright">
@@ -1316,7 +1317,10 @@ li > p:last-of-type {
                 <p id="section-toc.1-1.3.2.2.1"><a href="#section-3.2" class="xref">3.2</a>.  <a href="#name-k_i-construction-2" class="xref">k_i construction</a></p>
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.3">
-                <p id="section-toc.1-1.3.2.3.1"><a href="#section-3.3" class="xref">3.3</a>.  <a href="#name-protocol-binding-2" class="xref">Protocol binding</a></p>
+                <p id="section-toc.1-1.3.2.3.1"><a href="#section-3.3" class="xref">3.3</a>.  <a href="#name-note-on-the-order-of-paramet" class="xref">Note on the order of parameters</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.4">
+                <p id="section-toc.1-1.3.2.4.1"><a href="#section-3.4" class="xref">3.4</a>.  <a href="#name-protocol-binding-2" class="xref">Protocol binding</a></p>
 </li>
             </ul>
 </li>
@@ -1526,57 +1530,78 @@ k_i = ct_i || rlen(ct_i) || ss_i || rlen(ss_i)
 </div>
 <p id="section-3.2-5">Any protocols making use of this construction MUST either right-encode the length of all inputs <code>ss_i</code> and <code>ct_i</code>, or justify that any inputs will always be fixed length.
 In the case of a PSK the associated ciphertext is the empty string.<a href="#section-3.2-5" class="pilcrow">¶</a></p>
-<p id="section-3.2-6">The ciphertext precedes the secret share, as memory-constrained devices can write <code>c_i</code> into the hash state and no further caching is required when streaming.<a href="#section-3.2-6" class="pilcrow">¶</a></p>
+<p id="section-3.2-6">Including the ciphertext guarantees that the combined kem is IND-CCA2 secure as long as one of the ingredient KEMs is, as stated by <span>[<a href="#GHP18" class="xref">GHP18</a>]</span>.<a href="#section-3.2-6" class="pilcrow">¶</a></p>
+<p id="section-3.2-7">The ciphertext precedes the secret share, as memory-constrained devices can write <code>c_i</code> into the hash state and no further caching is required when streaming.<a href="#section-3.2-7" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="note-on-the-order-of-parameters">
+<section id="section-3.3">
+        <h3 id="name-note-on-the-order-of-paramet">
+<a href="#section-3.3" class="section-number selfRef">3.3. </a><a href="#name-note-on-the-order-of-paramet" class="section-name selfRef">Note on the order of parameters</a>
+        </h3>
+<p id="section-3.3-1">For a two-KEM instantiation, the construction is<a href="#section-3.3-1" class="pilcrow">¶</a></p>
+<p id="section-3.3-2"><code>
+KDF(counter || ct_1 || rlen(ct_1) || ss_1 || rlen(ss_1) || 
+               ct_2 || rlen(ct_2) || ss_2 || rlen(ss_2) || 
+               fixedInfo, outputBits)
+</code><a href="#section-3.3-2" class="pilcrow">¶</a></p>
+<p id="section-3.3-3">The order of parameters is chosen intentionally to facilitate streaming implementations
+on devices that lack sufficient memory to hold the entirety of <code>ct_1</code> or <code>ct_2</code>.<a href="#section-3.3-3" class="pilcrow">¶</a></p>
+<p id="section-3.3-4">This construction aims to have two streaming-friendly properties. First, 
+<code>ct_i</code> can be written to <code>KDF</code>'s update interface as it is received and 
+does not need to be stored, finally adding its corresponding <code>ss_i</code> once 
+it is available. And second, the first KEM can be processed in its entirety and
+written to <code>KDF</code>'s update interface before beginning to process the second KEM.<a href="#section-3.3-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="protocol-binding">
-<section id="section-3.3">
+<section id="section-3.4">
         <h3 id="name-protocol-binding-2">
-<a href="#section-3.3" class="section-number selfRef">3.3. </a><a href="#name-protocol-binding-2" class="section-name selfRef">Protocol binding</a>
+<a href="#section-3.4" class="section-number selfRef">3.4. </a><a href="#name-protocol-binding-2" class="section-name selfRef">Protocol binding</a>
         </h3>
-<p id="section-3.3-1">The <code>fixedInfo</code> parameter is a fixed-format string containing some context-specific information.
-This serves to prevent cross-context attacks by making this key derivation unique to its protocol context.<a href="#section-3.3-1" class="pilcrow">¶</a></p>
-<p id="section-3.3-2">The <code>fixedInfo</code> string MUST have a definite structure depending on the protocol where all parts strictly defined by the protocol specification.<a href="#section-3.3-2" class="pilcrow">¶</a></p>
-<div class="alignLeft art-text artwork" id="section-3.3-3">
+<p id="section-3.4-1">The <code>fixedInfo</code> parameter is a fixed-format string containing some context-specific information.
+This serves to prevent cross-context attacks by making this key derivation unique to its protocol context.<a href="#section-3.4-1" class="pilcrow">¶</a></p>
+<p id="section-3.4-2">The <code>fixedInfo</code> string MUST have a definite structure depending on the protocol where all parts strictly defined by the protocol specification.<a href="#section-3.4-2" class="pilcrow">¶</a></p>
+<div class="alignLeft art-text artwork" id="section-3.4-3">
 <pre>
 fixedInfo = fixedInfo || s
-</pre><a href="#section-3.3-3" class="pilcrow">¶</a>
+</pre><a href="#section-3.4-3" class="pilcrow">¶</a>
 </div>
-<p id="section-3.3-4">Each fixed-length input string <code>f</code> MAY be directly used as input:<a href="#section-3.3-4" class="pilcrow">¶</a></p>
-<div class="alignLeft art-text artwork" id="section-3.3-5">
+<p id="section-3.4-4">Each fixed-length input string <code>f</code> MAY be directly used as input:<a href="#section-3.4-4" class="pilcrow">¶</a></p>
+<div class="alignLeft art-text artwork" id="section-3.4-5">
 <pre>
 s = f ; f is guaranteed to have fixed length
-</pre><a href="#section-3.3-5" class="pilcrow">¶</a>
+</pre><a href="#section-3.4-5" class="pilcrow">¶</a>
 </div>
-<p id="section-3.3-6">Each variable-length input string <code>v</code> MUST be suffixed with a right-encoding of the length:<a href="#section-3.3-6" class="pilcrow">¶</a></p>
-<div class="alignLeft art-text artwork" id="section-3.3-7">
+<p id="section-3.4-6">Each variable-length input string <code>v</code> MUST be suffixed with a right-encoding of the length:<a href="#section-3.4-6" class="pilcrow">¶</a></p>
+<div class="alignLeft art-text artwork" id="section-3.4-7">
 <pre>
 s = v || rlen(v) ; v may have variable length
-</pre><a href="#section-3.3-7" class="pilcrow">¶</a>
+</pre><a href="#section-3.4-7" class="pilcrow">¶</a>
 </div>
-<p id="section-3.3-8"><code>fixedInfo</code> MUST NOT include the shared secrets and ciphertexts, as they are already represented in the KDF input.<a href="#section-3.3-8" class="pilcrow">¶</a></p>
-<p id="section-3.3-9">The parameter fixedInfo MAY contain any of the following information:<a href="#section-3.3-9" class="pilcrow">¶</a></p>
+<p id="section-3.4-8"><code>fixedInfo</code> MUST NOT include the shared secrets and ciphertexts, as they are already represented in the KDF input.<a href="#section-3.4-8" class="pilcrow">¶</a></p>
+<p id="section-3.4-9">The parameter fixedInfo MAY contain any of the following information:<a href="#section-3.4-9" class="pilcrow">¶</a></p>
 <ul class="normal">
-<li class="normal" id="section-3.3-10.1">Public information about the communication parties, such as their identifiers.<a href="#section-3.3-10.1" class="pilcrow">¶</a>
+<li class="normal" id="section-3.4-10.1">Public information about the communication parties, such as their identifiers.<a href="#section-3.4-10.1" class="pilcrow">¶</a>
 </li>
-          <li class="normal" id="section-3.3-10.2">The public keys or certificates contributed by each party to the key-agreement transaction.<a href="#section-3.3-10.2" class="pilcrow">¶</a>
+          <li class="normal" id="section-3.4-10.2">The public keys or certificates contributed by each party to the key-agreement transaction.<a href="#section-3.4-10.2" class="pilcrow">¶</a>
 </li>
-          <li class="normal" id="section-3.3-10.3">Other public information shared between communication parties before or during the transaction, such as nonces.<a href="#section-3.3-10.3" class="pilcrow">¶</a>
+          <li class="normal" id="section-3.4-10.3">Other public information shared between communication parties before or during the transaction, such as nonces.<a href="#section-3.4-10.3" class="pilcrow">¶</a>
 </li>
-          <li class="normal" id="section-3.3-10.4">An indication of the protocol or application employing the key-derivation method.<a href="#section-3.3-10.4" class="pilcrow">¶</a>
+          <li class="normal" id="section-3.4-10.4">An indication of the protocol or application employing the key-derivation method.<a href="#section-3.4-10.4" class="pilcrow">¶</a>
 </li>
-          <li class="normal" id="section-3.3-10.5">Protocol-related information, such as a label or session identifier.<a href="#section-3.3-10.5" class="pilcrow">¶</a>
+          <li class="normal" id="section-3.4-10.5">Protocol-related information, such as a label or session identifier.<a href="#section-3.4-10.5" class="pilcrow">¶</a>
 </li>
-          <li class="normal" id="section-3.3-10.6">An indication of the key-agreement scheme and/or key-derivation method used.<a href="#section-3.3-10.6" class="pilcrow">¶</a>
+          <li class="normal" id="section-3.4-10.6">An indication of the key-agreement scheme and/or key-derivation method used.<a href="#section-3.4-10.6" class="pilcrow">¶</a>
 </li>
-          <li class="normal" id="section-3.3-10.7">An indication of the domain parameters associated with the asymmetric key pairs employed for key establishment.<a href="#section-3.3-10.7" class="pilcrow">¶</a>
+          <li class="normal" id="section-3.4-10.7">An indication of the domain parameters associated with the asymmetric key pairs employed for key establishment.<a href="#section-3.4-10.7" class="pilcrow">¶</a>
 </li>
-          <li class="normal" id="section-3.3-10.8">An indication of other parameter or primitive choices.<a href="#section-3.3-10.8" class="pilcrow">¶</a>
+          <li class="normal" id="section-3.4-10.8">An indication of other parameter or primitive choices.<a href="#section-3.4-10.8" class="pilcrow">¶</a>
 </li>
-          <li class="normal" id="section-3.3-10.9">An indication of how the derived keying material should be parsed, including an indication of which algorithm(s) will use the (parsed) keying material.<a href="#section-3.3-10.9" class="pilcrow">¶</a>
+          <li class="normal" id="section-3.4-10.9">An indication of how the derived keying material should be parsed, including an indication of which algorithm(s) will use the (parsed) keying material.<a href="#section-3.4-10.9" class="pilcrow">¶</a>
 </li>
         </ul>
-<p id="section-3.3-11">This is a non-comprehensive list, further information can be found in paragraph 5.8.2 of NIST SP800-56Ar3 <span>[<a href="#SP800-56A" class="xref">SP800-56A</a>]</span>.<a href="#section-3.3-11" class="pilcrow">¶</a></p>
+<p id="section-3.4-11">This is a non-comprehensive list, further information can be found in paragraph 5.8.2 of NIST SP800-56Ar3 <span>[<a href="#SP800-56A" class="xref">SP800-56A</a>]</span>.<a href="#section-3.4-11" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
@@ -1734,7 +1759,7 @@ hash function.<a href="#section-6-2" class="pilcrow">¶</a></p>
 <dd class="break"></dd>
 <dt id="I-D.ounsworth-pq-composite-kem">[I-D.ounsworth-pq-composite-kem]</dt>
         <dd>
-<span class="refAuthor">Ounsworth, M.</span> and <span class="refAuthor">J. Gray</span>, <span class="refTitle">"Composite KEM For Use In Internet PKI"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-ounsworth-pq-composite-kem-01</span>, <time datetime="2023-03-13" class="refDate">13 March 2023</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-ounsworth-pq-composite-kem-01">https://datatracker.ietf.org/doc/html/draft-ounsworth-pq-composite-kem-01</a>&gt;</span>. </dd>
+<span class="refAuthor">Ounsworth, M.</span> and <span class="refAuthor">J. Gray</span>, <span class="refTitle">"Composite KEM For Use In Internet PKI"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-ounsworth-pq-composite-kem-02</span>, <time datetime="2023-05-29" class="refDate">29 May 2023</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-ounsworth-pq-composite-kem-02">https://datatracker.ietf.org/doc/html/draft-ounsworth-pq-composite-kem-02</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="I-D.wussler-openpgp-pqc">[I-D.wussler-openpgp-pqc]</dt>
         <dd>
