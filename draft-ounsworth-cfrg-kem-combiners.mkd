@@ -373,6 +373,25 @@ The parameter fixedInfo MAY contain any of the following information:
 
 This is a non-comprehensive list, further information can be found in paragraph 5.8.2 of NIST SP800-56Ar3 {{SP800-56A}}.
 
+## Note on the order of parameters
+
+For a two-KEM instantiation, the construction is
+
+```
+KDF(counter || ct_1 || rlen(ct_i1 || ss_1 || rlen(ss_1) || 
+               ct_2 || rlen(ct_2) || ss_2 || rlen(ss_2) || 
+               k_n || fixedInfo, outputBits)
+```
+
+The order of parameters is chosen intentionally to facilitate streaming implementations
+on devices that lack sufficient memory to hold the entirety of `ct_1` or `ct_2`. 
+
+This construction aims to have two streaming-friendly properties. First, 
+`ct_i` can be fed into `KDF`'s update interface as it is received and 
+does not need to be stored, finally adding its corresponding `ss_i` once 
+it is available. And second, the first KEM can be processed in its entirety and
+fed into `KDF`'s update interface before beginning to process the second KEM.
+
 # Practical instantiations {#sec-instantiation}
 
 The KDF must be instantiated with cryptographically-secure choices for `KDF`. The following are RECOMMENDED Keccak-based instatiations, but other choices MAY be made for example to allow for future cryptographic agility. A protocol using a different instantiation MUST justify that it will behave as a multi-PRF.
