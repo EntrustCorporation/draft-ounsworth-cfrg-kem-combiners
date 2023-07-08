@@ -1541,7 +1541,7 @@ In the case of a PSK the associated ciphertext is the empty string.<a href="#sec
         </h3>
 <p id="section-3.3-1">For a two-KEM instantiation, the construction is<a href="#section-3.3-1" class="pilcrow">¶</a></p>
 <p id="section-3.3-2"><code>
-KDF(counter || ct_1 || rlen(ct_i1 || ss_1 || rlen(ss_1) || 
+KDF(counter || ct_1 || rlen(ct_1) || ss_1 || rlen(ss_1) || 
                ct_2 || rlen(ct_2) || ss_2 || rlen(ss_2) || 
                k_n || fixedInfo, outputBits)
 </code><a href="#section-3.3-2" class="pilcrow">¶</a></p>

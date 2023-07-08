@@ -350,7 +350,7 @@ Internet-Draft                KEM Combiner                     July 2023
 
    For a two-KEM instantiation, the construction is
 
-   KDF(counter || ct_1 || rlen(ct_i1 || ss_1 || rlen(ss_1) || ct_2 ||
+   KDF(counter || ct_1 || rlen(ct_1) || ss_1 || rlen(ss_1) || ct_2 ||
    rlen(ct_2) || ss_2 || rlen(ss_2) || k_n || fixedInfo, outputBits)
 
    The order of parameters is chosen intentionally to facilitate
