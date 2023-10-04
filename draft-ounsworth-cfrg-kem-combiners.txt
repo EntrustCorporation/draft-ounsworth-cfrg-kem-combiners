@@ -5,10 +5,10 @@
 CFRG                                                        M. Ounsworth
 Internet-Draft                                                   Entrust
 Intended status: Informational                                A. Wussler
-Expires: 9 January 2024                                           Proton
+Expires: 6 April 2024                                             Proton
                                                              S. Kousidis
                                                                      BSI
-                                                             8 July 2023
+                                                          4 October 2023
 
 
 Combiner function for hybrid key encapsulation mechanisms (Hybrid KEMs)
@@ -53,9 +53,9 @@ Status of This Memo
 
 
 
-Ounsworth, et al.        Expires 9 January 2024                 [Page 1]
+Ounsworth, et al.         Expires 6 April 2024                  [Page 1]
 
-Internet-Draft                KEM Combiner                     July 2023
+Internet-Draft                KEM Combiner                  October 2023
 
 
    Internet-Drafts are working documents of the Internet Engineering
@@ -68,7 +68,7 @@ Internet-Draft                KEM Combiner                     July 2023
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 9 January 2024.
+   This Internet-Draft will expire on 6 April 2024.
 
 Copyright Notice
 
@@ -109,9 +109,9 @@ Table of Contents
 
 
 
-Ounsworth, et al.        Expires 9 January 2024                 [Page 2]
+Ounsworth, et al.         Expires 6 April 2024                  [Page 2]
 
-Internet-Draft                KEM Combiner                     July 2023
+Internet-Draft                KEM Combiner                  October 2023
 
 
 1.  Terminology
@@ -165,9 +165,9 @@ Internet-Draft                KEM Combiner                     July 2023
 
 
 
-Ounsworth, et al.        Expires 9 January 2024                 [Page 3]
+Ounsworth, et al.         Expires 6 April 2024                  [Page 3]
 
-Internet-Draft                KEM Combiner                     July 2023
+Internet-Draft                KEM Combiner                  October 2023
 
 
 2.1.  KEM/PSK hybrids
@@ -221,9 +221,9 @@ Internet-Draft                KEM Combiner                     July 2023
 
 
 
-Ounsworth, et al.        Expires 9 January 2024                 [Page 4]
+Ounsworth, et al.         Expires 6 April 2024                  [Page 4]
 
-Internet-Draft                KEM Combiner                     July 2023
+Internet-Draft                KEM Combiner                  October 2023
 
 
    ss = kemCombiner(ss_1, ss_2, ..., ss_n)
@@ -277,9 +277,9 @@ Internet-Draft                KEM Combiner                     July 2023
 
 
 
-Ounsworth, et al.        Expires 9 January 2024                 [Page 5]
+Ounsworth, et al.         Expires 6 April 2024                  [Page 5]
 
-Internet-Draft                KEM Combiner                     July 2023
+Internet-Draft                KEM Combiner                  October 2023
 
 
 3.1.  Length encoding
@@ -333,9 +333,9 @@ Internet-Draft                KEM Combiner                     July 2023
 
 
 
-Ounsworth, et al.        Expires 9 January 2024                 [Page 6]
+Ounsworth, et al.         Expires 6 April 2024                  [Page 6]
 
-Internet-Draft                KEM Combiner                     July 2023
+Internet-Draft                KEM Combiner                  October 2023
 
 
    Including the ciphertext guarantees that the combined kem is IND-CCA2
@@ -389,9 +389,9 @@ Internet-Draft                KEM Combiner                     July 2023
 
 
 
-Ounsworth, et al.        Expires 9 January 2024                 [Page 7]
+Ounsworth, et al.         Expires 6 April 2024                  [Page 7]
 
-Internet-Draft                KEM Combiner                     July 2023
+Internet-Draft                KEM Combiner                  October 2023
 
 
    fixedInfo MUST NOT include the shared secrets and ciphertexts, as
@@ -445,9 +445,9 @@ Internet-Draft                KEM Combiner                     July 2023
 
 
 
-Ounsworth, et al.        Expires 9 January 2024                 [Page 8]
+Ounsworth, et al.         Expires 6 April 2024                  [Page 8]
 
-Internet-Draft                KEM Combiner                     July 2023
+Internet-Draft                KEM Combiner                  October 2023
 
 
    2.  KDF = KMAC256, with hashSize = 256 bit.
@@ -479,7 +479,7 @@ Internet-Draft                KEM Combiner                     July 2023
       context separation, in scenarios where fixedInfo is not
       sufficient.
 
-   *  The parameter counter MUST be the fixed value 0x00000001.
+   *  The parameter counter MUST be the fixed value 0x00000000.
 
    To derive a shared secret ss of desired length, KMAC is called a
    single time with the input string X defined in Section 3 and length L
@@ -491,7 +491,7 @@ Internet-Draft                KEM Combiner                     July 2023
    Options 3 and 4 instantiate the KDF using SHA3, specified in NIST
    FIPS 202 [FIPS202].  To generate an outputBits long secret share ss:
 
-   *  the counter MUST be initialized with the value 0x00000001.
+   *  the counter MUST be initialized with the value 0x00000000.
 
    *  The hash is performed over the string defined in Section 3, and
       repeated ceil(outputBits/hashSize) times.  For each iteration the
@@ -501,9 +501,9 @@ Internet-Draft                KEM Combiner                     July 2023
 
 
 
-Ounsworth, et al.        Expires 9 January 2024                 [Page 9]
+Ounsworth, et al.         Expires 6 April 2024                  [Page 9]
 
-Internet-Draft                KEM Combiner                     July 2023
+Internet-Draft                KEM Combiner                  October 2023
 
 
    *  The leftmost outputBits are returned as ss.
@@ -557,9 +557,9 @@ Internet-Draft                KEM Combiner                     July 2023
 
 
 
-Ounsworth, et al.        Expires 9 January 2024                [Page 10]
+Ounsworth, et al.         Expires 6 April 2024                 [Page 10]
 
-Internet-Draft                KEM Combiner                     July 2023
+Internet-Draft                KEM Combiner                  October 2023
 
 
    [ADKPRY22] Aviram, N., Dowling, B., Komargodski, I., Paterson, K. G.,
@@ -613,14 +613,14 @@ Internet-Draft                KEM Combiner                     July 2023
 
 
 
-Ounsworth, et al.        Expires 9 January 2024                [Page 11]
+Ounsworth, et al.         Expires 6 April 2024                 [Page 11]
 
-Internet-Draft                KEM Combiner                     July 2023
+Internet-Draft                KEM Combiner                  October 2023
 
 
-              draft-ietf-tls-hybrid-design-06, 27 February 2023,
+              draft-ietf-tls-hybrid-design-09, 7 September 2023,
               <https://datatracker.ietf.org/doc/html/draft-ietf-tls-
-              hybrid-design-06>.
+              hybrid-design-09>.
 
    [I-D.ounsworth-pq-composite-kem]
               Ounsworth, M. and J. Gray, "Composite KEM For Use In
@@ -632,9 +632,9 @@ Internet-Draft                KEM Combiner                     July 2023
    [I-D.wussler-openpgp-pqc]
               Kousidis, S., Strenzke, F., and A. Wussler, "Post-Quantum
               Cryptography in OpenPGP", Work in Progress, Internet-
-              Draft, draft-wussler-openpgp-pqc-01, 25 March 2023,
+              Draft, draft-wussler-openpgp-pqc-02, 10 July 2023,
               <https://datatracker.ietf.org/doc/html/draft-wussler-
-              openpgp-pqc-01>.
+              openpgp-pqc-02>.
 
    [PQCAPI]   Project, N. P.-Q. C., "PQC - API notes", November 2022,
               <https://csrc.nist.gov/CSRC/media/Projects/Post-Quantum-
@@ -669,9 +669,9 @@ Internet-Draft                KEM Combiner                     July 2023
 
 
 
-Ounsworth, et al.        Expires 9 January 2024                [Page 12]
+Ounsworth, et al.         Expires 6 April 2024                 [Page 12]
 
-Internet-Draft                KEM Combiner                     July 2023
+Internet-Draft                KEM Combiner                  October 2023
 
 
    [SP800-56A]
@@ -725,9 +725,9 @@ Authors' Addresses
 
 
 
-Ounsworth, et al.        Expires 9 January 2024                [Page 13]
+Ounsworth, et al.         Expires 6 April 2024                 [Page 13]
 
-Internet-Draft                KEM Combiner                     July 2023
+Internet-Draft                KEM Combiner                  October 2023
 
 
    Stavros Kousidis
@@ -781,4 +781,4 @@ Internet-Draft                KEM Combiner                     July 2023
 
 
 
-Ounsworth, et al.        Expires 9 January 2024                [Page 14]
+Ounsworth, et al.         Expires 6 April 2024                 [Page 14]
