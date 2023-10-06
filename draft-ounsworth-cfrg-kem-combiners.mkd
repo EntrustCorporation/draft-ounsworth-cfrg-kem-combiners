@@ -416,7 +416,8 @@ To instantiate the function:
 
 * The context `S` MUST be the utf-8 string "KDF".
 * The key `K` MUST be a context-specific string of at least `hashSize` bits, and it MAY be used as an additional option to perform context separation, in scenarios where `fixedInfo` is not sufficient.
-* The parameter `counter` MUST be the fixed value `0x00000001`.
+* The parameter `counter` MUST be the fixed value `0x00000001`, corresponding to a 32-bit binary big-endian representation of the number zero.
+    * This aligns with {{SP800-56C}} where `counter` is initialized to `0x00000000` is Section 4.1 Step 3, but is first incremented in 6.1 before being used in a hash in 6.2.
 
 To derive a shared secret `ss` of desired length, KMAC is called a single time with the input string `X` defined in {{sec-kem-combiner}} and length `L` being `outputBits`.
 This is compatible with the one-step KDF definition given in NIST SP800-56Cr2 {{SP800-56C}}, Section 4.
