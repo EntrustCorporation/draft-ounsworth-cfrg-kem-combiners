@@ -1670,32 +1670,32 @@ SHAKE is also not included in the list as it is not allowed by <span>[<a href="#
         <h3 id="name-kmac-based-construction-2">
 <a href="#section-5.1" class="section-number selfRef">5.1. </a><a href="#name-kmac-based-construction-2" class="section-name selfRef">KMAC based construction</a>
         </h3>
-<p id="section-5.1-1">This section defines a <code>KDF(Z, OtherInput, outputBits)</code> as per <span>[<a href="#SP800-56C" class="xref">SP800-56C</a>]</span> section 4.1 Option 3 using the KMAC primitive as specified in NIST SP 800-185 <span>[<a href="#SP800-185" class="xref">SP800-185</a>]</span>.<a href="#section-5.1-1" class="pilcrow">¶</a></p>
-<p id="section-5.1-2">To instantiate <code>KMAC#</code>:<a href="#section-5.1-2" class="pilcrow">¶</a></p>
-<p id="section-5.1-3">KMAC is defined in NIST SP 800-185 <span>[<a href="#SP800-185" class="xref">SP800-185</a>]</span>. The <code>KMAC#(K, X, L, S)</code> parameters MUST be instantiated as follows:<a href="#section-5.1-3" class="pilcrow">¶</a></p>
+<p id="section-5.1-1">This section defines a <code>KDF(Z, OtherInput, outputBits)</code> as per <span>[<a href="#SP800-56C" class="xref">SP800-56C</a>]</span> section 4.1 Option 3 using the KMAC primitive as specified in NIST SP 800-185 <span>[<a href="#SP800-185" class="xref">SP800-185</a>]</span>.
+To instantiate <code>KMAC#</code>:<a href="#section-5.1-1" class="pilcrow">¶</a></p>
+<p id="section-5.1-2">KMAC is defined in NIST SP 800-185 <span>[<a href="#SP800-185" class="xref">SP800-185</a>]</span>. The <code>KMAC#(K, X, L, S)</code> parameters MUST be instantiated as follows:<a href="#section-5.1-2" class="pilcrow">¶</a></p>
 <ul class="normal">
-<li class="normal" id="section-5.1-4.1">
-            <code>KMAC#</code> : either <code>KMAC128</code> or <code>KMAC256</code> is per <a href="#tab-kdfs" class="xref">Table 1</a>.<a href="#section-5.1-4.1" class="pilcrow">¶</a>
+<li class="normal" id="section-5.1-3.1">
+            <code>KMAC#</code> : either <code>KMAC128</code> or <code>KMAC256</code> is per <a href="#tab-kdfs" class="xref">Table 1</a>.<a href="#section-5.1-3.1" class="pilcrow">¶</a>
 </li>
-          <li class="normal" id="section-5.1-4.2">
-            <code>K</code>: a context-specific string of at least <code>hashSize</code> bits, and it MAY be used as an additional option to perform context separation, in scenarios where <code>OtherInput</code> is not sufficient.<a href="#section-5.1-4.2" class="pilcrow">¶</a>
+          <li class="normal" id="section-5.1-3.2">
+            <code>K</code>: a context-specific string of at least <code>hashSize</code> bits, and it MAY be used as an additional option to perform context separation, in scenarios where <code>OtherInput</code> is not sufficient.<a href="#section-5.1-3.2" class="pilcrow">¶</a>
 </li>
-          <li class="normal" id="section-5.1-4.3">
-            <code>X</code>: the message input to <code>KDF()</code>, as defined above.<a href="#section-5.1-4.3" class="pilcrow">¶</a>
+          <li class="normal" id="section-5.1-3.3">
+            <code>X</code>: the message input to <code>KDF()</code>, as defined above.<a href="#section-5.1-3.3" class="pilcrow">¶</a>
 </li>
-          <li class="normal" id="section-5.1-4.4">
-            <code>L</code>: integer representation of <code>outputBits</code>.<a href="#section-5.1-4.4" class="pilcrow">¶</a>
+          <li class="normal" id="section-5.1-3.4">
+            <code>L</code>: integer representation of <code>outputBits</code>.<a href="#section-5.1-3.4" class="pilcrow">¶</a>
 </li>
-          <li class="normal" id="section-5.1-4.5">
-            <code>S</code>: as specified in <span>[<a href="#SP800-56C" class="xref">SP800-56C</a>]</span>, it is the 8-bit ASCII string string "KDF".<a href="#section-5.1-4.5" class="pilcrow">¶</a>
+          <li class="normal" id="section-5.1-3.5">
+            <code>S</code>: as specified in <span>[<a href="#SP800-56C" class="xref">SP800-56C</a>]</span>, it is the 8-bit ASCII string string "KDF".<a href="#section-5.1-3.5" class="pilcrow">¶</a>
 </li>
         </ul>
-<p id="section-5.1-5">Since we are setting <code>L = outputBits</code>, Step 1 of the process in <span>[<a href="#SP800-56C" class="xref">SP800-56C</a>]</span> spction 4.1 will always be <code>reps = ciel(L / H_outputBits) = 1</code>, and since the input strings defined in <a href="#sec-kem-combiner" class="xref">Section 4</a> are fixed-length and and well below the max input size of KMAC, we can also skip step 4.<a href="#section-5.1-5" class="pilcrow">¶</a></p>
-<p id="section-5.1-6">That means <code>KDF(Z, OtherInput)</code> reduces to:<a href="#section-5.1-6" class="pilcrow">¶</a></p>
-<div class="alignLeft art-text artwork" id="section-5.1-7">
+<p id="section-5.1-4">Since we are setting <code>L = outputBits</code>, Step 1 of the process in <span>[<a href="#SP800-56C" class="xref">SP800-56C</a>]</span> spction 4.1 will always be <code>reps = ciel(L / H_outputBits) = 1</code>, and since the input strings defined in <a href="#sec-kem-combiner" class="xref">Section 4</a> are fixed-length and and well below the max input size of KMAC, we can also skip step 4.<a href="#section-5.1-4" class="pilcrow">¶</a></p>
+<p id="section-5.1-5">That means <code>KDF(Z, OtherInput)</code> reduces to:<a href="#section-5.1-5" class="pilcrow">¶</a></p>
+<div class="alignLeft art-text artwork" id="section-5.1-6">
 <pre>
 KMAC#(K, 0x00000001 || Z || fixedInfo, L, S)
-</pre><a href="#section-5.1-7" class="pilcrow">¶</a>
+</pre><a href="#section-5.1-6" class="pilcrow">¶</a>
 </div>
 </section>
 </div>

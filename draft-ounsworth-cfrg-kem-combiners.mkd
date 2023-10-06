@@ -409,7 +409,6 @@ KMAC constructions are RECOMMENDED over SHA-3, as KMAC offers a simple cSHAKE-ba
 ## KMAC based construction {#sec-kmac-kdf}
 
 This section defines a `KDF(Z, OtherInput, outputBits)` as per {{SP800-56C}} section 4.1 Option 3 using the KMAC primitive as specified in NIST SP 800-185 {{SP800-185}}.
-
 To instantiate `KMAC#`:
 
 KMAC is defined in NIST SP 800-185 [SP800-185]. The `KMAC#(K, X, L, S)` parameters MUST be instantiated as follows:
