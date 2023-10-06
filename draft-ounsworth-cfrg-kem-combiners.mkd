@@ -393,7 +393,7 @@ This is a non-comprehensive list, further information can be found in paragraph 
 
 The KDF must be instantiated with cryptographically-secure choices for `KDF`. The following are RECOMMENDED KDF constructions based on NIST SP800-56Cr2 {{SP800-56C}} with Keccak-based instatiations, but other choices MAY be made for example to allow for future cryptographic agility. A protocol using a different instantiation MUST justify that it will behave as a split-key PRF, as required in {{GHP18}}.
 
-| Instantiation number | KDF construction | ??       | hashSize | outputBits |
+| Instantiation number | KDF construction | H(x)     | hashSize | outputBits |
 | ---                  | ---              | ---      | ---      | ---        |
 | 1                    | {#sec-kmac-kdf}  | KMAC128  | 128 bit  | Variable   |
 | 2                    | {#sec-kmac-kdf}  | KMAC256  | 256 bit  | Variable   |

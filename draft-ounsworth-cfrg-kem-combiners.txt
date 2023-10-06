@@ -451,7 +451,7 @@ Internet-Draft                KEM Combiner                  October 2023
 
 
    +===============+=================+=========+==========+============+
-   | Instantiation |KDF construction |??       | hashSize | outputBits |
+   | Instantiation |KDF construction |H(x)     | hashSize | outputBits |
    | number        |                 |         |          |            |
    +===============+=================+=========+==========+============+
    | 1             |{#sec-kmac-kdf}  |KMAC128  | 128 bit  | Variable   |
