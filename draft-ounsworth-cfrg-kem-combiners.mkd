@@ -1,7 +1,7 @@
 ---
 title: Combiner function for hybrid key encapsulation mechanisms (Hybrid KEMs)
 abbrev: KEM Combiner
-docname: draft-ounsworth-cfrg-kem-combiners-04
+docname: draft-ounsworth-cfrg-kem-combiners-05
 
 # <!-- stand_alone: true -->
 ipr: trust200902
@@ -46,7 +46,7 @@ author:
       name: Stavros Kousidis
       org: BSI
       country: Germany
-      email: stavros.kousidis@bsi.bund.de
+      email: kousidis.ietf@gmail.com
 
 
 normative:

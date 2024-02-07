@@ -12,7 +12,7 @@ Expires: 10 August 2024                                           Proton
 
 
 Combiner function for hybrid key encapsulation mechanisms (Hybrid KEMs)
-                 draft-ounsworth-cfrg-kem-combiners-04
+                 draft-ounsworth-cfrg-kem-combiners-05
 
 Abstract
 
@@ -348,7 +348,7 @@ Internet-Draft                KEM Combiner                 February 2024
 
 4.3.  Note on the order of parameters
 
-   For a two-KEM instantiation, the construction is
+   For a two-KEM instantiation with length encoding, the construction is
 
    KDF(ct_1 || rlen(ct_1) || ss_1 || rlen(ss_1) || ct_2 || rlen(ct_2) ||
    ss_2 || rlen(ss_2), fixedInfo)
@@ -749,7 +749,7 @@ Authors' Addresses
    Stavros Kousidis
    BSI
    Germany
-   Email: stavros.kousidis@bsi.bund.de
+   Email: kousidis.ietf@gmail.com
 
 
 
