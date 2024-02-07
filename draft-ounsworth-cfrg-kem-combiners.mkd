@@ -333,7 +333,7 @@ The ciphertext precedes the secret share, as memory-constrained devices can writ
 
 ## Note on the order of parameters
 
-For a two-KEM instantiation, the construction is
+For a two-KEM instantiation with length encoding, the construction is
 
 ```
 KDF(ct_1 || rlen(ct_1) || ss_1 || rlen(ss_1) || 
