@@ -94,7 +94,7 @@ informative:
     date: April 2018
     seriesinfo:
       NIST Special Publication 800-56A
-  SP800-56C:
+  SP800-56Cr2:
     target: https://doi.org/10.6028/NIST.SP.800-56Cr2
     title: Recommendation for Key-Derivation Methods in Key-Establishment Schemes
     author:
@@ -205,7 +205,7 @@ This document defines a comprehensible and easy to implement Keccak-based KEM co
 
 # Changes in this version
 
-* Re-structured {{sec-instantiation}} to clarify the dependence on the KDF defined in {{SP800-56C}}.
+* Re-structured {{sec-instantiation}} to clarify the dependence on the KDF defined in [SP800-56Cr2].
 
 # Terminology {#sec-terminology}
 The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in BCP 14 {{RFC2119}}  {{RFC8174}} when, and only when, they appear in all capitals, as shown here.
@@ -273,7 +273,7 @@ In general it is desirable to use a split-key PRF as a KEM combiner, meaning tha
 The following simple yet generic construction can be used in all IETF protocols that need to combine the output of two or more KEMs:
 
 ~~~
-ss = KDF(k_1 || ... || k_n, fixedInfo)
+ss = KDF(k_1 || ... || k_n || fixedInfo, outputBits)
 ~~~
 {: #tab-kemCombiner title="general KEM combiner construction" }
 
@@ -282,9 +282,10 @@ where:
 - `KDF` represents a suitable choice of a cryptographic key derivation function as defined in {{sec-instantiation}}.
 - `k_i` represent the constant-length input keys and is discussed in {{sec-k_i-construction}},
 - `fixedInfo` is some protocol-specific KDF binding,
+- `outputBits` determines the length of the output keying material
 - `||` represents concatenation.
 
-In {{sec-instantiation}} several possible practical instantiations are listed that are in compliance with NIST SP-800 56Cr2 {{SP800-56C}}.
+In {{sec-instantiation}} several possible practical instantiations are listed that are in compliance with NIST SP-800 56Cr2 [SP800-56Cr2].
 The shared secret `ss` MAY be used directly as a symmetric key, for example as a MAC key or as a Key Encryption Key (KEK).
 
 The values `k_i` can be processed individually, without requiring to store intermediate values except for the hash state and the protocol binding information required for `fixedInfo`.
@@ -391,14 +392,14 @@ This is a non-comprehensive list, further information can be found in paragraph 
 
 # Practical instantiations {#sec-instantiation}
 
-The KDF must be instantiated with cryptographically-secure choices for `KDF`. The following are RECOMMENDED KDF constructions based on NIST SP800-56Cr2 {{SP800-56C}} with Keccak-based instatiations, but other choices MAY be made for example to allow for future cryptographic agility. A protocol using a different instantiation MUST justify that it will behave as a split-key PRF, as required in {{GHP18}}.
+The KDF must be instantiated with cryptographically-secure choices for `KDF`. The following are RECOMMENDED KDF constructions based on NIST SP800-56Cr2 [SP800-56Cr2] with Keccak-based instatiations, but other choices MAY be made for example to allow for future cryptographic agility. A protocol using a different instantiation MUST justify that it will behave as a split-key PRF, as required in {{GHP18}}.
 
-| Instantiation number | KDF construction | H(x)     | hashSize | outputBits |
-| ---                  | ---              | ---      | ---      | ---        |
-| 1                    | {#sec-kmac-kdf}  | KMAC128  | 128 bit  | Variable   |
-| 2                    | {#sec-kmac-kdf}  | KMAC256  | 256 bit  | Variable   |
-| 3                    | {#sec-hash-kdf}  | SHA3-256 | 256 bit  | 256 bit    |
-| 4                    | {#sec-hash-kdf}  | SHA3-512 | 512 bit  | 512 bit    |
+| Instantiation number | KDF construction | Auxiliary FunctionH(x) | hashSize | outputBits |
+| ---                  | ---              | ---                    | ---      | ---        |
+| 1                    | {#sec-kmac-kdf}  | Option 3 with KMAC128  | 128 bit  | Variable   |
+| 2                    | {#sec-kmac-kdf}  | Option 3 with KMAC256  | 256 bit  | Variable   |
+| 3                    | {#sec-hash-kdf}  | Option 1 with SHA3-256 | 256 bit  | 256 bit    |
+| 4                    | {#sec-hash-kdf}  | Option 1 with SHA3-512 | 512 bit  | 512 bit    |
 {: #tab-kdfs title="KDF instantiations"}
 
 As justified in the security considerations, we recommend only Keccak-based instantiations because assuming there are no weaknesses found in the Keccak permutation, it behaves as a split-key PRF that can be keyed by any input `k_i`.
@@ -408,19 +409,19 @@ KMAC constructions are RECOMMENDED over SHA-3, as KMAC offers a simple cSHAKE-ba
 
 ## KMAC based construction {#sec-kmac-kdf}
 
-This section defines a `KDF(Z, OtherInput, outputBits)` as per {{SP800-56C}} section 4.1 Option 3 using the KMAC primitive as specified in NIST SP 800-185 {{SP800-185}}.
+This section defines a `KDF(Z, OtherInput, outputBits)` as per [SP800-56Cr2] section 4.1 Option 3 using the KMAC primitive as specified in NIST SP 800-185 {{SP800-185}}.
 To instantiate `KMAC#`:
 
 KMAC is defined in NIST SP 800-185 [SP800-185]. The `KMAC#(K, X, L, S)` parameters MUST be instantiated as follows:
 
-* `KMAC#` : either `KMAC128` or `KMAC256` is per {{tab-kdfs}}.
-* `K`: a context-specific string of at least `hashSize` bits, and it MAY be used as an additional option to perform context separation, in scenarios where `OtherInput` is not sufficient.
+* `KMAC#` : either `KMAC128` or `KMAC256` as per {{tab-kdfs}}.
+* `K`: a context-specific string of which MAY be used as an additional option to perform context separation, in scenarios where `OtherInput` is not sufficient.
 * `X`: the message input to `KDF()`, as defined above.
 * `L`: integer representation of `outputBits`.
-* `S`: as specified in {{SP800-56C}}, it is the 8-bit ASCII string string "KDF".
+* `S`: as specified in [SP800-56Cr2], it is the 8-bit ASCII string "KDF".
 
 
-Since we are setting `L = outputBits`, Step 1 of the process in {{SP800-56C}} spction 4.1 will always be `reps = ciel(L / H_outputBits) = 1`, and since the input strings defined in {{sec-kem-combiner}} are fixed-length and and well below the max input size of KMAC, we can also skip step 4.
+Since we are setting `L = outputBits`, Step 1 of the process in [SP800-56Cr2] section 4.1 will always be `reps = ceil(L / H_outputBits) = 1`. Also, since [SP800-56Cr2] allows SHA3-based constructions to take arbitrarily long inputs, we can skip step 4.
 
 That means `KDF(Z, OtherInput)` reduces to:
 
@@ -431,9 +432,9 @@ KMAC#(K, 0x00000001 || Z || fixedInfo, L, S)
 
 ## Hash-and-counter based construction {#sec-hash-kdf}
 
-This section defines a `KDF(Z, OtherInput)` as per {{SP800-56C}} section 4.1 Option 1 using the SHA3 primitive as specified in NIST FIPS 202 {{FIPS202}}.
+This section defines a `KDF(Z, OtherInput)` as per [SP800-56Cr2] section 4.1 Option 1 using the SHA3 primitive as specified in NIST FIPS 202 {{FIPS202}}.
 
-This KDF construction requires the full KDF construction as specified {{SP800-56C}} section 4.1. No additional parameters are required.
+This KDF construction requires the full KDF construction as specified in [SP800-56Cr2] section 4.1. No additional parameters are required.
 
 # IANA Considerations {#sec-iana}
 
