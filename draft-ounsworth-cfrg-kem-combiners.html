@@ -10,7 +10,7 @@
 <meta content="Stavros Kousidis" name="author">
 <meta content="
        The migration to post-quantum cryptography often calls for performing multiple key encapsulations in parallel and then combining their outputs to derive a single shared secret. 
-       This document defines a comprehensible and easy to implement Keccak-based KEM combiner to join an arbitrary number of key shares, that is compatible with NIST SP 800-56Cr2   when viewed as a key derivation function. The combiners defined here are practical split-key PRFs and are CCA-secure as long as at least one of the ingredient KEMs is. 
+       This document defines a comprehensible and easy to implement Keccak-based KEM combiner to join an arbitrary number of key shares, that is compatible with NIST SP 800-56Cr2 [SP800-56C] when viewed as a key derivation function. The combiners defined here are practical split-key PRFs and are CCA-secure as long as at least one of the ingredient KEMs is. 
        
 
 
@@ -1179,11 +1179,11 @@ li > p:last-of-type {
 <thead><tr>
 <td class="left">Internet-Draft</td>
 <td class="center">KEM Combiner</td>
-<td class="right">January 2024</td>
+<td class="right">February 2024</td>
 </tr></thead>
 <tfoot><tr>
 <td class="left">Ounsworth, et al.</td>
-<td class="center">Expires 3 August 2024</td>
+<td class="center">Expires 10 August 2024</td>
 <td class="right">[Page]</td>
 </tr></tfoot>
 </table>
@@ -1196,12 +1196,12 @@ li > p:last-of-type {
 <dd class="internet-draft">draft-ounsworth-cfrg-kem-combiners-05</dd>
 <dt class="label-published">Published:</dt>
 <dd class="published">
-<time datetime="2024-01-31" class="published">31 January 2024</time>
+<time datetime="2024-02-07" class="published">7 February 2024</time>
     </dd>
 <dt class="label-intended-status">Intended Status:</dt>
 <dd class="intended-status">Informational</dd>
 <dt class="label-expires">Expires:</dt>
-<dd class="expires"><time datetime="2024-08-03">3 August 2024</time></dd>
+<dd class="expires"><time datetime="2024-08-10">10 August 2024</time></dd>
 <dt class="label-authors">Authors:</dt>
 <dd class="authors">
 <div class="author">
@@ -1223,7 +1223,7 @@ li > p:last-of-type {
 <section id="section-abstract">
       <h2 id="abstract"><a href="#abstract" class="selfRef">Abstract</a></h2>
 <p id="section-abstract-1">The migration to post-quantum cryptography often calls for performing multiple key encapsulations in parallel and then combining their outputs to derive a single shared secret.<a href="#section-abstract-1" class="pilcrow">¶</a></p>
-<p id="section-abstract-2">This document defines a comprehensible and easy to implement Keccak-based KEM combiner to join an arbitrary number of key shares, that is compatible with NIST SP 800-56Cr2 <span>[<a href="#SP800-56C" class="xref">SP800-56C</a>]</span> when viewed as a key derivation function. The combiners defined here are practical split-key PRFs and are CCA-secure as long as at least one of the ingredient KEMs is.<a href="#section-abstract-2" class="pilcrow">¶</a></p>
+<p id="section-abstract-2">This document defines a comprehensible and easy to implement Keccak-based KEM combiner to join an arbitrary number of key shares, that is compatible with NIST SP 800-56Cr2 [SP800-56C] when viewed as a key derivation function. The combiners defined here are practical split-key PRFs and are CCA-secure as long as at least one of the ingredient KEMs is.<a href="#section-abstract-2" class="pilcrow">¶</a></p>
 </section>
 <section class="note rfcEditorRemove" id="section-note.1">
       <h2 id="name-about-this-document-2">
@@ -1259,7 +1259,7 @@ li > p:last-of-type {
         time. It is inappropriate to use Internet-Drafts as reference
         material or to cite them other than as "work in progress."<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
 <p id="section-boilerplate.1-4">
-        This Internet-Draft will expire on 3 August 2024.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
+        This Internet-Draft will expire on 10 August 2024.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="copyright">
@@ -1286,214 +1286,221 @@ li > p:last-of-type {
         </h2>
 <nav class="toc"><ul class="compact toc ulBare ulEmpty">
 <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.1">
-            <p id="section-toc.1-1.1.1" class="keepWithNext"><a href="#section-1" class="xref">1</a>.  <a href="#name-terminology-2" class="xref">Terminology</a></p>
-<ul class="compact toc ulBare ulEmpty">
-<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.1.2.1">
-                <p id="section-toc.1-1.1.2.1.1" class="keepWithNext"><a href="#section-1.1" class="xref">1.1</a>.  <a href="#name-key-encapsulation-mechanisms" class="xref">Key Encapsulation Mechanisms</a></p>
-</li>
-            </ul>
+            <p id="section-toc.1-1.1.1" class="keepWithNext"><a href="#section-1" class="xref">1</a>.  <a href="#name-changes-in-this-version-2" class="xref">Changes in this version</a></p>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.2">
-            <p id="section-toc.1-1.2.1"><a href="#section-2" class="xref">2</a>.  <a href="#name-introduction-2" class="xref">Introduction</a></p>
+            <p id="section-toc.1-1.2.1" class="keepWithNext"><a href="#section-2" class="xref">2</a>.  <a href="#name-terminology-2" class="xref">Terminology</a></p>
 <ul class="compact toc ulBare ulEmpty">
 <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.2.2.1">
-                <p id="section-toc.1-1.2.2.1.1" class="keepWithNext"><a href="#section-2.1" class="xref">2.1</a>.  <a href="#name-kem-psk-hybrids-2" class="xref">KEM/PSK hybrids</a></p>
-</li>
-              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.2.2.2">
-                <p id="section-toc.1-1.2.2.2.1"><a href="#section-2.2" class="xref">2.2</a>.  <a href="#name-pq-traditional-hybrid-kems-2" class="xref">PQ/Traditional hybrid KEMs</a></p>
-</li>
-              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.2.2.3">
-                <p id="section-toc.1-1.2.2.3.1"><a href="#section-2.3" class="xref">2.3</a>.  <a href="#name-kem-based-ake-2" class="xref">KEM-based AKE</a></p>
+                <p id="section-toc.1-1.2.2.1.1" class="keepWithNext"><a href="#section-2.1" class="xref">2.1</a>.  <a href="#name-key-encapsulation-mechanisms" class="xref">Key Encapsulation Mechanisms</a></p>
 </li>
             </ul>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3">
-            <p id="section-toc.1-1.3.1"><a href="#section-3" class="xref">3</a>.  <a href="#name-kem-combiner-construction-2" class="xref">KEM Combiner construction</a></p>
+            <p id="section-toc.1-1.3.1"><a href="#section-3" class="xref">3</a>.  <a href="#name-introduction-2" class="xref">Introduction</a></p>
 <ul class="compact toc ulBare ulEmpty">
 <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.1">
-                <p id="section-toc.1-1.3.2.1.1"><a href="#section-3.1" class="xref">3.1</a>.  <a href="#name-length-encoding-2" class="xref">Length encoding</a></p>
+                <p id="section-toc.1-1.3.2.1.1"><a href="#section-3.1" class="xref">3.1</a>.  <a href="#name-kem-psk-hybrids-2" class="xref">KEM/PSK hybrids</a></p>
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.2">
-                <p id="section-toc.1-1.3.2.2.1"><a href="#section-3.2" class="xref">3.2</a>.  <a href="#name-k_i-construction-2" class="xref">k_i construction</a></p>
+                <p id="section-toc.1-1.3.2.2.1"><a href="#section-3.2" class="xref">3.2</a>.  <a href="#name-pq-traditional-hybrid-kems-2" class="xref">PQ/Traditional hybrid KEMs</a></p>
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.3">
-                <p id="section-toc.1-1.3.2.3.1"><a href="#section-3.3" class="xref">3.3</a>.  <a href="#name-note-on-the-order-of-paramet" class="xref">Note on the order of parameters</a></p>
-</li>
-              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.4">
-                <p id="section-toc.1-1.3.2.4.1"><a href="#section-3.4" class="xref">3.4</a>.  <a href="#name-protocol-binding-2" class="xref">Protocol binding</a></p>
+                <p id="section-toc.1-1.3.2.3.1"><a href="#section-3.3" class="xref">3.3</a>.  <a href="#name-kem-based-ake-2" class="xref">KEM-based AKE</a></p>
 </li>
             </ul>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4">
-            <p id="section-toc.1-1.4.1"><a href="#section-4" class="xref">4</a>.  <a href="#name-practical-instantiations-2" class="xref">Practical instantiations</a></p>
+            <p id="section-toc.1-1.4.1"><a href="#section-4" class="xref">4</a>.  <a href="#name-kem-combiner-construction-2" class="xref">KEM Combiner construction</a></p>
 <ul class="compact toc ulBare ulEmpty">
 <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.1">
-                <p id="section-toc.1-1.4.2.1.1"><a href="#section-4.1" class="xref">4.1</a>.  <a href="#name-kmac-based-construction-2" class="xref">KMAC based construction</a></p>
+                <p id="section-toc.1-1.4.2.1.1"><a href="#section-4.1" class="xref">4.1</a>.  <a href="#name-length-encoding-2" class="xref">Length encoding</a></p>
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.2">
-                <p id="section-toc.1-1.4.2.2.1"><a href="#section-4.2" class="xref">4.2</a>.  <a href="#name-hash-and-counter-based-const" class="xref">Hash-and-counter based construction</a></p>
+                <p id="section-toc.1-1.4.2.2.1"><a href="#section-4.2" class="xref">4.2</a>.  <a href="#name-k_i-construction-2" class="xref">k_i construction</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.3">
+                <p id="section-toc.1-1.4.2.3.1"><a href="#section-4.3" class="xref">4.3</a>.  <a href="#name-note-on-the-order-of-paramet" class="xref">Note on the order of parameters</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.4">
+                <p id="section-toc.1-1.4.2.4.1"><a href="#section-4.4" class="xref">4.4</a>.  <a href="#name-protocol-binding-2" class="xref">Protocol binding</a></p>
 </li>
             </ul>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5">
-            <p id="section-toc.1-1.5.1"><a href="#section-5" class="xref">5</a>.  <a href="#name-iana-considerations-2" class="xref">IANA Considerations</a></p>
-</li>
-          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6">
-            <p id="section-toc.1-1.6.1"><a href="#section-6" class="xref">6</a>.  <a href="#name-security-considerations-2" class="xref">Security Considerations</a></p>
-</li>
-          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7">
-            <p id="section-toc.1-1.7.1"><a href="#section-7" class="xref">7</a>.  <a href="#name-references-2" class="xref">References</a></p>
+            <p id="section-toc.1-1.5.1"><a href="#section-5" class="xref">5</a>.  <a href="#name-practical-instantiations-2" class="xref">Practical instantiations</a></p>
 <ul class="compact toc ulBare ulEmpty">
-<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7.2.1">
-                <p id="section-toc.1-1.7.2.1.1"><a href="#section-7.1" class="xref">7.1</a>.  <a href="#name-normative-references-2" class="xref">Normative References</a></p>
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5.2.1">
+                <p id="section-toc.1-1.5.2.1.1"><a href="#section-5.1" class="xref">5.1</a>.  <a href="#name-kmac-based-construction-2" class="xref">KMAC based construction</a></p>
 </li>
-              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7.2.2">
-                <p id="section-toc.1-1.7.2.2.1"><a href="#section-7.2" class="xref">7.2</a>.  <a href="#name-informative-references-2" class="xref">Informative References</a></p>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5.2.2">
+                <p id="section-toc.1-1.5.2.2.1"><a href="#section-5.2" class="xref">5.2</a>.  <a href="#name-hash-and-counter-based-const" class="xref">Hash-and-counter based construction</a></p>
 </li>
             </ul>
 </li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6">
+            <p id="section-toc.1-1.6.1"><a href="#section-6" class="xref">6</a>.  <a href="#name-iana-considerations-2" class="xref">IANA Considerations</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7">
+            <p id="section-toc.1-1.7.1"><a href="#section-7" class="xref">7</a>.  <a href="#name-security-considerations-2" class="xref">Security Considerations</a></p>
+</li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.8">
-            <p id="section-toc.1-1.8.1"><a href="#appendix-A" class="xref"></a><a href="#name-acknowledgements-2" class="xref">Acknowledgements</a></p>
+            <p id="section-toc.1-1.8.1"><a href="#section-8" class="xref">8</a>.  <a href="#name-references-2" class="xref">References</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.8.2.1">
+                <p id="section-toc.1-1.8.2.1.1"><a href="#section-8.1" class="xref">8.1</a>.  <a href="#name-normative-references-2" class="xref">Normative References</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.8.2.2">
+                <p id="section-toc.1-1.8.2.2.1"><a href="#section-8.2" class="xref">8.2</a>.  <a href="#name-informative-references-2" class="xref">Informative References</a></p>
+</li>
+            </ul>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.9">
-            <p id="section-toc.1-1.9.1"><a href="#appendix-B" class="xref"></a><a href="#name-authors-addresses-2" class="xref">Authors' Addresses</a></p>
+            <p id="section-toc.1-1.9.1"><a href="#appendix-A" class="xref"></a><a href="#name-acknowledgements-2" class="xref">Acknowledgements</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.10">
+            <p id="section-toc.1-1.10.1"><a href="#appendix-B" class="xref"></a><a href="#name-authors-addresses-2" class="xref">Authors' Addresses</a></p>
 </li>
         </ul>
 </nav>
 </section>
 </div>
-<div id="sec-terminology">
+<div id="changes-in-this-version">
 <section id="section-1">
-      <h2 id="name-terminology-2">
-<a href="#section-1" class="section-number selfRef">1. </a><a href="#name-terminology-2" class="section-name selfRef">Terminology</a>
+      <h2 id="name-changes-in-this-version-2">
+<a href="#section-1" class="section-number selfRef">1. </a><a href="#name-changes-in-this-version-2" class="section-name selfRef">Changes in this version</a>
       </h2>
-<p id="section-1-1">The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in BCP 14 <span>[<a href="#RFC2119" class="xref">RFC2119</a>]</span>  <span>[<a href="#RFC8174" class="xref">RFC8174</a>]</span> when, and only when, they appear in all capitals, as shown here.<a href="#section-1-1" class="pilcrow">¶</a></p>
-<p id="section-1-2">This document is consistent with all terminology defined in <span>[<a href="#I-D.driscoll-pqt-hybrid-terminology" class="xref">I-D.driscoll-pqt-hybrid-terminology</a>]</span>.<a href="#section-1-2" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-1-1.1">Re-structured <a href="#sec-instantiation" class="xref">Section 5</a> to clarify the dependence on the KDF defined in <span>[<a href="#SP800-56Cr2" class="xref">SP800-56Cr2</a>]</span>.<a href="#section-1-1.1" class="pilcrow">¶</a>
+</li>
+      </ul>
+</section>
+</div>
+<div id="sec-terminology">
+<section id="section-2">
+      <h2 id="name-terminology-2">
+<a href="#section-2" class="section-number selfRef">2. </a><a href="#name-terminology-2" class="section-name selfRef">Terminology</a>
+      </h2>
+<p id="section-2-1">The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in BCP 14 <span>[<a href="#RFC2119" class="xref">RFC2119</a>]</span>  <span>[<a href="#RFC8174" class="xref">RFC8174</a>]</span> when, and only when, they appear in all capitals, as shown here.<a href="#section-2-1" class="pilcrow">¶</a></p>
+<p id="section-2-2">This document is consistent with all terminology defined in <span>[<a href="#I-D.driscoll-pqt-hybrid-terminology" class="xref">I-D.driscoll-pqt-hybrid-terminology</a>]</span>.<a href="#section-2-2" class="pilcrow">¶</a></p>
 <div id="sec-kem-defn">
-<section id="section-1.1">
+<section id="section-2.1">
         <h3 id="name-key-encapsulation-mechanisms">
-<a href="#section-1.1" class="section-number selfRef">1.1. </a><a href="#name-key-encapsulation-mechanisms" class="section-name selfRef">Key Encapsulation Mechanisms</a>
+<a href="#section-2.1" class="section-number selfRef">2.1. </a><a href="#name-key-encapsulation-mechanisms" class="section-name selfRef">Key Encapsulation Mechanisms</a>
         </h3>
-<p id="section-1.1-1">For the purposes of this document, we consider a Key Encapsulation Mechanism (KEM) to be any asymmetric cryptographic scheme comprised of algorithms satisfying the following interfaces <span>[<a href="#PQCAPI" class="xref">PQCAPI</a>]</span>.<a href="#section-1.1-1" class="pilcrow">¶</a></p>
-<div class="alignLeft art-text artwork" id="section-1.1-2">
+<p id="section-2.1-1">For the purposes of this document, we consider a Key Encapsulation Mechanism (KEM) to be any asymmetric cryptographic scheme comprised of algorithms satisfying the following interfaces <span>[<a href="#PQCAPI" class="xref">PQCAPI</a>]</span>.<a href="#section-2.1-1" class="pilcrow">¶</a></p>
+<div class="alignLeft art-text artwork" id="section-2.1-2">
 <pre>
 def kemKeyGen() -&gt; (pk, sk)
 def kemEncaps(pk) -&gt; (ct, ss)
 def kemDecaps(ct, sk) -&gt; ss
-</pre><a href="#section-1.1-2" class="pilcrow">¶</a>
+</pre><a href="#section-2.1-2" class="pilcrow">¶</a>
 </div>
-<p id="section-1.1-3">where <code>pk</code> is public key, <code>sk</code> is secret key, <code>ct</code> is the ciphertext representing an encapsulated key, and <code>ss</code> is the shared secret.<a href="#section-1.1-3" class="pilcrow">¶</a></p>
-<p id="section-1.1-4">KEMs are typically used in cases where two parties, hereby referred to as the "encapsulater" and the "decapsulater", wish to establish a shared secret via public key cryptography, where the decapsulater has an asymmetric key pair and has previously shared the public key with the encapsulater.<a href="#section-1.1-4" class="pilcrow">¶</a></p>
+<p id="section-2.1-3">where <code>pk</code> is public key, <code>sk</code> is secret key, <code>ct</code> is the ciphertext representing an encapsulated key, and <code>ss</code> is the shared secret.<a href="#section-2.1-3" class="pilcrow">¶</a></p>
+<p id="section-2.1-4">KEMs are typically used in cases where two parties, hereby referred to as the "encapsulater" and the "decapsulater", wish to establish a shared secret via public key cryptography, where the decapsulater has an asymmetric key pair and has previously shared the public key with the encapsulater.<a href="#section-2.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
 </div>
 <div id="sec-intro">
-<section id="section-2">
+<section id="section-3">
       <h2 id="name-introduction-2">
-<a href="#section-2" class="section-number selfRef">2. </a><a href="#name-introduction-2" class="section-name selfRef">Introduction</a>
+<a href="#section-3" class="section-number selfRef">3. </a><a href="#name-introduction-2" class="section-name selfRef">Introduction</a>
       </h2>
-<p id="section-2-1">The need for a KEM combiner function arises in three different contexts within IETF security protocols:<a href="#section-2-1" class="pilcrow">¶</a></p>
-<ol start="1" type="1" class="normal type-1" id="section-2-2">
-<li id="section-2-2.1">KEM / PSK hybrids where the output of a KEM is combined with a static pre-shared key.<a href="#section-2-2.1" class="pilcrow">¶</a>
+<p id="section-3-1">The need for a KEM combiner function arises in three different contexts within IETF security protocols:<a href="#section-3-1" class="pilcrow">¶</a></p>
+<ol start="1" type="1" class="normal type-1" id="section-3-2">
+<li id="section-3-2.1">KEM / PSK hybrids where the output of a KEM is combined with a static pre-shared key.<a href="#section-3-2.1" class="pilcrow">¶</a>
 </li>
-        <li id="section-2-2.2">Post-quantum / traditional hybrid KEMs where output of a post-quantum KEM is combined with the output of a classical key transport or key exchange algorithm.<a href="#section-2-2.2" class="pilcrow">¶</a>
+        <li id="section-3-2.2">Post-quantum / traditional hybrid KEMs where output of a post-quantum KEM is combined with the output of a classical key transport or key exchange algorithm.<a href="#section-3-2.2" class="pilcrow">¶</a>
 </li>
-        <li id="section-2-2.3">KEM-based authenticated key exchanges (AKEs) where the output of two or more KEMs performed in different directions are combined.<a href="#section-2-2.3" class="pilcrow">¶</a>
+        <li id="section-3-2.3">KEM-based authenticated key exchanges (AKEs) where the output of two or more KEMs performed in different directions are combined.<a href="#section-3-2.3" class="pilcrow">¶</a>
 </li>
       </ol>
-<p id="section-2-3">This document normalizes a mechanism for combining the output of two or more KEMs.<a href="#section-2-3" class="pilcrow">¶</a></p>
+<p id="section-3-3">This document normalizes a mechanism for combining the output of two or more KEMs.<a href="#section-3-3" class="pilcrow">¶</a></p>
 <div id="kempsk-hybrids">
-<section id="section-2.1">
+<section id="section-3.1">
         <h3 id="name-kem-psk-hybrids-2">
-<a href="#section-2.1" class="section-number selfRef">2.1. </a><a href="#name-kem-psk-hybrids-2" class="section-name selfRef">KEM/PSK hybrids</a>
+<a href="#section-3.1" class="section-number selfRef">3.1. </a><a href="#name-kem-psk-hybrids-2" class="section-name selfRef">KEM/PSK hybrids</a>
         </h3>
-<p id="section-2.1-1">As a post-quantum stop-gap, several IETF protocols have added extensions to allow for mixing a pre-shared key (PSK) into an (EC)DH based key exchange. Examples include CMS <span>[<a href="#RFC8696" class="xref">RFC8696</a>]</span> and IKEv2 <span>[<a href="#RFC8784" class="xref">RFC8784</a>]</span>.<a href="#section-2.1-1" class="pilcrow">¶</a></p>
+<p id="section-3.1-1">As a post-quantum stop-gap, several IETF protocols have added extensions to allow for mixing a pre-shared key (PSK) into an (EC)DH based key exchange. Examples include CMS <span>[<a href="#RFC8696" class="xref">RFC8696</a>]</span> and IKEv2 <span>[<a href="#RFC8784" class="xref">RFC8784</a>]</span>.<a href="#section-3.1-1" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="pqtraditional-hybrid-kems">
-<section id="section-2.2">
+<section id="section-3.2">
         <h3 id="name-pq-traditional-hybrid-kems-2">
-<a href="#section-2.2" class="section-number selfRef">2.2. </a><a href="#name-pq-traditional-hybrid-kems-2" class="section-name selfRef">PQ/Traditional hybrid KEMs</a>
+<a href="#section-3.2" class="section-number selfRef">3.2. </a><a href="#name-pq-traditional-hybrid-kems-2" class="section-name selfRef">PQ/Traditional hybrid KEMs</a>
         </h3>
-<p id="section-2.2-1">A post-quantum / traditional hybrid key encapsulation mechanism (hybrid KEM) as defined in <span>[<a href="#I-D.driscoll-pqt-hybrid-terminology" class="xref">I-D.driscoll-pqt-hybrid-terminology</a>]</span> as<a href="#section-2.2-1" class="pilcrow">¶</a></p>
-<span class="break"></span><dl class="dlParallel" id="section-2.2-2">
-          <dt id="section-2.2-2.1">PQ/T Hybrid Key Encapsulation Mechanism:</dt>
-          <dd style="margin-left: 1.5em" id="section-2.2-2.2">
-            <p id="section-2.2-2.2.1">A Key Encapsulation Mechanism (KEM) made up of two or more component KEM algorithms where at least one is a post-quantum algorithm and at least one is a traditional algorithm.<a href="#section-2.2-2.2.1" class="pilcrow">¶</a></p>
+<p id="section-3.2-1">A post-quantum / traditional hybrid key encapsulation mechanism (hybrid KEM) as defined in <span>[<a href="#I-D.driscoll-pqt-hybrid-terminology" class="xref">I-D.driscoll-pqt-hybrid-terminology</a>]</span> as<a href="#section-3.2-1" class="pilcrow">¶</a></p>
+<span class="break"></span><dl class="dlParallel" id="section-3.2-2">
+          <dt id="section-3.2-2.1">PQ/T Hybrid Key Encapsulation Mechanism:</dt>
+          <dd style="margin-left: 1.5em" id="section-3.2-2.2">
+            <p id="section-3.2-2.2.1">A Key Encapsulation Mechanism (KEM) made up of two or more component KEM algorithms where at least one is a post-quantum algorithm and at least one is a traditional algorithm.<a href="#section-3.2-2.2.1" class="pilcrow">¶</a></p>
 </dd>
         <dd class="break"></dd>
 </dl>
-<p id="section-2.2-3">Building a PQ/T hybrid KEM requires a secure function which combines the output of both component KEMs to form a single output. Several IETF protocols are adding PQ/T hybrid KEM mechanisms as part of their overall post-quantum migration strategies, examples include TLS 1.3 <span>[<a href="#I-D.ietf-tls-hybrid-design" class="xref">I-D.ietf-tls-hybrid-design</a>]</span>, IKEv2 <span>[<a href="#I-D.ietf-ipsecme-ikev2-multiple-ke" class="xref">I-D.ietf-ipsecme-ikev2-multiple-ke</a>]</span>, X.509; PKIX; CMS <span>[<a href="#I-D.ounsworth-pq-composite-kem" class="xref">I-D.ounsworth-pq-composite-kem</a>]</span>, OpenPGP <span>[<a href="#I-D.wussler-openpgp-pqc" class="xref">I-D.wussler-openpgp-pqc</a>]</span>, JOSE / COSE (CITE once Orie's drafts are up).<a href="#section-2.2-3" class="pilcrow">¶</a></p>
-<p id="section-2.2-4">The traditional algorithm may in fact be a key transport or key agreement scheme, but since simple transformations exist to turn both of those schemes into KEMs, this document assumes that all cryptograhpic algorithms satisfy the KEM interface described in <a href="#sec-kem-defn" class="xref">Section 1.1</a>.<a href="#section-2.2-4" class="pilcrow">¶</a></p>
+<p id="section-3.2-3">Building a PQ/T hybrid KEM requires a secure function which combines the output of both component KEMs to form a single output. Several IETF protocols are adding PQ/T hybrid KEM mechanisms as part of their overall post-quantum migration strategies, examples include TLS 1.3 <span>[<a href="#I-D.ietf-tls-hybrid-design" class="xref">I-D.ietf-tls-hybrid-design</a>]</span>, IKEv2 <span>[<a href="#I-D.ietf-ipsecme-ikev2-multiple-ke" class="xref">I-D.ietf-ipsecme-ikev2-multiple-ke</a>]</span>, X.509; PKIX; CMS <span>[<a href="#I-D.ounsworth-pq-composite-kem" class="xref">I-D.ounsworth-pq-composite-kem</a>]</span>, OpenPGP <span>[<a href="#I-D.wussler-openpgp-pqc" class="xref">I-D.wussler-openpgp-pqc</a>]</span>, JOSE / COSE (CITE once Orie's drafts are up).<a href="#section-3.2-3" class="pilcrow">¶</a></p>
+<p id="section-3.2-4">The traditional algorithm may in fact be a key transport or key agreement scheme, but since simple transformations exist to turn both of those schemes into KEMs, this document assumes that all cryptograhpic algorithms satisfy the KEM interface described in <a href="#sec-kem-defn" class="xref">Section 2.1</a>.<a href="#section-3.2-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="kem-based-ake">
-<section id="section-2.3">
+<section id="section-3.3">
         <h3 id="name-kem-based-ake-2">
-<a href="#section-2.3" class="section-number selfRef">2.3. </a><a href="#name-kem-based-ake-2" class="section-name selfRef">KEM-based AKE</a>
+<a href="#section-3.3" class="section-number selfRef">3.3. </a><a href="#name-kem-based-ake-2" class="section-name selfRef">KEM-based AKE</a>
         </h3>
-<p id="section-2.3-1">The need for a KEM-based authenticated key establishment arises, for example, when two communicating parties each have long-term KEM keys (for example in X.509 certificates), and wish to involve both KEM keys in deriving a mutually-authenticated shared secret. In particular this will arise for any protocol that needs to provide post-quantum replacements for static-static (Elliptic Curve) Diffie-Hellman mechanisms. Examples include a KEM replacement for CMP's DHBasedMac <span>[<a href="#I-D.ietf-lamps-cmp-updates" class="xref">I-D.ietf-lamps-cmp-updates</a>]</span>.<a href="#section-2.3-1" class="pilcrow">¶</a></p>
+<p id="section-3.3-1">The need for a KEM-based authenticated key establishment arises, for example, when two communicating parties each have long-term KEM keys (for example in X.509 certificates), and wish to involve both KEM keys in deriving a mutually-authenticated shared secret. In particular this will arise for any protocol that needs to provide post-quantum replacements for static-static (Elliptic Curve) Diffie-Hellman mechanisms. Examples include a KEM replacement for CMP's DHBasedMac <span>[<a href="#I-D.ietf-lamps-cmp-updates" class="xref">I-D.ietf-lamps-cmp-updates</a>]</span>.<a href="#section-3.3-1" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
 </div>
 <div id="sec-kem-combiner">
-<section id="section-3">
+<section id="section-4">
       <h2 id="name-kem-combiner-construction-2">
-<a href="#section-3" class="section-number selfRef">3. </a><a href="#name-kem-combiner-construction-2" class="section-name selfRef">KEM Combiner construction</a>
+<a href="#section-4" class="section-number selfRef">4. </a><a href="#name-kem-combiner-construction-2" class="section-name selfRef">KEM Combiner construction</a>
       </h2>
-<p id="section-3-1">A KEM combiner is a function that takes in two or more shared secrets <code>ss_i</code> and returns a combined shared secret <code>ss</code>.<a href="#section-3-1" class="pilcrow">¶</a></p>
-<div class="alignLeft art-text artwork" id="section-3-2">
-<pre>
-ss = kemCombiner(ss_1, ss_2, ..., ss_n)
-</pre><a href="#section-3-2" class="pilcrow">¶</a>
-</div>
-<p id="section-3-3">This document assumes that shared secrets are the output of a KEM, but without loss of generality they MAY also be any other source of cryptographic key material, such as pre-shared keys (PSKs), with PQ/PSK being a quantum-safe migration strategy being made available by some protocols, see for example IKEv2 in <span>[<a href="#RFC8784" class="xref">RFC8784</a>]</span>.<a href="#section-3-3" class="pilcrow">¶</a></p>
-<p id="section-3-4">In general it is desirable to use a split-key PRF as a KEM combiner, meaning that the combiner has the properties of a PRF when keyed by any of its single inputs.
-The following simple yet generic construction can be used in all IETF protocols that need to combine the output of two or more KEMs:<a href="#section-3-4" class="pilcrow">¶</a></p>
+<p id="section-4-1">TODO: as per https://www.enisa.europa.eu/publications/post-quantum-cryptography-integration-study section 4.2, might need to specify behaviour in light of KEMs with a non-zero failure probability.<a href="#section-4-1" class="pilcrow">¶</a></p>
+<p id="section-4-2">A KEM combiner is a function that takes the output of two or more KEM encapsulations and combines them to produce a single shared secret.<a href="#section-4-2" class="pilcrow">¶</a></p>
+<p id="section-4-3">This document assumes that shared secrets are the output of a KEM, but without loss of generality they MAY also be any other source of cryptographic key material, such as pre-shared keys (PSKs), with PQ/PSK being a quantum-safe migration strategy being made available by some protocols, see for example IKEv2 in <span>[<a href="#RFC8784" class="xref">RFC8784</a>]</span>.<a href="#section-4-3" class="pilcrow">¶</a></p>
+<p id="section-4-4">In general it is desirable to use a split-key PRF as a KEM combiner, meaning that the combiner has the properties of a PRF when keyed by any of its single inputs.
+The following simple yet generic construction can be used in all IETF protocols that need to combine the output of two or more KEMs:<a href="#section-4-4" class="pilcrow">¶</a></p>
 <span id="name-general-kem-combiner-constru"></span><div id="tab-kemCombiner">
 <figure id="figure-1">
-        <div class="alignLeft art-text artwork" id="section-3-5.1">
+        <div class="alignLeft art-text artwork" id="section-4-5.1">
 <pre>
-ss = KDF(counter || k_1 || ... || k_n || fixedInfo, outputBits)
+ss = KDF(k_1 || ... || k_n || fixedInfo, outputBits)
 </pre>
 </div>
 <figcaption><a href="#figure-1" class="selfRef">Figure 1</a>:
 <a href="#name-general-kem-combiner-constru" class="selfRef">general KEM combiner construction</a>
         </figcaption></figure>
 </div>
-<p id="section-3-6">where:<a href="#section-3-6" class="pilcrow">¶</a></p>
+<p id="section-4-6">where:<a href="#section-4-6" class="pilcrow">¶</a></p>
 <ul class="normal">
-<li class="normal" id="section-3-7.1">
-          <code>KDF</code> represents a suitable choice of a cryptographic key derivation function,<a href="#section-3-7.1" class="pilcrow">¶</a>
+<li class="normal" id="section-4-7.1">
+          <code>KDF</code> represents a suitable choice of a cryptographic key derivation function as defined in <a href="#sec-instantiation" class="xref">Section 5</a>.<a href="#section-4-7.1" class="pilcrow">¶</a>
 </li>
-        <li class="normal" id="section-3-7.2">
-          <code>k_i</code> represent the constant-length input keys and is discussed in <a href="#sec-k_i-construction" class="xref">Section 3.2</a>,<a href="#section-3-7.2" class="pilcrow">¶</a>
+        <li class="normal" id="section-4-7.2">
+          <code>k_i</code> represent the constant-length input keys and is discussed in <a href="#sec-k_i-construction" class="xref">Section 4.2</a>,<a href="#section-4-7.2" class="pilcrow">¶</a>
 </li>
-        <li class="normal" id="section-3-7.3">
-          <code>fixedInfo</code> is some protocol-specific KDF binding,<a href="#section-3-7.3" class="pilcrow">¶</a>
+        <li class="normal" id="section-4-7.3">
+          <code>fixedInfo</code> is some protocol-specific KDF binding,<a href="#section-4-7.3" class="pilcrow">¶</a>
 </li>
-        <li class="normal" id="section-3-7.4">
-          <code>counter</code> parameter is instantiation-specific and is discussed in <a href="#sec-instantiation" class="xref">Section 4</a>.<a href="#section-3-7.4" class="pilcrow">¶</a>
+        <li class="normal" id="section-4-7.4">
+          <code>outputBits</code> determines the length of the output keying material<a href="#section-4-7.4" class="pilcrow">¶</a>
 </li>
-        <li class="normal" id="section-3-7.5">
-          <code>outputBits</code> determines the length of the output keying material,<a href="#section-3-7.5" class="pilcrow">¶</a>
-</li>
-        <li class="normal" id="section-3-7.6">
-          <code>||</code> represents concatenation.<a href="#section-3-7.6" class="pilcrow">¶</a>
+        <li class="normal" id="section-4-7.5">
+          <code>||</code> represents concatenation.<a href="#section-4-7.5" class="pilcrow">¶</a>
 </li>
       </ul>
-<p id="section-3-8">In <a href="#sec-instantiation" class="xref">Section 4</a> several possible practical instantiations are listed that are in compliance with NIST SP-800 56Cr2 <span>[<a href="#SP800-56C" class="xref">SP800-56C</a>]</span>.
-The shared secret <code>ss</code> MAY be used directly as a symmetric key, for example as a MAC key or as a Key Encryption Key (KEK).<a href="#section-3-8" class="pilcrow">¶</a></p>
-<p id="section-3-9">The values <code>k_i</code> can be processed individually, without requiring to store intermediate values except for the hash state and the protocol binding information required for <code>fixedInfo</code>.<a href="#section-3-9" class="pilcrow">¶</a></p>
+<p id="section-4-8">In <a href="#sec-instantiation" class="xref">Section 5</a> several possible practical instantiations are listed that are in compliance with NIST SP-800 56Cr2 <span>[<a href="#SP800-56Cr2" class="xref">SP800-56Cr2</a>]</span>.
+The shared secret <code>ss</code> MAY be used directly as a symmetric key, for example as a MAC key or as a Key Encryption Key (KEK).<a href="#section-4-8" class="pilcrow">¶</a></p>
+<p id="section-4-9">The values <code>k_i</code> can be processed individually, without requiring to store intermediate values except for the hash state and the protocol binding information required for <code>fixedInfo</code>.<a href="#section-4-9" class="pilcrow">¶</a></p>
 <div id="length-encoding">
-<section id="section-3.1">
+<section id="section-4.1">
         <h3 id="name-length-encoding-2">
-<a href="#section-3.1" class="section-number selfRef">3.1. </a><a href="#name-length-encoding-2" class="section-name selfRef">Length encoding</a>
+<a href="#section-4.1" class="section-number selfRef">4.1. </a><a href="#name-length-encoding-2" class="section-name selfRef">Length encoding</a>
         </h3>
-<p id="section-3.1-1">All variable length string inputs <code>s</code> MUST be suffixed with the length, right-encoded using the <code>rlen</code> function, having the following construction:<a href="#section-3.1-1" class="pilcrow">¶</a></p>
-<div class="alignLeft art-text artwork" id="section-3.1-2">
+<p id="section-4.1-1">All variable length string inputs <code>s</code> MUST be suffixed with the length, right-encoded using the <code>rlen</code> function, having the following construction:<a href="#section-4.1-1" class="pilcrow">¶</a></p>
+<div class="alignLeft art-text artwork" id="section-4.1-2">
 <pre>
 Validity Conditions: 0 &lt;= len(s) &lt; 2^{2040}
 1. Let x = len(s)
@@ -1503,198 +1510,228 @@ Validity Conditions: 0 &lt;= len(s) &lt; 2^{2040}
 3. Let O_i = uint8(x_i), for i = 1 to n
 4. Let O_{n+1} = uint8(n)
 5. rlen(s) = O_1 || O_2 || ... || O_n || O_{n+1}
-</pre><a href="#section-3.1-2" class="pilcrow">¶</a>
+</pre><a href="#section-4.1-2" class="pilcrow">¶</a>
 </div>
-<p id="section-3.1-3">This is compatible with the <code>right_encode</code> construction presented in <span>[<a href="#SP800-185" class="xref">SP800-185</a>]</span>, and encodes the length of the string <code>s</code> as a byte string in a way that can be unambiguously parsed from the end.<a href="#section-3.1-3" class="pilcrow">¶</a></p>
-<p id="section-3.1-4">Right encoding is preferred to left encoding, since it provides the same security guarantees but allows
-encoding ciphertext where length is a priori unknown.<a href="#section-3.1-4" class="pilcrow">¶</a></p>
+<p id="section-4.1-3">This is compatible with the <code>right_encode</code> construction presented in <span>[<a href="#SP800-185" class="xref">SP800-185</a>]</span>, and encodes the length of the string <code>s</code> as a byte string in a way that can be unambiguously parsed from the end.<a href="#section-4.1-3" class="pilcrow">¶</a></p>
+<p id="section-4.1-4">Right encoding is preferred to left encoding, since it provides the same security guarantees but allows
+encoding ciphertext where length is a priori unknown.<a href="#section-4.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="sec-k_i-construction">
-<section id="section-3.2">
+<section id="section-4.2">
         <h3 id="name-k_i-construction-2">
-<a href="#section-3.2" class="section-number selfRef">3.2. </a><a href="#name-k_i-construction-2" class="section-name selfRef">k_i construction</a>
+<a href="#section-4.2" class="section-number selfRef">4.2. </a><a href="#name-k_i-construction-2" class="section-name selfRef">k_i construction</a>
         </h3>
-<p id="section-3.2-1">Following the guidance of Giacon et al. <span>[<a href="#GHP18" class="xref">GHP18</a>]</span>, we wish for a KEM combiner that is CCA-secure as long as at least one of the ingredient KEMs is. In order to protect against chosen ciphertext attacks, it is necessary to include both the shared secret <code>ss_i</code> and its corresponding ciphertext <code>ct_i</code>.
-If both the secret share <code>ss_i</code> and the ciphertext <code>ct_i</code> are constant length, then <code>k_i</code> MAY be constructed concatenating the two values:<a href="#section-3.2-1" class="pilcrow">¶</a></p>
-<div class="alignLeft art-text artwork" id="section-3.2-2">
+<p id="section-4.2-1">Following the guidance of Giacon et al. <span>[<a href="#GHP18" class="xref">GHP18</a>]</span>, we wish for a KEM combiner that is CCA-secure as long as at least one of the ingredient KEMs is. In order to protect against chosen ciphertext attacks, it is necessary to include both the shared secret <code>ss_i</code> and its corresponding ciphertext <code>ct_i</code>.
+If both the secret share <code>ss_i</code> and the ciphertext <code>ct_i</code> are constant length, then <code>k_i</code> MAY be constructed concatenating the two values:<a href="#section-4.2-1" class="pilcrow">¶</a></p>
+<div class="alignLeft art-text artwork" id="section-4.2-2">
 <pre>
 k_i = ct_i || ss_i
-</pre><a href="#section-3.2-2" class="pilcrow">¶</a>
+</pre><a href="#section-4.2-2" class="pilcrow">¶</a>
 </div>
-<p id="section-3.2-3">If <code>ss_i</code> or <code>ct_i</code> are not guaranteed to have constant length, it is REQUIRED to append the <code>rlen</code> encoded length when concatenating, prior to inclusion in the overall construction described in <a href="#tab-kemCombiner" class="xref">Figure 1</a>:<a href="#section-3.2-3" class="pilcrow">¶</a></p>
-<div class="alignLeft art-text artwork" id="section-3.2-4">
+<p id="section-4.2-3">If <code>ss_i</code> or <code>ct_i</code> are not guaranteed to have constant length, it is REQUIRED to append the <code>rlen</code> encoded length when concatenating, prior to inclusion in the overall construction described in <a href="#tab-kemCombiner" class="xref">Figure 1</a>:<a href="#section-4.2-3" class="pilcrow">¶</a></p>
+<div class="alignLeft art-text artwork" id="section-4.2-4">
 <pre>
 k_i = ct_i || rlen(ct_i) || ss_i || rlen(ss_i)
-</pre><a href="#section-3.2-4" class="pilcrow">¶</a>
+</pre><a href="#section-4.2-4" class="pilcrow">¶</a>
 </div>
-<p id="section-3.2-5">Any protocols making use of this construction MUST either right-encode the length of all inputs <code>ss_i</code> and <code>ct_i</code>, or justify that any inputs will always be fixed length.
-In the case of a PSK the associated ciphertext is the empty string.<a href="#section-3.2-5" class="pilcrow">¶</a></p>
-<p id="section-3.2-6">Including the ciphertext guarantees that the combined kem is IND-CCA2 secure as long as one of the ingredient KEMs is, as stated by <span>[<a href="#GHP18" class="xref">GHP18</a>]</span>.<a href="#section-3.2-6" class="pilcrow">¶</a></p>
-<p id="section-3.2-7">The ciphertext precedes the secret share, as memory-constrained devices can write <code>c_i</code> into the hash state and no further caching is required when streaming.<a href="#section-3.2-7" class="pilcrow">¶</a></p>
+<p id="section-4.2-5">Any protocols making use of this construction MUST either right-encode the length of all inputs <code>ss_i</code> and <code>ct_i</code>, or justify that any inputs will always be fixed length.
+In the case of a PSK the associated ciphertext is the empty string.<a href="#section-4.2-5" class="pilcrow">¶</a></p>
+<p id="section-4.2-6">Including the ciphertext guarantees that the combined kem is IND-CCA2 secure as long as one of the ingredient KEMs is, as stated by <span>[<a href="#GHP18" class="xref">GHP18</a>]</span>.<a href="#section-4.2-6" class="pilcrow">¶</a></p>
+<p id="section-4.2-7">The ciphertext precedes the secret share, as memory-constrained devices can write <code>c_i</code> into the hash state and no further caching is required when streaming.<a href="#section-4.2-7" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="note-on-the-order-of-parameters">
-<section id="section-3.3">
+<section id="section-4.3">
         <h3 id="name-note-on-the-order-of-paramet">
-<a href="#section-3.3" class="section-number selfRef">3.3. </a><a href="#name-note-on-the-order-of-paramet" class="section-name selfRef">Note on the order of parameters</a>
+<a href="#section-4.3" class="section-number selfRef">4.3. </a><a href="#name-note-on-the-order-of-paramet" class="section-name selfRef">Note on the order of parameters</a>
         </h3>
-<p id="section-3.3-1">For a two-KEM instantiation, the construction is<a href="#section-3.3-1" class="pilcrow">¶</a></p>
-<p id="section-3.3-2"><code>
-KDF(counter || ct_1 || rlen(ct_1) || ss_1 || rlen(ss_1) || 
-               ct_2 || rlen(ct_2) || ss_2 || rlen(ss_2) || 
-               fixedInfo, outputBits)
-</code><a href="#section-3.3-2" class="pilcrow">¶</a></p>
-<p id="section-3.3-3">The order of parameters is chosen intentionally to facilitate streaming implementations
-on devices that lack sufficient memory to hold the entirety of <code>ct_1</code> or <code>ct_2</code>.<a href="#section-3.3-3" class="pilcrow">¶</a></p>
-<p id="section-3.3-4">This construction aims to have two streaming-friendly properties. First, 
+<p id="section-4.3-1">For a two-KEM instantiation with length encoding, the construction is<a href="#section-4.3-1" class="pilcrow">¶</a></p>
+<p id="section-4.3-2"><code>
+KDF(ct_1 || rlen(ct_1) || ss_1 || rlen(ss_1) || 
+    ct_2 || rlen(ct_2) || ss_2 || rlen(ss_2), fixedInfo)
+</code><a href="#section-4.3-2" class="pilcrow">¶</a></p>
+<p id="section-4.3-3">The order of parameters is chosen intentionally to facilitate streaming implementations
+on devices that lack sufficient memory to hold the entirety of <code>ct_1</code> or <code>ct_2</code>.<a href="#section-4.3-3" class="pilcrow">¶</a></p>
+<p id="section-4.3-4">This construction aims to have two streaming-friendly properties. First, 
 <code>ct_i</code> can be written to <code>KDF</code>'s update interface as it is received and 
 does not need to be stored, finally adding its corresponding <code>ss_i</code> once 
 it is available. And second, the first KEM can be processed in its entirety and
-written to <code>KDF</code>'s update interface before beginning to process the second KEM.<a href="#section-3.3-4" class="pilcrow">¶</a></p>
+written to <code>KDF</code>'s update interface before beginning to process the second KEM.<a href="#section-4.3-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="protocol-binding">
-<section id="section-3.4">
+<section id="section-4.4">
         <h3 id="name-protocol-binding-2">
-<a href="#section-3.4" class="section-number selfRef">3.4. </a><a href="#name-protocol-binding-2" class="section-name selfRef">Protocol binding</a>
+<a href="#section-4.4" class="section-number selfRef">4.4. </a><a href="#name-protocol-binding-2" class="section-name selfRef">Protocol binding</a>
         </h3>
-<p id="section-3.4-1">The <code>fixedInfo</code> parameter is a fixed-format string containing some context-specific information.
-This serves to prevent cross-context attacks by making this key derivation unique to its protocol context.<a href="#section-3.4-1" class="pilcrow">¶</a></p>
-<p id="section-3.4-2">The <code>fixedInfo</code> string MUST have a definite structure depending on the protocol where all parts strictly defined by the protocol specification.<a href="#section-3.4-2" class="pilcrow">¶</a></p>
-<div class="alignLeft art-text artwork" id="section-3.4-3">
+<p id="section-4.4-1">The <code>fixedInfo</code> parameter is a fixed-format string containing some context-specific information.
+This serves to prevent cross-context attacks by making this key derivation unique to its protocol context.<a href="#section-4.4-1" class="pilcrow">¶</a></p>
+<p id="section-4.4-2">The <code>fixedInfo</code> string MUST have a definite structure depending on the protocol where all parts strictly defined by the protocol specification.<a href="#section-4.4-2" class="pilcrow">¶</a></p>
+<div class="alignLeft art-text artwork" id="section-4.4-3">
 <pre>
 fixedInfo = fixedInfo || s
-</pre><a href="#section-3.4-3" class="pilcrow">¶</a>
+</pre><a href="#section-4.4-3" class="pilcrow">¶</a>
 </div>
-<p id="section-3.4-4">Each fixed-length input string <code>f</code> MAY be directly used as input:<a href="#section-3.4-4" class="pilcrow">¶</a></p>
-<div class="alignLeft art-text artwork" id="section-3.4-5">
+<p id="section-4.4-4">Each fixed-length input string <code>f</code> MAY be directly used as input:<a href="#section-4.4-4" class="pilcrow">¶</a></p>
+<div class="alignLeft art-text artwork" id="section-4.4-5">
 <pre>
 s = f ; f is guaranteed to have fixed length
-</pre><a href="#section-3.4-5" class="pilcrow">¶</a>
+</pre><a href="#section-4.4-5" class="pilcrow">¶</a>
 </div>
-<p id="section-3.4-6">Each variable-length input string <code>v</code> MUST be suffixed with a right-encoding of the length:<a href="#section-3.4-6" class="pilcrow">¶</a></p>
-<div class="alignLeft art-text artwork" id="section-3.4-7">
+<p id="section-4.4-6">Each variable-length input string <code>v</code> MUST be suffixed with a right-encoding of the length:<a href="#section-4.4-6" class="pilcrow">¶</a></p>
+<div class="alignLeft art-text artwork" id="section-4.4-7">
 <pre>
 s = v || rlen(v) ; v may have variable length
-</pre><a href="#section-3.4-7" class="pilcrow">¶</a>
+</pre><a href="#section-4.4-7" class="pilcrow">¶</a>
 </div>
-<p id="section-3.4-8"><code>fixedInfo</code> MUST NOT include the shared secrets and ciphertexts, as they are already represented in the KDF input.<a href="#section-3.4-8" class="pilcrow">¶</a></p>
-<p id="section-3.4-9">The parameter fixedInfo MAY contain any of the following information:<a href="#section-3.4-9" class="pilcrow">¶</a></p>
+<p id="section-4.4-8"><code>fixedInfo</code> MUST NOT include the shared secrets and ciphertexts, as they are already represented in the KDF input.<a href="#section-4.4-8" class="pilcrow">¶</a></p>
+<p id="section-4.4-9">The parameter fixedInfo MAY contain any of the following information:<a href="#section-4.4-9" class="pilcrow">¶</a></p>
 <ul class="normal">
-<li class="normal" id="section-3.4-10.1">Public information about the communication parties, such as their identifiers.<a href="#section-3.4-10.1" class="pilcrow">¶</a>
+<li class="normal" id="section-4.4-10.1">Public information about the communication parties, such as their identifiers.<a href="#section-4.4-10.1" class="pilcrow">¶</a>
 </li>
-          <li class="normal" id="section-3.4-10.2">The public keys or certificates contributed by each party to the key-agreement transaction.<a href="#section-3.4-10.2" class="pilcrow">¶</a>
+          <li class="normal" id="section-4.4-10.2">The public keys or certificates contributed by each party to the key-agreement transaction.<a href="#section-4.4-10.2" class="pilcrow">¶</a>
 </li>
-          <li class="normal" id="section-3.4-10.3">Other public information shared between communication parties before or during the transaction, such as nonces.<a href="#section-3.4-10.3" class="pilcrow">¶</a>
+          <li class="normal" id="section-4.4-10.3">Other public information shared between communication parties before or during the transaction, such as nonces.<a href="#section-4.4-10.3" class="pilcrow">¶</a>
 </li>
-          <li class="normal" id="section-3.4-10.4">An indication of the protocol or application employing the key-derivation method.<a href="#section-3.4-10.4" class="pilcrow">¶</a>
+          <li class="normal" id="section-4.4-10.4">An indication of the protocol or application employing the key-derivation method.<a href="#section-4.4-10.4" class="pilcrow">¶</a>
 </li>
-          <li class="normal" id="section-3.4-10.5">Protocol-related information, such as a label or session identifier.<a href="#section-3.4-10.5" class="pilcrow">¶</a>
+          <li class="normal" id="section-4.4-10.5">Protocol-related information, such as a label or session identifier.<a href="#section-4.4-10.5" class="pilcrow">¶</a>
 </li>
-          <li class="normal" id="section-3.4-10.6">An indication of the key-agreement scheme and/or key-derivation method used.<a href="#section-3.4-10.6" class="pilcrow">¶</a>
+          <li class="normal" id="section-4.4-10.6">An indication of the key-agreement scheme and/or key-derivation method used.<a href="#section-4.4-10.6" class="pilcrow">¶</a>
 </li>
-          <li class="normal" id="section-3.4-10.7">An indication of the domain parameters associated with the asymmetric key pairs employed for key establishment.<a href="#section-3.4-10.7" class="pilcrow">¶</a>
+          <li class="normal" id="section-4.4-10.7">An indication of the domain parameters associated with the asymmetric key pairs employed for key establishment.<a href="#section-4.4-10.7" class="pilcrow">¶</a>
 </li>
-          <li class="normal" id="section-3.4-10.8">An indication of other parameter or primitive choices.<a href="#section-3.4-10.8" class="pilcrow">¶</a>
+          <li class="normal" id="section-4.4-10.8">An indication of other parameter or primitive choices.<a href="#section-4.4-10.8" class="pilcrow">¶</a>
 </li>
-          <li class="normal" id="section-3.4-10.9">An indication of how the derived keying material should be parsed, including an indication of which algorithm(s) will use the (parsed) keying material.<a href="#section-3.4-10.9" class="pilcrow">¶</a>
+          <li class="normal" id="section-4.4-10.9">An indication of how the derived keying material should be parsed, including an indication of which algorithm(s) will use the (parsed) keying material.<a href="#section-4.4-10.9" class="pilcrow">¶</a>
 </li>
         </ul>
-<p id="section-3.4-11">This is a non-comprehensive list, further information can be found in paragraph 5.8.2 of NIST SP800-56Ar3 <span>[<a href="#SP800-56A" class="xref">SP800-56A</a>]</span>.<a href="#section-3.4-11" class="pilcrow">¶</a></p>
+<p id="section-4.4-11">This is a non-comprehensive list, further information can be found in paragraph 5.8.2 of NIST SP800-56Ar3 <span>[<a href="#SP800-56A" class="xref">SP800-56A</a>]</span>.<a href="#section-4.4-11" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
 </div>
 <div id="sec-instantiation">
-<section id="section-4">
+<section id="section-5">
       <h2 id="name-practical-instantiations-2">
-<a href="#section-4" class="section-number selfRef">4. </a><a href="#name-practical-instantiations-2" class="section-name selfRef">Practical instantiations</a>
+<a href="#section-5" class="section-number selfRef">5. </a><a href="#name-practical-instantiations-2" class="section-name selfRef">Practical instantiations</a>
       </h2>
-<p id="section-4-1">The KDF must be instantiated with cryptographically-secure choices for <code>KDF</code>. The following are RECOMMENDED Keccak-based instatiations, but other choices MAY be made for example to allow for future cryptographic agility. A protocol using a different instantiation MUST justify that it will behave as a split-key PRF, as required in <span>[<a href="#GHP18" class="xref">GHP18</a>]</span>.<a href="#section-4-1" class="pilcrow">¶</a></p>
-<p id="section-4-2">Each instance defines a function to be used as <code>KDF</code>, a <code>hashSize</code> to determine parameter size, and optionally a <code>counter</code>:<a href="#section-4-2" class="pilcrow">¶</a></p>
-<ol start="1" type="1" class="normal type-1" id="section-4-3">
-<li id="section-4-3.1">
-          <code>KDF = KMAC128</code>, with <code>hashSize = 128 bit</code>.<a href="#section-4-3.1" class="pilcrow">¶</a>
-</li>
-        <li id="section-4-3.2">
-          <code>KDF = KMAC256</code>, with <code>hashSize = 256 bit</code>.<a href="#section-4-3.2" class="pilcrow">¶</a>
-</li>
-        <li id="section-4-3.3">
-          <code>KDF = SHA3-256</code>, with <code>hashSize = 256 bit</code>.<a href="#section-4-3.3" class="pilcrow">¶</a>
-</li>
-        <li id="section-4-3.4">
-          <code>KDF = SHA3-512</code>, with <code>hashSize = 512 bit</code>.<a href="#section-4-3.4" class="pilcrow">¶</a>
-</li>
-      </ol>
-<p id="section-4-4">As justified in the security considerations, we recommend only Keccak-based instantiations because assuming there are no weaknesses found in the Keccak permutation, it behaves as a split-key PRF that can be keyed by any input <code>k_i</code>.
-SHAKE is also not included in the list as it is not allowed by <span>[<a href="#SP800-56A" class="xref">SP800-56A</a>]</span> section 7, and does not provide any implementation advantage over KMAC.<a href="#section-4-4" class="pilcrow">¶</a></p>
-<p id="section-4-5">KMAC constructions are RECOMMENDED over SHA-3, as KMAC offers a simple cSHAKE-based construction, with the advantage of returning an unrelated output when requesting a different <code>outputBits</code> KEK length.<a href="#section-4-5" class="pilcrow">¶</a></p>
-<div id="kmac-based-construction">
-<section id="section-4.1">
+<p id="section-5-1">The KDF must be instantiated with cryptographically-secure choices for <code>KDF</code>. The following are RECOMMENDED KDF constructions based on NIST SP800-56Cr2 <span>[<a href="#SP800-56Cr2" class="xref">SP800-56Cr2</a>]</span> with Keccak-based instatiations, but other choices MAY be made for example to allow for future cryptographic agility. A protocol using a different instantiation MUST justify that it will behave as a split-key PRF, as required in <span>[<a href="#GHP18" class="xref">GHP18</a>]</span>.<a href="#section-5-1" class="pilcrow">¶</a></p>
+<span id="name-kdf-instantiations-2"></span><div id="tab-kdfs">
+<table class="center" id="table-1">
+        <caption>
+<a href="#table-1" class="selfRef">Table 1</a>:
+<a href="#name-kdf-instantiations-2" class="selfRef">KDF instantiations</a>
+        </caption>
+<thead>
+          <tr>
+            <th class="text-left" rowspan="1" colspan="1">Instantiation number</th>
+            <th class="text-left" rowspan="1" colspan="1">KDF construction</th>
+            <th class="text-left" rowspan="1" colspan="1">Auxiliary FunctionH(x)</th>
+            <th class="text-left" rowspan="1" colspan="1">hashSize</th>
+            <th class="text-left" rowspan="1" colspan="1">outputBits</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="text-left" rowspan="1" colspan="1">1</td>
+            <td class="text-left" rowspan="1" colspan="1">{#sec-kmac-kdf}</td>
+            <td class="text-left" rowspan="1" colspan="1">Option 3 with KMAC128</td>
+            <td class="text-left" rowspan="1" colspan="1">128 bit</td>
+            <td class="text-left" rowspan="1" colspan="1">Variable</td>
+          </tr>
+          <tr>
+            <td class="text-left" rowspan="1" colspan="1">2</td>
+            <td class="text-left" rowspan="1" colspan="1">{#sec-kmac-kdf}</td>
+            <td class="text-left" rowspan="1" colspan="1">Option 3 with KMAC256</td>
+            <td class="text-left" rowspan="1" colspan="1">256 bit</td>
+            <td class="text-left" rowspan="1" colspan="1">Variable</td>
+          </tr>
+          <tr>
+            <td class="text-left" rowspan="1" colspan="1">3</td>
+            <td class="text-left" rowspan="1" colspan="1">{#sec-hash-kdf}</td>
+            <td class="text-left" rowspan="1" colspan="1">Option 1 with SHA3-256</td>
+            <td class="text-left" rowspan="1" colspan="1">256 bit</td>
+            <td class="text-left" rowspan="1" colspan="1">256 bit</td>
+          </tr>
+          <tr>
+            <td class="text-left" rowspan="1" colspan="1">4</td>
+            <td class="text-left" rowspan="1" colspan="1">{#sec-hash-kdf}</td>
+            <td class="text-left" rowspan="1" colspan="1">Option 1 with SHA3-512</td>
+            <td class="text-left" rowspan="1" colspan="1">512 bit</td>
+            <td class="text-left" rowspan="1" colspan="1">512 bit</td>
+          </tr>
+        </tbody>
+      </table>
+</div>
+<p id="section-5-3">As justified in the security considerations, we recommend only Keccak-based instantiations because assuming there are no weaknesses found in the Keccak permutation, it behaves as a split-key PRF that can be keyed by any input <code>k_i</code>.
+SHAKE is also not included in the list as it is not allowed by <span>[<a href="#SP800-56A" class="xref">SP800-56A</a>]</span> section 7, and does not provide any implementation advantage over KMAC.<a href="#section-5-3" class="pilcrow">¶</a></p>
+<p id="section-5-4">KMAC constructions are RECOMMENDED over SHA-3, as KMAC offers a simple cSHAKE-based construction, with the advantage of returning an unrelated output when requesting a different <code>outputBits</code> KEK length.<a href="#section-5-4" class="pilcrow">¶</a></p>
+<div id="sec-kmac-kdf">
+<section id="section-5.1">
         <h3 id="name-kmac-based-construction-2">
-<a href="#section-4.1" class="section-number selfRef">4.1. </a><a href="#name-kmac-based-construction-2" class="section-name selfRef">KMAC based construction</a>
+<a href="#section-5.1" class="section-number selfRef">5.1. </a><a href="#name-kmac-based-construction-2" class="section-name selfRef">KMAC based construction</a>
         </h3>
-<p id="section-4.1-1">Options 1 and 2 are KMAC-based, as specified in NIST SP 800-185 <span>[<a href="#SP800-185" class="xref">SP800-185</a>]</span>.
-To instantiate the function:<a href="#section-4.1-1" class="pilcrow">¶</a></p>
+<p id="section-5.1-1">This section defines a <code>KDF(Z, OtherInput, outputBits)</code> as per <span>[<a href="#SP800-56Cr2" class="xref">SP800-56Cr2</a>]</span> section 4.1 Option 3 using the KMAC primitive as specified in NIST SP 800-185 <span>[<a href="#SP800-185" class="xref">SP800-185</a>]</span>.
+To instantiate <code>KMAC#</code>:<a href="#section-5.1-1" class="pilcrow">¶</a></p>
+<p id="section-5.1-2">KMAC is defined in NIST SP 800-185 <span>[<a href="#SP800-185" class="xref">SP800-185</a>]</span>. The <code>KMAC#(K, X, L, S)</code> parameters MUST be instantiated as follows:<a href="#section-5.1-2" class="pilcrow">¶</a></p>
 <ul class="normal">
-<li class="normal" id="section-4.1-2.1">The context <code>S</code> MUST be the utf-8 string "KDF".<a href="#section-4.1-2.1" class="pilcrow">¶</a>
+<li class="normal" id="section-5.1-3.1">
+            <code>KMAC#</code> : either <code>KMAC128</code> or <code>KMAC256</code> as per <a href="#tab-kdfs" class="xref">Table 1</a>.<a href="#section-5.1-3.1" class="pilcrow">¶</a>
 </li>
-          <li class="normal" id="section-4.1-2.2">The key <code>K</code> MUST be a context-specific string of at least <code>hashSize</code> bits, and it MAY be used as an additional option to perform context separation, in scenarios where <code>fixedInfo</code> is not sufficient.<a href="#section-4.1-2.2" class="pilcrow">¶</a>
+          <li class="normal" id="section-5.1-3.2">
+            <code>K</code>: a context-specific string of which MAY be used as an additional option to perform context separation, in scenarios where <code>OtherInput</code> is not sufficient.<a href="#section-5.1-3.2" class="pilcrow">¶</a>
 </li>
-          <li class="normal" id="section-4.1-2.3">
-            <p id="section-4.1-2.3.1">The parameter <code>counter</code> MUST be the fixed value <code>0x00000001</code>, corresponding to a 32-bit binary big-endian representation of the number zero.<a href="#section-4.1-2.3.1" class="pilcrow">¶</a></p>
-<ul class="normal">
-<li class="normal" id="section-4.1-2.3.2.1">This aligns with <span>[<a href="#SP800-56C" class="xref">SP800-56C</a>]</span> where <code>counter</code> is initialized to <code>0x00000000</code> is Section 4.1 Step 3, but is first incremented in 6.1 before being used in a hash in 6.2.<a href="#section-4.1-2.3.2.1" class="pilcrow">¶</a>
+          <li class="normal" id="section-5.1-3.3">
+            <code>X</code>: the message input to <code>KDF()</code>, as defined above.<a href="#section-5.1-3.3" class="pilcrow">¶</a>
 </li>
-            </ul>
+          <li class="normal" id="section-5.1-3.4">
+            <code>L</code>: integer representation of <code>outputBits</code>.<a href="#section-5.1-3.4" class="pilcrow">¶</a>
+</li>
+          <li class="normal" id="section-5.1-3.5">
+            <code>S</code>: as specified in <span>[<a href="#SP800-56Cr2" class="xref">SP800-56Cr2</a>]</span>, it is the 8-bit ASCII string "KDF".<a href="#section-5.1-3.5" class="pilcrow">¶</a>
 </li>
         </ul>
-<p id="section-4.1-3">To derive a shared secret <code>ss</code> of desired length, KMAC is called a single time with the input string <code>X</code> defined in <a href="#sec-kem-combiner" class="xref">Section 3</a> and length <code>L</code> being <code>outputBits</code>.
-This is compatible with the one-step KDF definition given in NIST SP800-56Cr2 <span>[<a href="#SP800-56C" class="xref">SP800-56C</a>]</span>, Section 4.<a href="#section-4.1-3" class="pilcrow">¶</a></p>
+<p id="section-5.1-4">Since we are setting <code>L = outputBits</code>, Step 1 of the process in <span>[<a href="#SP800-56Cr2" class="xref">SP800-56Cr2</a>]</span> section 4.1 will always be <code>reps = ceil(L / H_outputBits) = 1</code>. Also, since <span>[<a href="#SP800-56Cr2" class="xref">SP800-56Cr2</a>]</span> allows SHA3-based constructions to take arbitrarily long inputs, we can skip step 4.<a href="#section-5.1-4" class="pilcrow">¶</a></p>
+<p id="section-5.1-5">That means <code>KDF(Z, OtherInput)</code> reduces to:<a href="#section-5.1-5" class="pilcrow">¶</a></p>
+<div class="alignLeft art-text artwork" id="section-5.1-6">
+<pre>
+KMAC#(K, 0x00000001 || Z || fixedInfo, L, S)
+</pre><a href="#section-5.1-6" class="pilcrow">¶</a>
+</div>
 </section>
 </div>
-<div id="hash-and-counter-based-construction">
-<section id="section-4.2">
+<div id="sec-hash-kdf">
+<section id="section-5.2">
         <h3 id="name-hash-and-counter-based-const">
-<a href="#section-4.2" class="section-number selfRef">4.2. </a><a href="#name-hash-and-counter-based-const" class="section-name selfRef">Hash-and-counter based construction</a>
+<a href="#section-5.2" class="section-number selfRef">5.2. </a><a href="#name-hash-and-counter-based-const" class="section-name selfRef">Hash-and-counter based construction</a>
         </h3>
-<p id="section-4.2-1">Options 3 and 4 instantiate the KDF using SHA3, specified in NIST FIPS 202 <span>[<a href="#FIPS202" class="xref">FIPS202</a>]</span>.
-To generate an <code>outputBits</code> long secret share <code>ss</code>:<a href="#section-4.2-1" class="pilcrow">¶</a></p>
-<ul class="normal">
-<li class="normal" id="section-4.2-2.1">the <code>counter</code> MUST be initialized with the value <code>0x00000001</code>.<a href="#section-4.2-2.1" class="pilcrow">¶</a>
-</li>
-          <li class="normal" id="section-4.2-2.2">The hash is performed over the string defined in <a href="#sec-kem-combiner" class="xref">Section 3</a>, and repeated <code>ceil(outputBits/hashSize)</code> times. For each iteration the <code>counter</code> MUST be increased by <code>0x01</code>.<a href="#section-4.2-2.2" class="pilcrow">¶</a>
-</li>
-          <li class="normal" id="section-4.2-2.3">The strings are concatenated ordered by <code>counter</code>.<a href="#section-4.2-2.3" class="pilcrow">¶</a>
-</li>
-          <li class="normal" id="section-4.2-2.4">The leftmost <code>outputBits</code> are returned as <code>ss</code>.<a href="#section-4.2-2.4" class="pilcrow">¶</a>
-</li>
-        </ul>
-<p id="section-4.2-3">An implementation MUST NOT overflow and reuse the <code>counter</code> and an error MUST be returned when producing more than 2^32 consecutive hashes.<a href="#section-4.2-3" class="pilcrow">¶</a></p>
+<p id="section-5.2-1">This section defines a <code>KDF(Z, OtherInput)</code> as per <span>[<a href="#SP800-56Cr2" class="xref">SP800-56Cr2</a>]</span> section 4.1 Option 1 using the SHA3 primitive as specified in NIST FIPS 202 <span>[<a href="#FIPS202" class="xref">FIPS202</a>]</span>.<a href="#section-5.2-1" class="pilcrow">¶</a></p>
+<p id="section-5.2-2">This KDF construction requires the full KDF construction as specified in <span>[<a href="#SP800-56Cr2" class="xref">SP800-56Cr2</a>]</span> section 4.1. No additional parameters are required.<a href="#section-5.2-2" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
 </div>
 <div id="sec-iana">
-<section id="section-5">
+<section id="section-6">
       <h2 id="name-iana-considerations-2">
-<a href="#section-5" class="section-number selfRef">5. </a><a href="#name-iana-considerations-2" class="section-name selfRef">IANA Considerations</a>
+<a href="#section-6" class="section-number selfRef">6. </a><a href="#name-iana-considerations-2" class="section-name selfRef">IANA Considerations</a>
       </h2>
-<p id="section-5-1">None.<a href="#section-5-1" class="pilcrow">¶</a></p>
+<p id="section-6-1">None.<a href="#section-6-1" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="security-considerations">
-<section id="section-6">
+<section id="section-7">
       <h2 id="name-security-considerations-2">
-<a href="#section-6" class="section-number selfRef">6. </a><a href="#name-security-considerations-2" class="section-name selfRef">Security Considerations</a>
+<a href="#section-7" class="section-number selfRef">7. </a><a href="#name-security-considerations-2" class="section-name selfRef">Security Considerations</a>
       </h2>
-<p id="section-6-1">The proposed instantiations in <a href="#sec-instantiation" class="xref">Section 4</a> are practical split-key PRFs since this specification limits to the use of Keccak-based constructions. The sponge construction was proven to be indifferentiable from a random oracle <span>[<a href="#BDPA08" class="xref">BDPA08</a>]</span>.
+<p id="section-7-1">The proposed instantiations in <a href="#sec-instantiation" class="xref">Section 5</a> are practical split-key PRFs since this specification limits to the use of Keccak-based constructions. The sponge construction was proven to be indifferentiable from a random oracle <span>[<a href="#BDPA08" class="xref">BDPA08</a>]</span>.
 More precisely, for a given capacity <code>c</code> the indifferentiability proof shows that assuming there are no weaknesses found in the Keccak permutation, an attacker has to make an expected number of <code>2^(c/2)</code> calls to the permutation to tell Keccak from a random oracle.
 For a random oracle, a difference in only a single bit gives an unrelated, uniformly random output.
-Hence, to be able to distinguish a key <code>k</code>, derived from shared keys <code>k_i</code> from a random bit string, an adversary has to correctly guess all key shares <code>k_i</code> entirely.<a href="#section-6-1" class="pilcrow">¶</a></p>
-<p id="section-6-2">The proposed construction in <a href="#sec-kem-combiner" class="xref">Section 3</a> with the instantiations in
-<a href="#sec-instantiation" class="xref">Section 4</a> preserves IND-CCA2 of any of its ingredient KEMs, i.e.
+Hence, to be able to distinguish a key <code>k</code>, derived from shared keys <code>k_i</code> from a random bit string, an adversary has to correctly guess all key shares <code>k_i</code> entirely.<a href="#section-7-1" class="pilcrow">¶</a></p>
+<p id="section-7-2">The proposed construction in <a href="#sec-kem-combiner" class="xref">Section 4</a> with the instantiations in
+<a href="#sec-instantiation" class="xref">Section 5</a> preserves IND-CCA2 of any of its ingredient KEMs, i.e.
 the newly formed combined KEM is IND-CCA2 secure as long as at least one of the
 ingredient KEMs is. Indeed, the above stated indifferentiability from a random
 oracle qualifies Keccak as a split-key pseudorandom function as defined in
@@ -1703,17 +1740,17 @@ shared secret <code>ss_i</code> is picked uniformly at random. Our construction 
 be seen as an instantiation of the IND-CCA2 preserving Example 3 in Figure 1 of
 <span>[<a href="#GHP18" class="xref">GHP18</a>]</span>, up to some reordering of input shared secrets <code>ss_i</code> and ciphertexts
 <code>ct_i</code> and their potential compression <code>H(ss_i || ct_i)</code> by a cryptographic
-hash function.<a href="#section-6-2" class="pilcrow">¶</a></p>
+hash function.<a href="#section-7-2" class="pilcrow">¶</a></p>
 </section>
 </div>
-<section id="section-7">
+<section id="section-8">
       <h2 id="name-references-2">
-<a href="#section-7" class="section-number selfRef">7. </a><a href="#name-references-2" class="section-name selfRef">References</a>
+<a href="#section-8" class="section-number selfRef">8. </a><a href="#name-references-2" class="section-name selfRef">References</a>
       </h2>
 <div id="sec-normative-references">
-<section id="section-7.1">
+<section id="section-8.1">
         <h3 id="name-normative-references-2">
-<a href="#section-7.1" class="section-number selfRef">7.1. </a><a href="#name-normative-references-2" class="section-name selfRef">Normative References</a>
+<a href="#section-8.1" class="section-number selfRef">8.1. </a><a href="#name-normative-references-2" class="section-name selfRef">Normative References</a>
         </h3>
 <dl class="references">
 <dt id="RFC2119">[RFC2119]</dt>
@@ -1724,9 +1761,9 @@ hash function.<a href="#section-6-2" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="sec-informative-references">
-<section id="section-7.2">
+<section id="section-8.2">
         <h3 id="name-informative-references-2">
-<a href="#section-7.2" class="section-number selfRef">7.2. </a><a href="#name-informative-references-2" class="section-name selfRef">Informative References</a>
+<a href="#section-8.2" class="section-number selfRef">8.2. </a><a href="#name-informative-references-2" class="section-name selfRef">Informative References</a>
         </h3>
 <dl class="references">
 <dt id="ADKPRY22">[ADKPRY22]</dt>
@@ -1801,7 +1838,7 @@ hash function.<a href="#section-6-2" class="pilcrow">¶</a></p>
         <dd>
 <span class="refAuthor">Barker, E.</span>, <span class="refAuthor">Chen, L.</span>, <span class="refAuthor">Roginsky, A.</span>, <span class="refAuthor">Vassilev, A.</span>, and <span class="refAuthor">R. Davis</span>, <span class="refTitle">"Recommendation for Pair-Wise Key-Establishment Schemes Using Discrete Logarithm Cryptography"</span>, <span class="seriesInfo">NIST Special Publication 800-56A </span>, <time datetime="2018-04" class="refDate">April 2018</time>, <span>&lt;<a href="https://doi.org/10.6028/NIST.SP.800-56Ar3">https://doi.org/10.6028/NIST.SP.800-56Ar3</a>&gt;</span>. </dd>
 <dd class="break"></dd>
-<dt id="SP800-56C">[SP800-56C]</dt>
+<dt id="SP800-56Cr2">[SP800-56Cr2]</dt>
       <dd>
 <span class="refAuthor">Barker, E.</span>, <span class="refAuthor">Chen, L.</span>, and <span class="refAuthor">R. Davis</span>, <span class="refTitle">"Recommendation for Key-Derivation Methods in Key-Establishment Schemes"</span>, <span class="seriesInfo">NIST Special Publication 800-56C </span>, <time datetime="2020-08" class="refDate">August 2020</time>, <span>&lt;<a href="https://doi.org/10.6028/NIST.SP.800-56Cr2">https://doi.org/10.6028/NIST.SP.800-56Cr2</a>&gt;</span>. </dd>
 <dd class="break"></dd>
@@ -1815,7 +1852,7 @@ hash function.<a href="#section-6-2" class="pilcrow">¶</a></p>
 <a href="#name-acknowledgements-2" class="section-name selfRef">Acknowledgements</a>
       </h2>
 <p id="appendix-A-1">This document incorporates contributions and comments from a large group of experts. The authors would especially like to acknowledge the expertise and tireless dedication of the following people, who attended many long meetings and generated millions of bytes of electronic mail and VOIP traffic over the past years in pursuit of this document:<a href="#appendix-A-1" class="pilcrow">¶</a></p>
-<p id="appendix-A-2">Douglas Stebila, Nimrod Aviram, and Andreas Huelsing.<a href="#appendix-A-2" class="pilcrow">¶</a></p>
+<p id="appendix-A-2">Serge Mister, Douglas Stebila, Nimrod Aviram, and Andreas Huelsing.<a href="#appendix-A-2" class="pilcrow">¶</a></p>
 <p id="appendix-A-3">We are grateful to all, including any contributors who may have
 been inadvertently omitted from this list.<a href="#appendix-A-3" class="pilcrow">¶</a></p>
 <p id="appendix-A-4">This document borrows text from similar documents, including those referenced below. Thanks go to the authors of those
